@@ -11,9 +11,7 @@ object Main extends SimpleSwingApplication:
     title = "App Multischermata ScalaSwing"
     preferredSize = new Dimension(600, 300)
 
-
     val centerContainer = new BoxPanel(Orientation.Vertical)
-
 
     def schermata1(): Panel = new FlowPanel:
       private var counter = 0
@@ -30,7 +28,6 @@ object Main extends SimpleSwingApplication:
       contents += new Label("--- Schermata 2 ---")
       contents += new Label("Contenuto personalizzato per la pagina 2")
 
-
     def cambiaVista(nuovaVista: Panel): Unit =
       centerContainer.contents.clear()
       centerContainer.contents += nuovaVista
@@ -38,7 +35,6 @@ object Main extends SimpleSwingApplication:
       centerContainer.repaint()
 
     cambiaVista(schermata1())
-
 
     contents = new BorderPanel:
       layout(new FlowPanel {
