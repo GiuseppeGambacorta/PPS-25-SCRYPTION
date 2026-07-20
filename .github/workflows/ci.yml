@@ -19,7 +19,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'sbt'
+
+      - name: sbt Configuration
+        uses: sbt/setup-sbt@v1
 
       - name: Checking Tests, format and Linter
         run: sbt checkAll
