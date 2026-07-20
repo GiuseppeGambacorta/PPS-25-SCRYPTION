@@ -25,3 +25,7 @@ jobs:
 
       - name: Checking Tests, format and Linter
         run: sbt checkAll
+
+      - name: Generate ScalaDoc (Main only)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: sbt doc

@@ -7,6 +7,9 @@ ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
 ThisBuild / scalacOptions += "-Wunused:all"
 
+
+Compile / doc / target := baseDirectory.value / "docs" / "api"
+
 lazy val root = (project in file("."))
   .settings(
     name := "scryption",

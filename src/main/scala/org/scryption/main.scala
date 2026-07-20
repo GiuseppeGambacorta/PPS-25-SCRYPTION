@@ -3,8 +3,19 @@ package org.scryption
 import java.awt.Dimension
 import scala.swing.*
 
+/** Rappresenta la logica principale dell'applicazione multischermata.
+  *
+  * Utilizza **ScalaSwing** per la gestione del layout senza tab visibili.
+  */
 object Main extends SimpleSwingApplication:
 
+  /** Incrementa di una unità il contatore fornito.
+    *
+    * @param counter
+    *   il valore intero di partenza
+    * @return
+    *   il valore incrementato di 1
+    */
   def incrementCounter(counter: Int): Int = counter + 1
 
   override def top: MainFrame = new MainFrame:
