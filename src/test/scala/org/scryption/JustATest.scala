@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class MultiSchermataSwingTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks:
+class JustATest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks:
 
   "L'ambiente di test" should "verificare le operazioni base" in:
     (1 + 1) shouldBe 2
