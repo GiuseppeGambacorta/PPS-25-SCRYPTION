@@ -9,11 +9,15 @@ title: Architettura del Sistema - Folder 1
   Creare un sistema in grado di poter effettuare una partita a scacchi, completa di tutte le regole di cui è provvisto il gioco originale.
 ## Utente
 - utente deve poter scegliere l'evento - strada da intraprendere
-  - per ogni evento deve esserci una gui dedicata
 
-- durante partita:
-  - utente puo vedere la sua mano
-  - 
+* **Viste Dedicate:** Ogni evento (combattimento, fuoco da campo, altare, ecc.) deve possedere una GUI dedicata.
+* **Interfaccia del combattimento:** Durante il combattimento, l'utente deve poter visualizzare in modo chiaro e intuitivo:
+  * La propria mano di carte (senza limiti di capienza).
+  * La griglia di gioco con le carte in campo.
+  * Il saldo corrente della risorsa Ossa.
+  * La bilancia dei punti che mostra il punteggio attuale.
+  * I mazzi da cui è possibile pescare.
+  * Gli attributi attuali delle carte, sia statiche che dinamiche 
 
 ## Funzionali
 - Ad ogni avvio di una nuova partira il giocatore inizia con la stessa configurazione del mazzo.
