@@ -10,7 +10,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 class JustATest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks:
 
   "L'ambiente di test" should "verificare le operazioni base" in:
-    (1 + 1) shouldBe 2
+    (1 + 2) shouldBe 3
 
   "Il contatore" should "incrementare il valore di uno" in:
     Main.incrementCounter(0) shouldBe 1
