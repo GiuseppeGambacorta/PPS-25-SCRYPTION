@@ -3,7 +3,18 @@ layout: default
 title: Architettura del Sistema - Folder 1
 ---
 
-# Folder 1
+# Specifica dei requisiti
 
-Pagina di prova per `fodler1`.
+## Business
+
+## Utente
+
+## Funzionali
+
+## Non Funzionali
+
+## Di implementazione
+
+## Opzionali
+
 
