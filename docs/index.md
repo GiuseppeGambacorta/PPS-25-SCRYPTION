@@ -5,7 +5,7 @@ title: Architettura del Sistema
 
 # Architettura del Sistema
 
-- [Folder 1](fodler1/)
-- [Folder 2](fodler2/)
-- [Folder 3](fodler3/)
+- [Introduzione](Introduzione/)
+- [Processo di Sviluppo](Processo_di_Sviluppo/)
+- [Specifica dei Requisiti](Specifica_dei_Requisiti/)
 - [API Reference (ScalaDoc)](./api/)
