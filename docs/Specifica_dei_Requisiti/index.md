@@ -52,7 +52,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
     * **Prova:** Sottopone il mazzo a un test su attributi casuali (es. costo totale, numero di sigilli, salute totale). Il superamento della prova garantisce una carta speciale potenziata con sigilli aggiuntivi.
     * **Micologi:** Fondono due carte identiche del mazzo in un'unica carta, sommandone Potenza e Salute e combinandone i rispettivi sigilli.
 
-### 2. Struttura delle Carte e delle Risorse
+### 2. Struttura delle Carte
 * **Anatomia della Carta:** Ogni carta possiede i seguenti attributi (ciascuno con valore minimo pari a 0):
     * **Attacco** (Potenza)
     * **Salute** (Vita)
