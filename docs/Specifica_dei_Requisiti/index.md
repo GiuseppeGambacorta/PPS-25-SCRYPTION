@@ -61,7 +61,6 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 * **Classificazione e Rarità:**
     * Le carte presentano diversi livelli di rarità.
     * Esistono carte oggetto speciali di supporto (es. Albero).
-* **Meccanica delle Ossa:** Quando una qualsiasi creatura sulla griglia muore (raggiunge 0 di Salute), il saldo Ossa del giocatore aumenta di +1 (salvo bonus da sigilli).
 
 ### 3. Sistema di Combattimento e Griglia
 * **Inizializzazione e Turni:**
@@ -77,6 +76,8 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
     * Un'unità attacca la casella di fronte: se è presente una creatura nemica, il danno viene inflitto alla sua Salute; se la casella è vuota, il danno viene inflitto direttamente all'avversario e calcolato sulla bilancia.
     * Le creature muoiono immediatamente quando la loro Salute scende a 0.
 * **Condizione di Fine Combattimento:** La battaglia termina instantaneamente quando uno dei due contendenti porta lo scarto della bilancia a 6 punti a proprio favore (vittoria a +6, sconfitta a -6). In questo caso il giocatore dovrà iniziare da capo il gioco.
+* **Meccanica delle Ossa:** Quando una qualsiasi creatura sulla griglia muore (raggiunge 0 di Salute), il saldo Ossa del giocatore aumenta di +1 (salvo bonus da sigilli).
+
 
 ### 4. Sigilli e Abilità Speciali (Poteri)
 Il sistema gestisce l'applicazione e l'esecuzione dei seguenti sigilli:
