@@ -89,7 +89,7 @@ Il sistema gestisce l'applicazione e l'esecuzione dei seguenti sigilli:
 * **Toccata della Morte (Touch of Death):** Qualsiasi creatura subisca un danno (anche pari a 1) da questa carta viene distrutta all'istante, a prescindere dai suoi punti Salute residui.
 * **Guardiano (Guardian):** Quando il nemico gioca una carta su una casella vuota, questa creatura si sposta automaticamente su quel nodo per bloccarla.
 * **Spinta (Sprinter):** Al termine del turno del giocatore, la creatura si sposta di una casella nella direzione indicata dal proprio indicatore.
-* **Immortale (Unkillable):** Alla morte della carta, questa non finisce nel cimitero ma ritorna immediatamente nella mano del giocatore.
+* **Immortale (Immmortale):** Alla morte della carta, questa non finisce nel cimitero ma ritorna immediatamente nella mano del giocatore.
 * **Ossa a Volontà (Bone King):** Alla morte della carta, assegna al giocatore 4 Ossa anziché 1.
 * **Sacrificio Infinito:** Quando la carta viene usata come sacrificio, rimane sul terreno di gioco invece che andare al cimitero.
 
