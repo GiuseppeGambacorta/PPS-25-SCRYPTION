@@ -39,6 +39,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 
 ### 1. Gestione della Partita e del Flusso di Gioco
 * **Condizioni Iniziali:** Ad ogni avvio di una nuova partita, il giocatore inizia sempre con la medesima configurazione di mazzo predefinita.
+* **Gestione Mazzo:** Man mano che il gioco prosegue, le carte verranno rimosse/aggiunte/modificate in base agli eventi, i modificatori che avvengono durante le partire non hanno nessun effetto sul mazzo del giocatore nei combattimenti successivi
 * **Al termine della partita:** Al termine della partita, il giocatore si ritroverà nella schermata iniziale del gioco, dovendo ripartire da zero.
 * **Sequenza degli Eventi:**
     * Il primo evento di ogni nuova partita è sempre un combattimento.
