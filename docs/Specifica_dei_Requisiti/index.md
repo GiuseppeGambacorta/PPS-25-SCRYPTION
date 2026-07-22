@@ -83,7 +83,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 ### 4. Sigilli e Abilità Speciali (Poteri)
 Il sistema gestisce l'applicazione e l'esecuzione dei seguenti sigilli:
 * **Volante (Airborne):** Ignora la carta nemica presidiante la casella di fronte e infligge danno diretto all'avversario/bilancia.
-* **Muro / Parata speciale (Mighty Leap):** Intercetta e blocca gli attacchi diretti inflitti da creature dotate del sigillo *Volante*.
+* **Muro / Parata speciale (Wall):** Intercetta e blocca gli attacchi diretti inflitti da creature dotate del sigillo *Volante*.
 * **Biforcazione (Bifurcated Strike):** La creatura esegue 2 attacchi indirizzati alle due caselle adiacenti anziché a quella frontale.
 * **Triforcazione (Trifurcated Strike):** La creatura esegue 3 attacchi totali: uno sulla casella frontale e due sulle caselle adiacenti.
 * **Toccata della Morte (Touch of Death):** Qualsiasi creatura subisca un danno (anche pari a 1) da questa carta viene distrutta all'istante, a prescindere dai suoi punti Salute residui.
