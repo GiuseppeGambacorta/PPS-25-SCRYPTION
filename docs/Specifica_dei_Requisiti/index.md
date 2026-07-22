@@ -29,6 +29,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 
 ### 1. Gestione della Partita e del Flusso di Gioco
 * **Condizioni Iniziali:** Ad ogni avvio di una nuova partita, il giocatore inizia sempre con la medesima configurazione di mazzo predefinita.
+* **Al termine della partita:** Al termine della partita, il giocatore si ritroverà nella schermata iniziale del gioco, dovendo ripartire da zero.
 * **Sequenza degli Eventi:**
     * Il primo evento di ogni nuova partita è sempre un combattimento.
     * Al termine di ogni battaglia viene sempre proposto un evento successivo o una scelta tra due percorsi/eventi distinti.
@@ -65,7 +66,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 * **Risoluzione degli Attacchi:**
     * Un'unità attacca la casella di fronte: se è presente una creatura nemica, il danno viene inflitto alla sua Salute; se la casella è vuota, il danno viene inflitto direttamente all'avversario e calcolato sulla bilancia.
     * Le creature muoiono immediatamente quando la loro Salute scende a 0.
-* **Condizione di Fine Combattimento:** La battaglia termina instantaneamente quando uno dei due contendenti porta lo scarto della bilancia a 6 punti a proprio favore (vittoria a +6, sconfitta a -6).
+* **Condizione di Fine Combattimento:** La battaglia termina instantaneamente quando uno dei due contendenti porta lo scarto della bilancia a 6 punti a proprio favore (vittoria a +6, sconfitta a -6). In questo caso il giocatore dovrà iniziare da capo il gioco.
 
 ### 4. Sigilli e Abilità Speciali (Poteri)
 Il sistema gestisce l'applicazione e l'esecuzione dei seguenti sigilli:
