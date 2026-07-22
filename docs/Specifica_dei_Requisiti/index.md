@@ -7,7 +7,9 @@ title: Requisiti
 Durante l'analisi del problema sono stati individuati i seguenti requisiti del sistema da realizzare.
 ## Business
 Creare un sistema in grado di poter effettuare una partita a carte stile Inscryption, completa di tutte le regole, meccaniche di sacrificio, gestione delle risorse e dinamiche della bilancia provviste nel gioco originale.
-## Utente
+
+
+## Requisiti Funzionali Utente
 
 * **Avvio Nuova Partita:** L'utente deve poter avviare una nuova partita in qualsiasi momento, resettando lo stato del mazzo, le riserve e il progresso di gioco.
 * **Scelta del Percorso:** L'utente deve poter selezionare autonomamente il nodo/evento successivo da affrontare lungo il percorso, senza una rappresentazione grafica della mappa.
@@ -25,7 +27,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
         * **Attributi Statici:** Nome, illustrazione, costo di evocazione (Sangue/Ossa) e sigilli originari.
         * **Attributi Dinamici:** Valori correnti di Attacco e Salute, inclusi danni subiti, modificatori e buff/debuff temporanei.
 
-## Funzionali
+## Requisiti Funzionali di Sistema
 
 ### 1. Gestione della Partita e del Flusso di Gioco
 * **Condizioni Iniziali:** Ad ogni avvio di una nuova partita, il giocatore inizia sempre con la medesima configurazione di mazzo predefinita.
