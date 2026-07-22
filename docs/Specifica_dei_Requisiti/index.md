@@ -14,6 +14,14 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 * **Avvio Nuova Partita:** L'utente deve poter avviare una nuova partita in qualsiasi momento, resettando lo stato del mazzo, le riserve e il progresso di gioco.
 * **Scelta del Percorso:** L'utente deve poter selezionare autonomamente il nodo/evento successivo da affrontare lungo il percorso, senza una rappresentazione grafica della mappa.
 * **Viste Dedicate per Evento:** Ogni tipologia di evento deve essere fornita di una GUI dedicata.
+    * **Schermata Iniziale / Menu Principale:** Per avviare una nuova partita o accedere alle impostazioni.
+    * **Vista Selezione Percorso:** Per la scelta del nodo/evento successivo.
+    * **Vista Combattimento:** Interfaccia principale dello scontro (Standard e Boss).
+    * **Vista Scelta Nuova Carta:** Per selezionare 1 carta tra 3 opzioni casuali.
+    * **Vista Fuoco da Campo:** Per il potenziamento di Potenza o Salute.
+    * **Vista Altare dei Sacrifici:** Per il trasferimento permanente dei sigilli.
+    * **Vista Prova (Trial):** Per il test degli attributi del mazzo.
+    * **Vista Micologi:** Per la fusione di carte identiche.
 
 
 * **Durante un combattimento**, l'interfaccia deve mostrare in modo chiaro, distinto e aggiornato in tempo reale i seguenti elementi:
