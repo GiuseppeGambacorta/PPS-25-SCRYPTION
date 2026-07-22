@@ -70,7 +70,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
         * **Mazzo Carte (Creature):** Contiene le carte del mazzo corrente del giocatore.
         * **Mazzo Sacrifici (Scoiattoli):** Contiene carte risorsa infinite da usare per i sacrifici di Sangue.
 * **Layout del Campo di Gioco:**
-    * La griglia si compone di **tre righe per quattro colonne:
+    * La griglia si compone di tre righe per quattro colonne:
         * Il giocatore può posizionare le proprie carte esclusivamente nella riga più vicina a sé (riga frontale).
         * L'avversario posiziona le sue carte sulla propria riga e queste avanzano progressivamente verso la riga centrale di scontro.
 * **Risoluzione degli Attacchi:**
