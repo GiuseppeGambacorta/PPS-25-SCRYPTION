@@ -42,7 +42,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 * **Al termine della partita:** Al termine della partita, il giocatore si ritroverà nella schermata iniziale del gioco, dovendo ripartire da zero.
 * **Sequenza degli Eventi:**
     * Il primo evento di ogni nuova partita è sempre un combattimento.
-    * Al termine di ogni battaglia viene sempre proposto un evento successivo o una scelta tra due percorsi/eventi distinti.
+    * Al termine di ogni battaglia viene sempre proposto un evento successivo o una scelta tra due percorsi/eventi distinti, non deve essere proposta un'altra battaglia.
 * **Tipologia eventi sulla mappa:**
     * **Scelta nuova carta :** Presenta una scelta tra tre carte casuali, il giocatore ne deve scegliere una che verrà poi aggiunto al proprio mazzo.
     * **Fuoco da Campo:** Permette di aumentare la Potenza (+1) o la Salute (+2) di una creatura scelta.
