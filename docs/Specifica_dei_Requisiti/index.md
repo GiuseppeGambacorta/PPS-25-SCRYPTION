@@ -91,7 +91,7 @@ Il sistema gestisce l'applicazione e l'esecuzione dei seguenti sigilli:
 * **Spinta (Sprinter):** Al termine del turno del giocatore, la creatura si sposta di una casella nella direzione indicata dal proprio indicatore.
 * **Immortale (Immortal):** Alla morte della carta, questa non finisce nel cimitero ma ritorna immediatamente nella mano del giocatore.
 * **Ossa a Volontà (Bone King):** Alla morte della carta, assegna al giocatore 4 Ossa anziché 1.
-* **Sacrificio Infinito:** Quando la carta viene usata come sacrificio, rimane sul terreno di gioco invece che andare al cimitero.
+* **Sacrificio Infinito(Infinite Sacrifice):** Quando la carta viene usata come sacrificio, rimane sul terreno di gioco invece che andare al cimitero.
 
 
 
