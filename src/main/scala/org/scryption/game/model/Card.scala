@@ -27,15 +27,17 @@ case class Card(name: String, attack: Int, life: Int, sacrificeAttribute: Sacrif
 object Card:
 
 
-  val card =  Card("Unnamed", 0, 0, SacrificeAttribute.Nil(), Set())
+  def card: Card =  Card("", 0, 0, SacrificeAttribute.Nil(), Set())
 
   extension (card: Card)
 
     infix def Named(name: String): Card =
       card.copy(name = name)
 
-    infix def WithAttack(attack: Int): Card =
+    infix def WithAttack(attack: Int): Card = {
+      assert(attack >= 0)
       card.copy(attack = attack)
+    }
 
     infix def WithLife(life: Int): Card =
       card.copy(life = life)
