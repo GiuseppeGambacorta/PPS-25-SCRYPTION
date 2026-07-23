@@ -37,6 +37,9 @@ object Deck :
  opaque type Deck = List[Card]
 
  def getStandardDeck: Deck = (List(CardLibrary.squirrel, CardLibrary.squirrel))
+
+ def getDeckFromList(l : List[Card]): Deck = l
+
   extension (deck : Deck)
 
     infix def removeCard(c: Card): Deck =
