@@ -1,5 +1,7 @@
 package org.scryption.game.model
 
+import scala.annotation.tailrec
+
 //case class deck2 (cards: List[Card])
 
 /*
@@ -37,7 +39,14 @@ object Deck :
  def getStandardDeck: Deck = (List(CardLibrary.squirrel, CardLibrary.squirrel))
   extension (deck : Deck)
 
-    infix def removeCard(c :Card): Deck = deck.filter(_ != c)
+    infix def removeCard(c: Card): Deck =
+      @tailrec
+      def loop(cards : List[Card], c:Card , acc : List[Card]): Deck = cards match
+        case Nil => acc
+        case x :: xs if x == c => xs ::: acc
+        case x :: xs => loop(xs ,c, x :: acc)
+
+      loop(deck, c, Nil)
 
     infix def addCard(c :Card): Deck = c :: deck
 
