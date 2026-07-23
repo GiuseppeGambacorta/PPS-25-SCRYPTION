@@ -23,7 +23,6 @@ class JustATest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks:
       }
     }
 
-
 class FeatureSpec extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks {
 
   val sumNumbers = (a: Int, b: Int) => a + b
@@ -93,5 +92,3 @@ class FeatureSpec extends AnyFeatureSpec with GivenWhenThen with Matchers with S
     }
   }
 }
-
-
