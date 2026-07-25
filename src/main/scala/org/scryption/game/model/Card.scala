@@ -53,11 +53,17 @@ sealed trait Card:
   def named(name: String): Card
   def withHealth(health: Int): Card
   def addSeal(seal: Seal): Card
+  def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): Card
 
 enum SacrificeAttribute:
   case Blood(value: Int)
   case Bones(value: Int)
   case Nil()
+
+  def isValid: Boolean = this match
+    case Blood(v) => v >= 0
+    case Bones(v) => v >= 0
+    case Nil() => true
 
 enum Seal:
   case Airborne
@@ -89,6 +95,9 @@ case class CreatureCard(name: String, attack: Int, health: Int, sacrificeAttribu
 
   override infix def addSeal(seal: Seal): CreatureCard = this.copy(seals = seals + seal)
 
+  override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): CreatureCard =
+    if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this
+
 
 case class SupportCard(name: String, health: Int, sacrificeAttribute: SacrificeAttribute, seals:Set[Seal], rarity: Rarity) extends Card:
   override infix def named(name: String): SupportCard = this.copy(name = name)
@@ -97,3 +106,6 @@ case class SupportCard(name: String, health: Int, sacrificeAttribute: SacrificeA
     if health >= 0 then this.copy(health = health) else this
 
   override infix def addSeal(seal: Seal): SupportCard = this.copy(seals = seals + seal)
+
+  override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): Card =
+    if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this
