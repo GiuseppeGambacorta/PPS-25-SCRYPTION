@@ -56,7 +56,7 @@ object Deck :
 
 
 
-
+/*
 @main def main2 : Unit =
   import Card.*
 
@@ -70,6 +70,7 @@ object Deck :
 
   val newdeck3 = standardDeck removeCard megasquirrel
   println(newdeck3)
+ */
 
 
 
