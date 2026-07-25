@@ -99,6 +99,9 @@ case class CreatureCard(name: String, attack: Int, health: Int, sacrificeAttribu
     if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this
 
 
+object SupportCard:
+  def empty: SupportCard = SupportCard("", 0, SacrificeAttribute.Nil(), Set.empty, Common)
+
 case class SupportCard(name: String, health: Int, sacrificeAttribute: SacrificeAttribute, seals:Set[Seal], rarity: Rarity) extends Card:
   override infix def named(name: String): SupportCard = this.copy(name = name)
 
@@ -107,5 +110,5 @@ case class SupportCard(name: String, health: Int, sacrificeAttribute: SacrificeA
 
   override infix def addSeal(seal: Seal): SupportCard = this.copy(seals = seals + seal)
 
-  override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): Card =
+  override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): SupportCard =
     if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this

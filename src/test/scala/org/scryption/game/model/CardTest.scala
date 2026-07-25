@@ -53,14 +53,14 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       And("the original card should remain unchanged")
       wolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil()
     }
-    
+
     Scenario("Setting a Bones sacrifice attribute should return a new instance") {
       Given("A basic CreatureCard with no cost")
       val skeleton = CreatureCard.empty named "Skeleton"
-      
+
       When("updated its sacrifice attribute to 4 bones")
       val boneSkeleton = skeleton withSacrificeAttribute SacrificeAttribute.Bones(4)
-      
+
       Then("the new card should cost 4 Bones")
       boneSkeleton.sacrificeAttribute shouldBe SacrificeAttribute.Bones(4)
     }
@@ -93,5 +93,17 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
     }
   }
 
+  Feature("Support Cards logic") {
+
+    Scenario("Creating and modifying a SupportCard") {
+      Given("A SupportCard")
+      val boulder = SupportCard.empty named "Boulder" withHealth 5 withSacrificeAttribute SacrificeAttribute.Nil() addSeal Seal.Wall
+
+      Then("it should correctly update all valid attributes")
+      boulder.name shouldBe "Boulder"
+      boulder.health shouldBe 5
+      boulder.seals.head shouldBe Seal.Wall
+    }
+  }
 
 }
