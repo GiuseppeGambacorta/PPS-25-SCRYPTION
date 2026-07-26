@@ -80,3 +80,7 @@ object Deck:
     def isEmpty: Boolean = deck.isEmpty
 
     infix def addCard(card: Card): Deck = card :: deck
+
+    def draw: Option[(Card, Deck)] = deck match
+      case Nil => None
+      case head :: tail => Some((head, tail))

@@ -41,6 +41,36 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       emptyDeck.isEmpty shouldBe true
     }
 
+    Scenario("Drawing from an empty deck should safely return None") {
+      Given("An empty deck")
+      val emptyDeck = Deck.empty
+
+      When("trying to draw a card")
+      val result = emptyDeck.draw
+
+      Then("it should return None")
+      result shouldBe None
+    }
+
+    Scenario("Drawing a card from a non-empty deck") {
+      Given("A deck with two cards")
+      val squirrel = CreatureCard.empty named "Squirrel"
+      val wolf = CreatureCard.empty named "Wolf"
+      val deck = Deck.empty addCard squirrel addCard wolf
+
+      When("a card is drawn")
+      val (drawnCard, newDeck) = deck.draw.get
+
+      Then("the drawn card should be the last one we added")
+      drawnCard.name shouldBe "Wolf"
+
+      And("the new deck should contain the first added card")
+      newDeck.size shouldBe 1
+      val (secondDrawnCard, emptyDeck) = newDeck.draw.get
+      secondDrawnCard.name shouldBe "Squirrel"
+      emptyDeck.size shouldBe 0
+    }
+
   }
   /*
   Feature("Changing the deck") {
