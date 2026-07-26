@@ -78,3 +78,5 @@ object Deck:
     def size: Int = deck.size
 
     def isEmpty: Boolean = deck.isEmpty
+
+    infix def addCard(card: Card): Deck = card :: deck

@@ -13,7 +13,6 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
     Scenario("Creating an empty deck") {
       Given("An empty deck factory")
-      // Ipotizziamo che ci sia un companion object con un metodo 'empty'
       val deck = Deck.empty
 
       Then("its size should be 0")
@@ -21,6 +20,25 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
       And("it should be considered empty")
       deck.isEmpty shouldBe true
+    }
+
+    Scenario("Adding a card to an empty deck") {
+      Given("An empty deck and a mock card")
+      val emptyDeck = Deck.empty
+      val squirrel = CreatureCard.empty named "Squirrel"
+
+      When("the card is added to the deck")
+      val deckWithOneCard = emptyDeck addCard squirrel
+
+      Then("the new deck should have size 1")
+      deckWithOneCard.size shouldBe 1
+
+      And("it should not be empty anymore")
+      deckWithOneCard.isEmpty shouldBe false
+
+      And("the original deck should remain empty")
+      emptyDeck.size shouldBe 0
+      emptyDeck.isEmpty shouldBe true
     }
 
   }
