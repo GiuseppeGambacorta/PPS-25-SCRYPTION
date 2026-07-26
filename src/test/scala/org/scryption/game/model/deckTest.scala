@@ -7,15 +7,14 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scryption.game.model.Deck.*
 
-
 class deckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks {
-
 
   Feature("Changing the deck") {
 
     Scenario("Removing a card from the Deck") {
       Given("a Deck")
-      val deck = Deck.getDeckFromList(List(CardLibrary.squirrel, CardLibrary.bear, CardLibrary.squirrel, CardLibrary.bear))
+      val deck =
+        Deck.getDeckFromList(List(CardLibrary.squirrel, CardLibrary.bear, CardLibrary.squirrel, CardLibrary.bear))
 
       When("remove a card")
       val card = CardLibrary.squirrel
@@ -26,8 +25,6 @@ class deckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
     }
 
-
   }
 
 }
-

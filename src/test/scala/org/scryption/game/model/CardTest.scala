@@ -6,8 +6,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-
-
 class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks {
 
   Feature("Card immutability and basic operations") {
@@ -113,7 +111,8 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
     Scenario("Creating and modifying a SupportCard") {
       Given("A SupportCard")
-      val boulder = SupportCard.empty named "Boulder" withHealth 5 withSacrificeAttribute SacrificeAttribute.Nil() addSeal Seal.Wall
+      val boulder =
+        SupportCard.empty named "Boulder" withHealth 5 withSacrificeAttribute SacrificeAttribute.Nil() addSeal Seal.Wall
 
       Then("it should correctly update all valid attributes")
       boulder.name shouldBe "Boulder"

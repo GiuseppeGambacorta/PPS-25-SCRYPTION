@@ -6,7 +6,7 @@ sealed trait Card:
   def name: String
   def health: Int
   def sacrificeAttribute: SacrificeAttribute
-  def seals:Set[Seal]
+  def seals: Set[Seal]
   def rarity: Rarity
   def named(name: String): Card
   def withHealth(health: Int): Card
@@ -21,7 +21,7 @@ enum SacrificeAttribute:
   def isValid: Boolean = this match
     case Blood(v) => v >= 0
     case Bones(v) => v >= 0
-    case Nil() => true
+    case Nil()    => true
 
 enum Seal:
   case Airborne
@@ -42,7 +42,14 @@ enum Rarity:
 object CreatureCard:
   def empty: CreatureCard = CreatureCard("", 0, 0, SacrificeAttribute.Nil(), Set.empty, Common)
 
-case class CreatureCard(name: String, attack: Int, health: Int, sacrificeAttribute: SacrificeAttribute, seals:Set[Seal], rarity: Rarity) extends Card:
+case class CreatureCard(
+    name: String,
+    attack: Int,
+    health: Int,
+    sacrificeAttribute: SacrificeAttribute,
+    seals: Set[Seal],
+    rarity: Rarity
+) extends Card:
   override infix def named(name: String): CreatureCard = this.copy(name = name)
 
   override infix def withHealth(health: Int): CreatureCard =
@@ -56,11 +63,16 @@ case class CreatureCard(name: String, attack: Int, health: Int, sacrificeAttribu
   override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): CreatureCard =
     if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this
 
-
 object SupportCard:
   def empty: SupportCard = SupportCard("", 0, SacrificeAttribute.Nil(), Set.empty, Common)
 
-case class SupportCard(name: String, health: Int, sacrificeAttribute: SacrificeAttribute, seals:Set[Seal], rarity: Rarity) extends Card:
+case class SupportCard(
+    name: String,
+    health: Int,
+    sacrificeAttribute: SacrificeAttribute,
+    seals: Set[Seal],
+    rarity: Rarity
+) extends Card:
   override infix def named(name: String): SupportCard = this.copy(name = name)
 
   override infix def withHealth(health: Int): SupportCard =
