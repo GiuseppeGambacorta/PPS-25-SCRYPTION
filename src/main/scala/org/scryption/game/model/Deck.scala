@@ -1,6 +1,7 @@
 package org.scryption.game.model
 
 import scala.annotation.tailrec
+import scala.util.Random
 
 //case class deck2 (cards: List[Card])
 
@@ -84,3 +85,7 @@ object Deck:
     def draw: Option[(Card, Deck)] = deck match
       case Nil => None
       case head :: tail => Some((head, tail))
+
+    def toList: List[Card] = deck
+
+    def shuffle(seed: Long = Random.nextLong()): Deck = new Random(seed).shuffle(deck)

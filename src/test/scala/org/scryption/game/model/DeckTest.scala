@@ -71,6 +71,28 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       emptyDeck.size shouldBe 0
     }
 
+    Scenario("Shuffling a deck deterministically with a seed") {
+      Given("A deck with multiple distinct cards and a fixed seed")
+      val squirrel = CreatureCard.empty named "Squirrel"
+      val wolf = CreatureCard.empty named "Wolf"
+      val stoat = CreatureCard.empty named "Stoat"
+      val originalDeck = Deck.empty addCard squirrel addCard wolf addCard stoat
+      val fixedSeed = 42
+
+      When("the deck is shuffled twice using the same seed")
+      val shuffledDeck1 = originalDeck.shuffle(fixedSeed)
+      val shuffledDeck2 = originalDeck.shuffle(fixedSeed)
+
+      Then("the size should remain the same")
+      shuffledDeck1.size shouldBe originalDeck.size
+
+      And("both shuffled decks should have the exact same card order")
+      shuffledDeck1.toList shouldBe shuffledDeck2.toList
+
+      And("they should contain the exact same elements as the original")
+      shuffledDeck1.toList should contain theSameElementsAs originalDeck.toList
+    }
+
   }
   /*
   Feature("Changing the deck") {
