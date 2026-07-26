@@ -66,7 +66,7 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
     }
   }
 
-  Feature("A card can't have negative values for its attack and health") {
+  Feature("A card can't have negative values for its attack and health and sacrifice attribute") {
 
     Scenario("Creating a card with attack") {
       Given("a Card")
@@ -90,6 +90,22 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       Then("it should not be updated")
       otherCard shouldBe card
       otherCard.health shouldBe 1
+    }
+
+    Scenario("Setting a negative sacrifice attribute should not modify the card") {
+      Given("A basic CreatureCard")
+      val baseWolf = CreatureCard.empty named "Wolf"
+
+      When("trying to set a negative Blood or Bones cost")
+      val invalidBloodWolf = baseWolf withSacrificeAttribute SacrificeAttribute.Blood(-2)
+      val invalidBonesWolf = baseWolf withSacrificeAttribute SacrificeAttribute.Bones(-1)
+
+      Then("it should return the exact same card unchanged")
+      invalidBloodWolf shouldBe baseWolf
+      invalidBloodWolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil()
+
+      invalidBonesWolf shouldBe baseWolf
+      invalidBonesWolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil()
     }
   }
 
