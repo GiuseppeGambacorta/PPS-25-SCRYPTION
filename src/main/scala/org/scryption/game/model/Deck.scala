@@ -29,7 +29,7 @@ object Deck:
 
 
  */
-
+/*
 object Deck:
 
   opaque type Deck = List[Card]
@@ -51,7 +51,7 @@ object Deck:
 
     infix def addCard(c: Card): Deck = c :: deck
 
-/*
+
 @main def main2 : Unit =
   import Card.*
 
@@ -65,4 +65,16 @@ object Deck:
 
   val newdeck3 = standardDeck removeCard megasquirrel
   println(newdeck3)
- */
+*/
+
+object Deck:
+
+  opaque type Deck = List[Card]
+
+  def empty: Deck = List.empty
+
+  extension (deck: Deck)
+
+    def size: Int = deck.size
+
+    def isEmpty: Boolean = deck.isEmpty
