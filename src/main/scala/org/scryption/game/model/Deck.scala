@@ -1,6 +1,5 @@
 package org.scryption.game.model
 
-import scala.annotation.tailrec
 import scala.util.Random
 
 object Deck:
@@ -22,12 +21,12 @@ object Deck:
     infix def addCard(card: Card): Deck = card :: deck
 
     infix def removeCard(card: Card): Deck = deck match
-      case Nil => Nil
+      case Nil                          => Nil
       case head :: tail if head == card => tail
-      case head :: tail => head :: tail.removeCard(card)
+      case head :: tail                 => head :: tail.removeCard(card)
 
     def draw: Option[(Card, Deck)] = deck match
-      case Nil => None
+      case Nil          => None
       case head :: tail => Some((head, tail))
 
     def toList: List[Card] = deck
