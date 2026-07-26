@@ -93,24 +93,18 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       shuffledDeck1.toList should contain theSameElementsAs originalDeck.toList
     }
 
-  }
-  /*
-  Feature("Changing the deck") {
+    Scenario("Removing a single instance of a card from the Deck") {
+      Given("a Deck with duplicate cards")
+      val squirrel = CreatureCard.empty named "Squirrel"
+      val bear = CreatureCard.empty named "Bear"
+      val deck = Deck.fromList(List(squirrel, bear, squirrel, bear))
 
-    Scenario("Removing a card from the Deck") {
-      Given("a Deck")
-      val deck =
-        Deck.getDeckFromList(List(CardLibrary.squirrel, CardLibrary.bear, CardLibrary.squirrel, CardLibrary.bear))
+      When("a specific card is removed")
+      val newDeck = deck removeCard squirrel
 
-      When("remove a card")
-      val card = CardLibrary.squirrel
-      val newDeck = deck removeCard card
-
-      Then("deck should not have the card removed")
-      newDeck shouldBe Deck.getDeckFromList(List(CardLibrary.bear, CardLibrary.squirrel, CardLibrary.bear))
-
+      Then("the deck should have exactly one instance of that card removed")
+      newDeck.toList shouldBe List(bear, squirrel, bear)
     }
 
   }
-*/
 }
