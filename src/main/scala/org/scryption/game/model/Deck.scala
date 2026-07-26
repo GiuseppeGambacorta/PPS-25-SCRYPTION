@@ -21,13 +21,10 @@ object Deck:
 
     infix def addCard(card: Card): Deck = card :: deck
 
-    infix def removeCard(card: Card): Deck =
-      @tailrec
-      def _removeCard(currentDeck: Deck, card: Card, acc: Deck): Deck = currentDeck match
-        case head :: tail if head.equals(card) => acc.reverse ::: tail
-        case head :: tail => _removeCard(tail, card, head :: acc)
-        case Nil => acc.reverse
-      _removeCard(deck, card, Nil)
+    infix def removeCard(card: Card): Deck = deck match
+      case Nil => Nil
+      case head :: tail if head == card => tail
+      case head :: tail => head :: tail.removeCard(card)
 
     def draw: Option[(Card, Deck)] = deck match
       case Nil => None
