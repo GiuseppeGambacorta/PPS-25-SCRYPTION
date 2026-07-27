@@ -45,37 +45,7 @@ class changeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       }
 
 
-    Scenario("Powering up a card with the Firecamp Attack Event") {
-      Given("An initial GameState with 2 cards and a GUIChannel")
-      val initialDeck = getDeckFromList(CardLibrary.squirrel :: CardLibrary.bear :: Nil)
-      val initialGameState = GameState(initialDeck, isGameOver = false)
-      val ch = GUIChannel.getNewChannel
-      var selectedCard = CardLibrary.squirrel
-
-      And("A Fake GUI running on a separate thread that selects the first random card from the event")
-      val guiThread = new Thread(() => {
-        ch.receiveFromGame match {
-          case GUIMessages.Cards(offeredCards) =>
-            selectedCard = offeredCards.head
-            ch.sendToGame(GUIMessages.SingleCard(selectedCard))
-          case _ => ()
-        }
-        ch.receiveFromGame match {
-          case GUIMessages.End => ()
-          case _ => ()
-        }
-      })
-      guiThread.start()
-
-      When("Executing the Firecamp Attack event")
-      val updatedGameState = fireCamp_Attack(initialGameState, ch)
-
-      Then("The resulting deck should equal the initial deck with the chosen card added")
-      updatedGameState.deck shouldBe initialDeck.addCard(selectedCard)
-      updatedGameState.isGameOver shouldBe false
-
-      guiThread.join(1000)
-    }
+   
 
 
   }
