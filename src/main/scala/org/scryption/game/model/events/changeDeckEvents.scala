@@ -24,7 +24,7 @@ enum GUIMessages:
 
 
 
-def GetANewCard(gameState: GameState, ch: GUIChannel): GameState = {
+def getANewCard(gameState: GameState, ch: GUIChannel): GameState = {
 
   ch.sendToGui(GUIMessages.Cards(List(CardLibrary.squirrel, CardLibrary.bear, CardLibrary.squirrel)))
   val message = ch.receiveFromGui
@@ -34,12 +34,12 @@ def GetANewCard(gameState: GameState, ch: GUIChannel): GameState = {
       ch.sendToGui(GUIMessages.End)
       GameState(gameState.deck.addCard(card), gameState.isGameOver)
     case _ =>
-      GetANewCard(gameState, ch)
+      getANewCard(gameState, ch)
   }
 }
 
 
-def SubstituteACard(gameState: GameState, ch: GUIChannel, f: (Card) => Card): GameState = {
+def substituteACard(gameState: GameState, ch: GUIChannel, f: (Card) => Card): GameState = {
 
   ch.sendToGui(GUIMessages.Cards(List(CardLibrary.squirrel, CardLibrary.bear, CardLibrary.squirrel)))
   val message = ch.receiveFromGui
@@ -50,22 +50,22 @@ def SubstituteACard(gameState: GameState, ch: GUIChannel, f: (Card) => Card): Ga
       gameState.deck.removeCard(card)
       GameState(gameState.deck.addCard(f(card)), gameState.isGameOver)
     case _ =>
-      SubstituteACard(gameState, ch, f)
+      substituteACard(gameState, ch, f)
   }
 }
 
 
-def MushRooms(gameState: GameState, ch: GUIChannel): GameState =
-  SubstituteACard(gameState, ch, Card => Card WithAttack Card.attack * 2 WithLife Card.life * 2)
+def mushRooms(gameState: GameState, ch: GUIChannel): GameState =
+  substituteACard(gameState, ch, Card => Card WithAttack Card.attack * 2 WithLife Card.life * 2)
 
 
-def FireCamp_Attack(gameState: GameState, ch: GUIChannel): GameState =
-  SubstituteACard(gameState, ch, Card => Card WithAttack Card.attack + 1) 
+def fireCamp_Attack(gameState: GameState, ch: GUIChannel): GameState =
+  substituteACard(gameState, ch, Card => Card WithAttack Card.attack + 1)
 
-def FireCamp_Life(gameState: GameState, ch: GUIChannel): GameState =
-  SubstituteACard(gameState, ch, Card => Card WithLife Card.life + 2)    
-    
-    
+def fireCamp_Life(gameState: GameState, ch: GUIChannel): GameState =
+  substituteACard(gameState, ch, Card => Card WithLife Card.life + 2)
+
+
 
 
 
@@ -87,21 +87,4 @@ object GUIChannel:
 
 
 
-// --- GAME LOOP ---
-//def gameLoop(gameState: GameState, events: List[Event], view: Gui): Unit = {
-//  (gameState, events) match {
-//    case (_, Nil) =>
-//      println(s"=== FINE EVENTI ===")
-//      println(s"Mazzo Finale: ${gameState.deck}")
-//
-//   case (GameState(_, endGame), _) if endGame =>
-//      println(s"=== GAME OVER ===")
-//      println(s"Mazzo Finale: ${gameState.deck}")
-//
-//    case (_, currentEvent :: remainingEvents) =>
-//      val ch = GUIChannel.getNewChannel
-//      view.setChannel(ch)
-//      val nextState = currentEvent(gameState, ch)
-//      gameLoop(nextState, remainingEvents, view)
-//  }
-//}
+
