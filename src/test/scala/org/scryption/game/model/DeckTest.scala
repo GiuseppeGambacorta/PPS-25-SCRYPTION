@@ -106,5 +106,44 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       newDeck.toList shouldBe List(bear, squirrel, bear)
     }
 
+    Scenario("Drawing N random cards from the deck") {
+      Given("A deck with 5 distinct cards and a fixed seed")
+      val c1 = CreatureCard.empty named "C1"
+      val c2 = CreatureCard.empty named "C2"
+      val c3 = CreatureCard.empty named "C3"
+      val c4 = CreatureCard.empty named "C4"
+      val c5 = CreatureCard.empty named "C5"
+      val deck = Deck.fromList(List(c1, c2, c3, c4, c5))
+      val fixedSeed = 42
+
+      When("drawing 3 random cards")
+      val (drawnCards, remainingDeck) = deck.drawRandom(3, fixedSeed)
+
+      Then("it should return exactly 3 cards")
+      drawnCards.size shouldBe 3
+
+      And("the remaining deck should have exactly 2 cards left")
+      remainingDeck.size shouldBe 2
+
+      And("the original deck's cards should be the sum of drawn and remaining (no cards lost)")
+      val allCardsAfterDraw = drawnCards ::: remainingDeck.toList
+      allCardsAfterDraw should contain theSameElementsAs deck.toList
+    }
+
+    Scenario("Adding multiple cards to the deck at once") {
+      Given("An initial deck and a list of new cards")
+      val initialDeck = Deck.fromList(List(CreatureCard.empty named "Wolf"))
+      val newCards = List(
+        CreatureCard.empty named "Buffed Squirrel",
+        CreatureCard.empty named "Buffed Stoat"
+      )
+
+      When("the list of cards is added to the deck")
+      val finalDeck = initialDeck addCards newCards
+
+      Then("the deck should grow by the number of added cards")
+      finalDeck.size shouldBe 3
+      finalDeck.toList shouldBe newCards ::: List(CreatureCard.empty named "Wolf")
+    }
   }
 }

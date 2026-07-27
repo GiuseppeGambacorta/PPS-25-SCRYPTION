@@ -32,3 +32,8 @@ object Deck:
     def toList: List[Card] = deck
 
     def shuffle(seed: Long = Random.nextLong()): Deck = new Random(seed).shuffle(deck)
+
+    def drawRandom(n: Int, seed: Long = Random.nextLong()): (List[Card], Deck) =
+      new Random(seed).shuffle(deck).splitAt(n)
+
+    infix def addCards(newCards: List[Card]): Deck = newCards ::: deck
