@@ -1,9 +1,8 @@
 package org.scryption.game.model
 
-import org.scryption.game.model.SacrificeAttribute.{Blood, Bones}
-
 object CardLibrary:
 
+  def getADeckWithAllTheLibrary: Deck.Deck = Deck.fromList(List(squirrel, bear))
   val squirrel: Card = CreatureCard.empty named "Squirrel" withAttack 0 withHealth 1
   val sparrow: Card = CreatureCard.empty named "Sparrow" withAttack 1 withHealth 2 withSacrificeAttribute Blood(1) addSeal Seal.Airborne
   val raven: Card = CreatureCard.empty named "Raven" withAttack 2 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Airborne
@@ -24,3 +23,6 @@ object CardLibrary:
   val grizzly: Card = CreatureCard.empty named "Grizzly" withAttack 4 withHealth 6 withSacrificeAttribute Blood(3)
   val opossum: Card = CreatureCard.empty named "Opossum" withAttack 1 withHealth 1 withSacrificeAttribute Bones(2)
   val bat: Card = CreatureCard.empty named "Bat" withAttack 2 withHealth 1 withSacrificeAttribute Bones(4)
+  val bear: Card = CreatureCard.empty named "Bear" withAttack 2 withHealth 3
+
+  def getADeckWithAllTheLibrary: Deck.Deck = Deck.fromList(List(squirrel, bear))

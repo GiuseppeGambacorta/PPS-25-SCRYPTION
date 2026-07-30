@@ -1,68 +1,39 @@
 package org.scryption.game.model
 
-import scala.annotation.tailrec
-
-//case class deck2 (cards: List[Card])
-
-/*
-trait Deck:
-  type cards
-  def addCard(c : Card): Unit
-
-  def getDeck(): cards
-
-
-object Deck:
-
-
-  private class DeckImpl extends Deck:
-    type cards = List[Card]
-
-    private var cards: cards = List()
-
-    def addCard(c : Card): Unit = cards = c :: cards
-
-    def getDeck(): cards = cards
-
-
-  def StandardDeck(): Deck = DeckImpl()
-
-
- */
+import scala.util.Random
 
 object Deck:
 
   opaque type Deck = List[Card]
 
+  def empty: Deck = List.empty
+
   def getStandardDeck: Deck = List(CardLibrary.squirrel, CardLibrary.squirrel)
 
-  def getDeckFromList(l: List[Card]): Deck = l
+  def fromList(cards: List[Card]): Deck = cards
 
   extension (deck: Deck)
 
-    infix def removeCard(c: Card): Deck =
-      @tailrec
-      def loop(cards: List[Card], c: Card, acc: List[Card]): Deck = cards match
-        case Nil               => acc
-        case x :: xs if x == c => xs ::: acc
-        case x :: xs           => loop(xs, c, x :: acc)
+    def size: Int = deck.size
 
-      loop(deck, c, Nil)
+    def isEmpty: Boolean = deck.isEmpty
 
-    infix def addCard(c: Card): Deck = c :: deck
+    infix def addCard(card: Card): Deck = card :: deck
 
-/*
-@main def main2 : Unit =
-  import Card.*
+    infix def removeCard(card: Card): Deck = deck match
+      case Nil                          => Nil
+      case head :: tail if head == card => tail
+      case head :: tail                 => head :: tail.removeCard(card)
 
+    def draw: Option[(Card, Deck)] = deck match
+      case Nil          => None
+      case head :: tail => Some((head, tail))
 
-  val standardDeck = Deck.getStandardDeck
-  println(standardDeck)
+    def toList: List[Card] = deck
 
-  val megasquirrel = CardLibrary.squirrel WithAttack 20 Named "MegaSquirell"
-  val newdeck2 = standardDeck addCard megasquirrel
-  println(newdeck2)
+    def shuffle(seed: Long = Random.nextLong()): Deck = new Random(seed).shuffle(deck)
 
-  val newdeck3 = standardDeck removeCard megasquirrel
-  println(newdeck3)
- */
+    def drawRandom(n: Int, seed: Long = Random.nextLong()): (List[Card], Deck) =
+      new Random(seed).shuffle(deck).splitAt(n)
+
+    infix def addCards(newCards: List[Card]): Deck = newCards ::: deck
