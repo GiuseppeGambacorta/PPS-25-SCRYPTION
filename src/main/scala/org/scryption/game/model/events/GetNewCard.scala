@@ -36,7 +36,7 @@ trait Event:
 
 class GetNewCard(deck : Deck, ch : Channel) extends Event:
 
-  override def start() : Unit = ch.setCards(List(CardLibrary.squirrel, CardLibrary.bear, CardLibrary.squirrel))
+  override def start() : Unit = ch.setCards(List(CardLibrary.squirrel, CardLibrary.grizzly, CardLibrary.squirrel))
 
   override def isDone: Boolean = ch.isReady
   override def getResult : Deck = deck addCard ch.getSelectedOne.get
