@@ -25,13 +25,13 @@ object ResourceLoader {
   /** Loads an image resource and scales it to a square of the given size. */
   def loadImage(relativePath: String, size: Int): Option[java.awt.Image] =
     openResource(relativePath)
-      .flatMap(stream => Using(stream)(s => ImageIO.read(s)).toOption)
-      .filter(_ != null)
+      .flatMap(stream => Using(stream)(s => Option(ImageIO.read(s))).toOption)
+      .flatten
       .map(_.getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH))
 
   /** Loads a full-size template image (card front/back) with no scaling. */
   def loadTemplateImage(relativePath: String): Option[BufferedImage] =
     openResource(relativePath)
-      .flatMap(stream => Using(stream)(s => ImageIO.read(s)).toOption)
-      .filter(_ != null)
+      .flatMap(stream => Using(stream)(s => Option(ImageIO.read(s))).toOption)
+      .flatten
 }

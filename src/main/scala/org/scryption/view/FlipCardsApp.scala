@@ -1,9 +1,13 @@
 package org.scryption.view
 
-import java.awt.{Color, Dimension}
-import scala.swing._
-import scala.swing.event._
-import org.scryption.view.{CardViewAssets, CardViewInfo, ResourceLoader}
+import org.scryption.view.CardViewAssets
+import org.scryption.view.CardViewInfo
+import org.scryption.view.ResourceLoader
+
+import java.awt.Color
+import java.awt.Dimension
+import scala.swing.*
+import scala.swing.event.*
 
 // Displays a row of test cards and flips them between back/front on click.
 
@@ -17,13 +21,18 @@ object FlipCardsApp extends SimpleSwingApplication {
   private val renderer = new CardView(geometry, nameFont, statFont)
 
   // Test cards
-  
+
   private val testCards = List(
     CardViewInfo(name = "Stoat", cost = "1blood", attack = "1", health = "2"),
-    CardViewInfo(name = "Mole Man", cost = "1blood", attack = "0", health = "6",
-      sigils = List("whackamole", "reach"), cardType = "rare"),
-    CardViewInfo(name = "Raven", cost = "2blood", attack = "2", health = "3",
-      sigils = List("flying"))
+    CardViewInfo(
+      name = "Mole Man",
+      cost = "1blood",
+      attack = "0",
+      health = "6",
+      sigils = List("whackamole", "reach"),
+      cardType = "rare"
+    ),
+    CardViewInfo(name = "Raven", cost = "2blood", attack = "2", health = "3", sigils = List("flying"))
   )
 
   def top: Frame = new MainFrame {
@@ -47,10 +56,9 @@ object FlipCardsApp extends SimpleSwingApplication {
           border = Swing.EmptyBorder(0, 0, 0, 0)
         }
 
-        btn.reactions += {
-          case ButtonClicked(_) =>
-            btn.icon = if (btn.icon == backIcon) frontIconOpt.orNull else backIcon
-            btn.peer.repaint()
+        btn.reactions += { case ButtonClicked(_) =>
+          btn.icon = if (btn.icon == backIcon) frontIconOpt.orNull else backIcon
+          btn.peer.repaint()
         }
 
         contents += btn

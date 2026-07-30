@@ -1,10 +1,9 @@
 package org.scryption
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
-
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class JustATest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks:
@@ -22,7 +21,6 @@ class JustATest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks:
         Main.incrementCounter(n) shouldBe n + 1
       }
     }
-
 
 class FeatureSpec extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks {
 
@@ -93,5 +91,3 @@ class FeatureSpec extends AnyFeatureSpec with GivenWhenThen with Matchers with S
     }
   }
 }
-
-

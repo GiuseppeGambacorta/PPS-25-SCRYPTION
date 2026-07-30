@@ -17,7 +17,8 @@ object CardViewAssets {
   private def normalize(name: String): String = name.toLowerCase.replace(" ", "_")
 
   def frontTemplatePath(cardType: String): String =
-    typeTemplates.get(cardType.toLowerCase)
+    typeTemplates
+      .get(cardType.toLowerCase)
       .map(fileName => s"$templateFolder/$fileName")
       .getOrElse(s"$templateFolder/front.png")
 
