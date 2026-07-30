@@ -4,7 +4,7 @@ package org.scryption.view
 
 object CardViewAssets {
 
-  private val costFolder = "costtextures"
+  private val costFolder = "costs"
   private val portraitFolder = "portraits"
   private val sigilFolder = "sigils"
   private val templateFolder = "cardtemplates"
@@ -28,5 +28,5 @@ object CardViewAssets {
 
   def portraitPath(name: String): String = s"$portraitFolder/portrait_${normalize(name)}.png"
 
-  def sigilPath(sigilName: String): String = s"$sigilFolder/ability_${normalize(sigilName)}.png"
+  def sigilPath(sigilName: String): String = s"$sigilFolder/sigil_${normalize(sigilName)}.png"
 }
