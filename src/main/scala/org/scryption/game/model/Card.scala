@@ -2,16 +2,35 @@ package org.scryption.game.model
 
 import org.scryption.game.model.Rarity.Common
 
-sealed trait Card:
+import java.util.UUID
+
+sealed trait Card[C <: Card[C]]:
+  def id: UUID
   def name: String
   def health: Int
   def sacrificeAttribute: SacrificeAttribute
   def seals: Set[Seal]
   def rarity: Rarity
-  def named(name: String): Card
-  def withHealth(health: Int): Card
-  def addSeal(seal: Seal): Card
-  def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): Card
+
+  infix def named(name: String): C =
+    copyCard(name = name)
+
+  infix def withHealth(health: Int): C =
+    if health >= 0 then copyCard(health = health) else this.asInstanceOf[C]
+
+  infix def addSeal(seal: Seal): C = copyCard(seals = this.seals + seal)
+
+  infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): C =
+    if sacrificeAttribute.isValid then copyCard(sacrificeAttribute = sacrificeAttribute) else this.asInstanceOf[C]
+
+  protected def copyCard(
+      id: UUID = this.id,
+      name: String = this.name,
+      health: Int = this.health,
+      sacrificeAttribute: SacrificeAttribute = this.sacrificeAttribute,
+      seals: Set[Seal] = this.seals,
+      rarity: Rarity = this.rarity
+  ): C
 
 enum SacrificeAttribute:
   case Blood(value: Int)
@@ -40,45 +59,50 @@ enum Rarity:
   case Rare
 
 object CreatureCard:
-  def empty: CreatureCard = CreatureCard("", 0, 0, SacrificeAttribute.Nil(), Set.empty, Common)
+  def empty: CreatureCard = CreatureCard(UUID.randomUUID(), "", 0, 0, SacrificeAttribute.Nil(), Set.empty, Common)
 
 case class CreatureCard(
+    id: UUID,
     name: String,
     attack: Int,
     health: Int,
     sacrificeAttribute: SacrificeAttribute,
     seals: Set[Seal],
     rarity: Rarity
-) extends Card:
-  override infix def named(name: String): CreatureCard = this.copy(name = name)
-
-  override infix def withHealth(health: Int): CreatureCard =
-    if health >= 0 then this.copy(health = health) else this
+) extends Card[CreatureCard]:
 
   infix def withAttack(attack: Int): CreatureCard =
     if attack >= 0 then this.copy(attack = attack) else this
 
-  override infix def addSeal(seal: Seal): CreatureCard = this.copy(seals = seals + seal)
+  override protected def copyCard(
+      id: UUID = this.id,
+      name: String = this.name,
+      health: Int = this.health,
+      sacrificeAttribute: SacrificeAttribute = this.sacrificeAttribute,
+      seals: Set[Seal] = this.seals,
+      rarity: Rarity = this.rarity
+  ): CreatureCard =
+    this.copy(id = id, name = name, health = health, sacrificeAttribute = sacrificeAttribute, seals = seals, rarity = rarity)
 
-  override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): CreatureCard =
-    if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this
 
 object SupportCard:
-  def empty: SupportCard = SupportCard("", 0, SacrificeAttribute.Nil(), Set.empty, Common)
+  def empty: SupportCard = SupportCard(UUID.randomUUID(), "", 0, SacrificeAttribute.Nil(), Set.empty, Common)
 
 case class SupportCard(
+    id: UUID,
     name: String,
     health: Int,
     sacrificeAttribute: SacrificeAttribute,
     seals: Set[Seal],
     rarity: Rarity
-) extends Card:
-  override infix def named(name: String): SupportCard = this.copy(name = name)
+) extends Card[SupportCard]:
 
-  override infix def withHealth(health: Int): SupportCard =
-    if health >= 0 then this.copy(health = health) else this
-
-  override infix def addSeal(seal: Seal): SupportCard = this.copy(seals = seals + seal)
-
-  override infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): SupportCard =
-    if sacrificeAttribute.isValid then this.copy(sacrificeAttribute = sacrificeAttribute) else this
+  override protected def copyCard(
+      id: UUID = this.id,
+      name: String = this.name,
+      health: Int = this.health,
+      sacrificeAttribute: SacrificeAttribute = this.sacrificeAttribute,
+      seals: Set[Seal] = this.seals,
+      rarity: Rarity = this.rarity
+  ): SupportCard =
+    this.copy(id = id, name = name, health = health, sacrificeAttribute = sacrificeAttribute, seals = seals, rarity = rarity)
