@@ -17,8 +17,8 @@ class changeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
    * @return Tupla contenente il thread avviato e una funzione getter per recuperare
    *         la carta selezionata al termine dello scambio.
    */
-  private def runFakeGuiThread(ch: GUIChannel.GUIChannel): (Thread, () => Card) = {
-    var selectedCard: Card = null
+  private def runFakeGuiThread(ch: GUIChannel.GUIChannel): (Thread, () => Card[?]) = {
+    var selectedCard: Card[?] = null
 
     val thread = new Thread(() => {
       ch.receiveFromGame match {

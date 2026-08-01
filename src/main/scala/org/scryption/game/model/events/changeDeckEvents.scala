@@ -3,8 +3,9 @@ package org.scryption.game.model.events
 import java.util.concurrent.LinkedBlockingQueue
 import org.scryption.game.model.*
 import org.scryption.game.model.Deck
-
 import GUIChannel.*
+
+import scala.annotation.tailrec
 
 
 
@@ -28,10 +29,11 @@ case class GameState(deck: Deck.Deck, isGameOver: Boolean)
 type Event = (GameState, GUIChannel) => GameState
 
 enum GUIMessages:
-  case Cards(cards: List[Card])
-  case SingleCard(card: Card)
+  case Cards(cards: List[Card[?]])
+  case SingleCard(card: Card[?])
   case End
 
+@tailrec
 def getANewCard(gameState: GameState, ch: GUIChannel): GameState = {
   ch.sendToGui(GUIMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3,42)._1))
   val message = ch.receiveFromGui
@@ -45,7 +47,8 @@ def getANewCard(gameState: GameState, ch: GUIChannel): GameState = {
   }
 }
 
-def substituteACard(gameState: GameState, ch: GUIChannel, f: Card => Card): GameState = {
+@tailrec
+def substituteACard(gameState: GameState, ch: GUIChannel, f: Card[?] => Card[?]): GameState = {
   val cardNumbersForGui = 5
   ch.sendToGui(
     GUIMessages.Cards(gameState.deck.drawRandom(Math.min(cardNumbersForGui, gameState.deck.size), 42)._1)
@@ -63,7 +66,7 @@ def substituteACard(gameState: GameState, ch: GUIChannel, f: Card => Card): Game
 }
 
 
-private def modifyCreature(card: Card)(f: CreatureCard => Card): Card = card match {
+private def modifyCreature(card: Card[?])(f: CreatureCard => Card[?]): Card[?] = card match {
   case c: CreatureCard => f(c)
   case other           => other
 }

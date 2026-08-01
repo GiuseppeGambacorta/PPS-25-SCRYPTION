@@ -22,6 +22,9 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
       And("the original card should remain unchanged (3 health)")
       wolf.health shouldBe 3
+
+      And("the identity of the card should remain the same")
+      buffedWolf.id shouldBe wolf.id
     }
 
     Scenario("Adding a seal to a creature should return a new instance") {
@@ -83,7 +86,7 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       val card = CreatureCard.empty named "Test Card" withHealth 1
 
       When("setting its health to a negative number")
-      val otherCard = card withAttack -1
+      val otherCard = card withHealth -1
 
       Then("it should not be updated")
       otherCard shouldBe card
