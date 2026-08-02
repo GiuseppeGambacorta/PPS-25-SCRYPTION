@@ -4,8 +4,15 @@ object PlayerHand:
 
   opaque type PlayerHand = List[Card[?]]
 
+  /** @return an empty hand.
+   */
   def empty: PlayerHand = List.empty
 
+  /** Wraps a list of cards into a PlayerHand.
+   *
+   * @param cards The list of cards.
+   * @return a new PlayerHand containing the provided cards.
+   */
   def fromList(cards: List[Card[?]]): PlayerHand = cards
 
   extension (hand: PlayerHand)
@@ -16,9 +23,26 @@ object PlayerHand:
 
     def toList: List[Card[?]] = hand
 
+    /** Adds a single card to the top of the hand.
+     *
+     * @param card The card to add.
+     * @return a new PlayerHand instance with the added card.
+     */
     infix def addCard(card: Card[?]): PlayerHand = card :: hand
 
+    /** Adds a list of new cards to the player's hand.
+     *
+     * @param cards The list of cards to add.
+     * @return a new PlayerHand instance containing the added cards.
+     */
+    infix def addCards(cards: List[Card[?]]): PlayerHand = cards ::: hand
+
+    /** Removes the specified card from the hand.
+     *
+     * @param card The card to remove.
+     * @return a new PlayerHand instance without the specified card.
+     */
     infix def removeCard(card: Card[?]): PlayerHand = hand match
-      case Nil => Nil
+      case Nil                                => Nil
       case head :: tail if head.id == card.id => tail
-      case head :: tail => head :: tail.removeCard(card)
+      case head :: tail                       => head :: tail.removeCard(card)

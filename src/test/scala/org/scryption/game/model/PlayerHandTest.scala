@@ -43,6 +43,23 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
       emptyHand.isEmpty shouldBe true
     }
 
+    Scenario("Adding multiple cards to the hand") {
+      Given("A hand with one card and a list of new cards")
+      val squirrel = CardLibrary.squirrel
+      val bear = CardLibrary.bear
+      val hand = PlayerHand.empty addCard squirrel
+      val newCards = List(bear, bear)
+
+      When("the multiple cards are added to the hand")
+      val updatedHand = hand addCards newCards
+
+      Then("the hand size should increase accordingly")
+      updatedHand.size shouldBe 3
+
+      And("it should contain all the cards")
+      updatedHand.toList should contain theSameElementsAs (bear :: bear :: squirrel :: Nil)
+    }
+
   }
 
 }
