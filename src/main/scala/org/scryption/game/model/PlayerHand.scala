@@ -6,6 +6,8 @@ object PlayerHand:
 
   def empty: PlayerHand = List.empty
 
+  def fromList(cards: List[Card[?]]): PlayerHand = cards
+
   extension (hand: PlayerHand)
 
     def size: Int = hand.size
@@ -15,3 +17,8 @@ object PlayerHand:
     def toList: List[Card[?]] = hand
 
     infix def addCard(card: Card[?]): PlayerHand = card :: hand
+
+    infix def removeCard(card: Card[?]): PlayerHand = hand match
+      case Nil => Nil
+      case head :: tail if head.id == card.id => tail
+      case head :: tail => head :: tail.removeCard(card)

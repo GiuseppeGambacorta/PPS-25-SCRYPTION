@@ -31,6 +31,18 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
       updatedHand.toList should contain(squirrel)
     }
 
+    Scenario("Removing a card from the hand by ID") {
+      Given("A hand with a card")
+      val bear = CardLibrary.bear
+      val hand = PlayerHand.empty addCard bear
+
+      When("the card is removed")
+      val emptyHand = hand removeCard bear
+
+      Then("the hand should be empty")
+      emptyHand.isEmpty shouldBe true
+    }
+
   }
 
 }
