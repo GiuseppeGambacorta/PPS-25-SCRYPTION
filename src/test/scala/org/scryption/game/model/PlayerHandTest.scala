@@ -18,6 +18,19 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
       hand.isEmpty shouldBe true
     }
 
+    Scenario("Adding a card to the hand") {
+      Given("An empty hand and a card")
+      val hand = PlayerHand.empty
+      val squirrel = CardLibrary.squirrel
+
+      When("the card is added to the hand")
+      val updatedHand = hand addCard squirrel
+
+      Then("the hand should contain 1 card")
+      updatedHand.size shouldBe 1
+      updatedHand.toList should contain(squirrel)
+    }
+
   }
 
 }
