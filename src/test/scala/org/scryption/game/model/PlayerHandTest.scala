@@ -60,6 +60,37 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
       updatedHand.toList should contain theSameElementsAs (bear :: bear :: squirrel :: Nil)
     }
 
+    Scenario("Extracting a specific card from the hand") {
+      Given("A hand with two different cards")
+      val squirrel = CardLibrary.squirrel
+      val bear = CardLibrary.bear
+      val hand = PlayerHand.empty addCard squirrel addCard bear
+
+      When("extracting the bear card using its ID")
+      val extractionResult = hand.extractCard(bear)
+
+      Then("it should return the bear card and a new hand without it")
+      extractionResult.isDefined shouldBe true
+      val (extractedCard, updatedHand) = extractionResult.get
+      extractedCard.id shouldBe bear.id
+      updatedHand.size shouldBe 1
+      updatedHand.toList should contain(squirrel)
+      updatedHand.toList shouldNot contain(bear)
+    }
+
+    Scenario("Failing to extract a card that is not in the hand") {
+      Given("A hand with a squirrel")
+      val squirrel = CardLibrary.squirrel
+      val bear = CardLibrary.bear
+      val hand = PlayerHand.empty addCard squirrel
+
+      When("attempting to extract the bear")
+      val extractionResult = hand.extractCard(bear)
+
+      Then("it should safely return None")
+      extractionResult.isEmpty shouldBe true
+    }
+
   }
 
 }

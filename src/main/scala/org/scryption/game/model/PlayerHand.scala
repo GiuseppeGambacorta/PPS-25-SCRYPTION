@@ -46,3 +46,12 @@ object PlayerHand:
       case Nil                                => Nil
       case head :: tail if head.id == card.id => tail
       case head :: tail                       => head :: tail.removeCard(card)
+
+    /** Extract a specific card from the hand.
+     *
+     * @param card The card to extract.
+     * @return an Option containing a tuple with the card extracted
+     * and the new hand. Returns None if the card is not present.
+     */
+    def extractCard(card: Card[?]): Option[(Card[?], PlayerHand)] =
+      hand.find(_.id == card.id).map(card => (card, hand.removeCard(card)))
