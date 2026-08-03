@@ -33,6 +33,9 @@ enum GUIMessages:
   case SingleCard(card: Card[?])
   case End
 
+
+
+
 @tailrec
 def getANewCard(gameState: GameState, ch: GUIChannel): GameState = {
   ch.sendToGui(GUIMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3,42)._1))
@@ -89,5 +92,39 @@ def fireCamp_Health(gameState: GameState, ch: GUIChannel): GameState =
   substituteACard(
     gameState,
     ch,
-    card => card withHealth (card.health + 2)
+    card => modifyCreature(card)(c => c withHealth (c.health + 2))
   )
+
+
+
+@tailrec
+def sacrifice(gameState: GameState, ch: GUIChannel): GameState = {
+  val cardNumbersForGui = 5
+ 
+  ch.sendToGui(
+    GUIMessages.Cards(
+      gameState.deck.drawRandom(Math.min(cardNumbersForGui, gameState.deck.size), 42)._1
+    )
+  )
+  
+  val firstMessage = ch.receiveFromGui
+  val secondMessage = ch.receiveFromGui
+
+  (firstMessage, secondMessage) match {
+    case (GUIMessages.SingleCard(firstCard), GUIMessages.SingleCard(secondCard)) =>
+  
+      val seals = firstCard.seals
+      val updatedCard = seals.foldLeft(secondCard)((card, seal) => card.addSeal(seal))
+      
+      val updatedDeck = gameState.deck
+        .removeCard(firstCard)
+        .removeCard(secondCard)
+        .addCard(updatedCard)
+      ch.sendToGui(GUIMessages.End)
+      GameState(updatedDeck, gameState.isGameOver)
+     
+
+    case _ =>
+      sacrifice(gameState, ch)
+  }
+}

@@ -4,8 +4,9 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scryption.game.model.{Card, CardLibrary, CreatureCard}
+import org.scryption.game.model.{Card, CardLibrary, CreatureCard, Seal}
 import org.scryption.game.model.Deck.*
+import org.scryption.game.model.Seal.{Sprinter, Wall}
 
 class changeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks {
 
@@ -141,7 +142,7 @@ class changeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Then("The deck size should remain unchanged")
       updatedGameState.deck.size shouldBe initialDeck.size
 
-      And("The selected card should be modified with new health, but all other attributes must remain identical")
+      And("The selected card should be modified with new health and attack, but all other attributes must remain identical")
       val updatedCard = (updatedGameState.deck.toList diff initialDeck.toList).head
       
       updatedCard match {
@@ -161,6 +162,53 @@ class changeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
 
       guiThread.join(1000)
     }
+
+
+    Scenario("Powering up a card with the Sacrifice Event") {
+      Given("An initial GameState with 2 cards and a GUIChannel")
+      val card1 = CreatureCard.empty  withAttack 0 named "firstCard" withHealth 1  addSeal Sprinter addSeal Wall
+      val card2 = CreatureCard.empty  withAttack 0 named "secondCard" withHealth 1
+      
+      val initialDeck = fromList(card1 :: card2:: Nil)
+      val initialGameState = GameState(initialDeck, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+
+      And("A Fake GUI running on a separate thread")
+      val (guiThread, getSelectedCard) = runFakeGuiThread(ch)
+      Thread.sleep(1000)
+      val (guiThread2, getSelectedCard2) = runFakeGuiThread(ch)
+
+      When("Executing the Sacrifice event")
+      val updatedGameState = sacrifice(initialGameState, ch)
+      val selectedCard = getSelectedCard()
+      val selectedCard2 = getSelectedCard2()
+
+      Then("The deck size should have been changed")
+      updatedGameState.deck.size shouldBe initialDeck.size - 1
+
+      And("The selected card should be modified with new health and attack, but all other attributes must remain identical")
+      updatedGameState.deck.toList.find(_ == selectedCard) shouldBe None
+      val updatedCard = updatedGameState.deck.toList.find(_.name == selectedCard2.name)
+
+      updatedCard match {
+        case Some(creature: CreatureCard) =>
+          creature.seals shouldBe card1.seals
+
+        case Some(_) =>
+          fail("The updated card is not a CreatureCard")
+
+        case None =>
+          fail("No updated card found with the expected name")
+      }
+
+
+      And("The game should not be over")
+      updatedGameState.isGameOver shouldBe false
+
+      guiThread.join(1000)
+      guiThread2.join(1000)
+    }
+
 
   }
 }
