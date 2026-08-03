@@ -12,7 +12,7 @@ import scala.annotation.tailrec
 
 case class GameState(deck: Deck.Deck, isGameOver: Boolean)
 type Event = (GameState, GUIChannelInterface) => GameState
-
+val cardsNumberForGui = 5
 
 @tailrec
 def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
@@ -31,9 +31,9 @@ def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
 
 @tailrec
 def substituteACard(gameState: GameState, ch: GUIChannelInterface, f: Card[?] => Card[?]): GameState = {
-  val cardNumbersForGui = 5
+
   ch.sendToGui(
-    GUIMessages.Cards(gameState.deck.drawRandom(Math.min(cardNumbersForGui, gameState.deck.size), 42)._1)
+    GUIMessages.Cards(gameState.deck.drawRandom(Math.min(cardsNumberForGui, gameState.deck.size), 42)._1)
   )
   val message = ch.receiveFromGui
 
@@ -76,30 +76,46 @@ def fireCamp_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
 
 @tailrec
 def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
-  val cardNumbersForGui = 5
+
 
   ch.sendToGui(
     GUIMessages.Cards(
-      gameState.deck.drawRandom(Math.min(cardNumbersForGui, gameState.deck.size), 42)._1
+      gameState.deck.drawRandom(Math.min(cardsNumberForGui, gameState.deck.size), 42)._1
     )
   )
 
-  val firstMessage = ch.receiveFromGui
-  val secondMessage = ch.receiveFromGui
+  ch.receiveFromGui match {
+    case GUIMessages.SingleCard(cardToRemove) =>
+  
+      val deckWithoutTheCard = gameState.deck.removeCard(cardToRemove)
+      
+      ch.sendToGui(
+        GUIMessages.Cards(
+          deckWithoutTheCard.drawRandom(Math.min(cardsNumberForGui, deckWithoutTheCard.size), 42)._1
+        )
+      )
 
-  (firstMessage, secondMessage) match {
-    case (GUIMessages.SingleCard(firstCard), GUIMessages.SingleCard(secondCard)) =>
-      val seals = firstCard.seals
-      val updatedCard = seals.foldLeft(secondCard)((card, seal) => card.addSeal(seal))
+      ch.receiveFromGui match {
+        case GUIMessages.SingleCard(cardToUpgrade) =>
+          
+          val seals = cardToRemove.seals
+          val updatedCard = seals.foldLeft(cardToUpgrade)((card, seal) => card.addSeal(seal))
 
-      val updatedDeck = gameState.deck
-        .removeCard(firstCard)
-        .removeCard(secondCard)
-        .addCard(updatedCard)
-      ch.sendToGui(GUIMessages.End)
-      GameState(updatedDeck, gameState.isGameOver)
+          val updatedDeck = gameState.deck
+            .removeCard(cardToRemove)
+            .removeCard(cardToUpgrade)
+            .addCard(updatedCard)
+
+          ch.sendToGui(GUIMessages.End)
+          GameState(updatedDeck, gameState.isGameOver)
+
+        case _ =>
+          ch.clear()
+          sacrifice(gameState, ch)
+      }
 
     case _ =>
+     
       ch.clear()
       sacrifice(gameState, ch)
   }

@@ -32,10 +32,10 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
    */
   private def runMockGuiWithRetry(ch: GUIChannelInterface)(wrongResponses: List[GUIMessages], correctResponses: List[GUIMessages]): Thread =
     val thread = new Thread(() => {
-      
+
       ch.receiveFromGame
       wrongResponses.foreach(ch.sendToGame)
-      
+
       ch.receiveFromGame
       correctResponses.foreach(ch.sendToGame)
     })
@@ -164,16 +164,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
 
       val updatedCard = updatedGameState.deck.toList.find(_.name == card2.name)
 
-      updatedCard match {
-        case Some(creature: CreatureCard) =>
-          creature.seals shouldBe card1.seals
-
-        case Some(_) =>
-          fail("The updated card is not a CreatureCard")
-
-        case None =>
-          fail("No updated card found with the expected name")
-      }
+      updatedCard.get.asInstanceOf[CreatureCard].seals shouldBe card1.seals
 
       And("The game should not be over")
       updatedGameState.isGameOver shouldBe false
