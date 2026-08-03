@@ -2,11 +2,12 @@ package org.scryption.game.model
 
 
 import org.scryption.game.model.events.*
-import org.scryption.game.model.events.GUIChannel.GUIChannel
+import org.scryption.GUIChannelInterface
+import org.scryption.GUIChannel
 
 
 trait Gui:
-  def setChannel(channel: GUIChannel): Unit
+  def setChannel(channel: GUIChannelInterface): Unit
   
 
 
