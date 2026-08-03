@@ -8,8 +8,8 @@ final case class CardGeometry(cardWidth: Int) {
 
   val cardHeight: Int = pct(1.52f)
 
-  val nameFontSize: Float = pct(0.16f).toFloat
-  val statFontSize: Float = pct(0.24f).toFloat
+  val nameFontSize: Int = pct(0.16f)
+  val statFontSize: Int = pct(0.24f)
 
   val portraitSize: Int = pct(0.77f)
   val costSize: Int = pct(0.4f)

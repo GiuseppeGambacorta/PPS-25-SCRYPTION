@@ -15,7 +15,7 @@ final case class CardViewInfo(
 
 //  Converts a game-model Card into the view-facing CardViewInfo
 
-extension (card: Card)
+extension (card: Card[?])
   def toViewInfo: CardViewInfo =
     CardViewInfo(
       name = card.name,
@@ -28,13 +28,13 @@ extension (card: Card)
 
 private object CardViewConversions:
 
-  def attackLabel(card: Card): String = card match
+  def attackLabel(card: Card[?]): String = card match
     case c: CreatureCard => c.attack.toString
     case _: SupportCard  => "" // no attack stat to show
 
   def costLabel(attribute: SacrificeAttribute): String = attribute match
     case SacrificeAttribute.Blood(value) => s"${value}blood"
-    case SacrificeAttribute.Bones(value) => s"${value}bones"
+    case SacrificeAttribute.Bones(value) => s"${value}bone"
     case SacrificeAttribute.Nil()        => ""
 
   def sealLabel(seal: Seal): String = seal match

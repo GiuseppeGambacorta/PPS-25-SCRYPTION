@@ -1,60 +1,28 @@
 package org.scryption.game.model
 
-import org.scryption.game.model.SacrificeAttribute.{Blood, Bones}
-import org.scryption.game.model.Seal.*
-
-import scala.util.Random
+import org.scryption.game.model.SacrificeAttribute.*
 
 object CardLibrary:
 
-  def squirrel: Card[?] = CreatureCard.empty named "Squirrel" withAttack 0 withHealth 1
-
-  def bear: Card[?] = CreatureCard.empty named "Bear" withAttack 2 withHealth 3 withSacrificeAttribute Blood(3)
-
-  def stoat: Card[?] = CreatureCard.empty named "Stoat" withAttack 1 withHealth 2 withSacrificeAttribute Blood(1)
-
-  def wolf: Card[?] = CreatureCard.empty named "Wolf" withAttack 3 withHealth 2 withSacrificeAttribute Blood(2)
-
-  def sparrow: Card[?] =
-    CreatureCard.empty named "Sparrow" withAttack 1 withHealth 2 withSacrificeAttribute Blood(1) addSeal Airborne
-
-  def adder: Card[?] =
-    CreatureCard.empty named "Adder" withAttack 1 withHealth 1 withSacrificeAttribute Blood(2) addSeal TouchOfDeath
-
-  def mantis: Card[?] =
-    CreatureCard.empty named "Mantis" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) addSeal BifurcatedStrike
-
-  def opossum: Card[?] =
-    CreatureCard.empty named "Opossum" withAttack 1 withHealth 1 withSacrificeAttribute Bones(2)
-
-  def boulder: Card[?] =
-    SupportCard.empty named "Boulder" withHealth 5 addSeal Wall
-
-  def mantisGod: Card[?] =
-    CreatureCard.empty named "Mantis God" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) addSeal TrifurcatedStrike withRarity Rarity.Rare
-
-  def urayuli: Card[?] =
-    CreatureCard.empty named "Urayuli" withAttack 7 withHealth 7 withSacrificeAttribute Blood(4) withRarity Rarity.Rare
-
-  def getADeckWithAllTheLibrary: Deck.Deck = Deck.fromList(List(squirrel, bear))
-
-  private val commonCards: List[() => Card[?]] = List(
-    () => squirrel, () => bear, () => stoat, () => wolf, () => sparrow, () => adder, () => mantis, () => opossum
-  )
-
-  private val rareCards: List[() => Card[?]] = List(
-    () => mantisGod, () => urayuli
-  )
-
-  /** Generates N random cards based on the rarity requested
-   * @param rarity The rarity required.
-   * @param n The number of cards required to be generated.
-   * @param seed Optional seed for reproducible shuffles.
-   * @return a list with the generated cards*/
-  def generateRandomCards(rarity: Rarity, n: Int, seed: Long = Random.nextLong()): List[Card[?]] =
-    val pool = rarity match
-      case Rarity.Common => commonCards
-      case Rarity.Rare => rareCards
-    val random = new Random(seed)
-    random.shuffle(pool).take(n).map(factory => factory())
-
+  def getADeckWithAllTheLibrary: Deck.Deck = Deck.fromList(List(squirrel, sparrow, raven, turkeyVulture, bloodhound, wolf, coyote, elk, pronghorn, bee, mantis, ringWorm, geck, adder, riverSnapper, rattler, stoat, grizzly, opossum, bat))
+  val squirrel: Card[?] = CreatureCard.empty named "Squirrel" withAttack 0 withHealth 1
+  val sparrow: Card[?] = CreatureCard.empty named "Sparrow" withAttack 1 withHealth 2 withSacrificeAttribute Blood(1) addSeal Seal.Airborne
+  val raven: Card[?] = CreatureCard.empty named "Raven" withAttack 2 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Airborne
+  val turkeyVulture: Card[?] = CreatureCard.empty named "Turkey Vulture" withAttack 3 withHealth 3 withSacrificeAttribute Bones(8) addSeal Seal.Airborne
+  val bloodhound: Card[?] = CreatureCard.empty named "Bloodhound" withAttack 2 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Guardian
+  val wolf: Card[?] = CreatureCard.empty named "Wolf" withAttack 3 withHealth 2 withSacrificeAttribute Blood(2)
+  val coyote: Card[?] = CreatureCard.empty named "Coyote" withAttack 2 withHealth 1 withSacrificeAttribute Bones(4)
+  val elk: Card[?] = CreatureCard.empty named "Elk" withAttack 2 withHealth 4 withSacrificeAttribute Blood(2) addSeal Seal.Sprinter
+  val pronghorn: Card[?] = CreatureCard.empty named "Pronghorn" withAttack 1 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Sprinter addSeal Seal.BifurcatedStrike
+  val bee: Card[?] = CreatureCard.empty named "Bee" withAttack 1 withHealth 1 addSeal Seal.Airborne
+  val mantis: Card[?] = CreatureCard.empty named "Mantis" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) addSeal Seal.BifurcatedStrike
+  val ringWorm: Card[?] = CreatureCard.empty named "Ring Worm" withAttack 0 withHealth 1 withSacrificeAttribute Blood(1)
+  val geck: Card[?] = CreatureCard.empty named "Geck" withAttack 1 withHealth 1
+  val adder: Card[?] = CreatureCard.empty named "Adder" withAttack 1 withHealth 1 withSacrificeAttribute Blood(2) addSeal Seal.TouchOfDeath
+  val riverSnapper: Card[?] = CreatureCard.empty named "River Snapper" withAttack 1 withHealth 6 withSacrificeAttribute Blood(2)
+  val rattler: Card[?] = CreatureCard.empty named "Rattler" withAttack 3 withHealth 1 withSacrificeAttribute Bones(6)
+  val stoat: Card[?] = CreatureCard.empty named "Stoat" withAttack 1 withHealth 3 withSacrificeAttribute Blood(1)
+  val grizzly: Card[?] = CreatureCard.empty named "Grizzly" withAttack 4 withHealth 6 withSacrificeAttribute Blood(3)
+  val opossum: Card[?] = CreatureCard.empty named "Opossum" withAttack 1 withHealth 1 withSacrificeAttribute Bones(2)
+  val bat: Card[?] = CreatureCard.empty named "Bat" withAttack 2 withHealth 1 withSacrificeAttribute Bones(4)
+  val bear: Card[?] = CreatureCard.empty named "Bear" withAttack 2 withHealth 3
