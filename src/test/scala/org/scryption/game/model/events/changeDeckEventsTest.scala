@@ -6,6 +6,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scryption.game.model.{Card, CreatureCard,Seal}
 import org.scryption.game.model.Deck.*
 import org.scryption.game.model.Seal.{Sprinter, Wall}
+import org.scryption.GUIMessages
+import org.scryption.GUIChannel
 
 object TestCards:
   val squirrel: CreatureCard = CreatureCard.empty withAttack(1) named("squirrel") withHealth(1)

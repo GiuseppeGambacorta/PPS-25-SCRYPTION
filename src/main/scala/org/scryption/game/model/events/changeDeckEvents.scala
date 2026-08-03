@@ -1,47 +1,18 @@
 package org.scryption.game.model.events
 
-import java.util.concurrent.LinkedBlockingQueue
 import org.scryption.game.model.*
 import org.scryption.game.model.Deck
-import GUIChannel.*
+import org.scryption.GUIMessages
+import org.scryption.GUIChannelInterface
 
 import scala.annotation.tailrec
 
-trait GUIChannelInterface:
-  def sendToGui(message: GUIMessages): Unit
-  def receiveFromGui: GUIMessages
-  def receiveFromGame: GUIMessages
-  def sendToGame(message: GUIMessages): Unit
 
-class GUIChannel private (
-                           private val toGui: LinkedBlockingQueue[GUIMessages],
-                           private val toGame: LinkedBlockingQueue[GUIMessages]
-                         ) extends GUIChannelInterface:
 
-  // Metodi usati dal thread del gioco
-  override def sendToGui(message: GUIMessages): Unit = toGui.put(message)
-  override def receiveFromGui: GUIMessages = toGame.take()
-
-  // Metodi usati dal thread della GUI
-  override def receiveFromGame: GUIMessages = toGui.take()
-  override def sendToGame(message: GUIMessages): Unit = toGame.put(message)
-
-object GUIChannel:
-  def getNewChannel: GUIChannelInterface =
-    new GUIChannel(
-      new LinkedBlockingQueue[GUIMessages](),
-      new LinkedBlockingQueue[GUIMessages]()
-    )
 
 case class GameState(deck: Deck.Deck, isGameOver: Boolean)
-
-// Usa l'interfaccia per rendere il modello disaccoppiato dall'implementazione
 type Event = (GameState, GUIChannelInterface) => GameState
 
-enum GUIMessages:
-  case Cards(cards: List[Card[?]])
-  case SingleCard(card: Card[?])
-  case End
 
 @tailrec
 def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {

@@ -2,7 +2,8 @@ package org.scryption.game.model
 
 
 import org.scryption.game.model.events.*
-import org.scryption.game.model.events.GUIChannel
+import org.scryption.GUIChannelInterface
+import org.scryption.GUIChannel
 
 
 trait Gui:
