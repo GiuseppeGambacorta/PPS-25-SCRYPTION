@@ -24,6 +24,7 @@ def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
       ch.sendToGui(GUIMessages.End)
       GameState(gameState.deck.addCard(card), gameState.isGameOver)
     case _ =>
+      ch.clear()
       getANewCard(gameState, ch)
   }
 }
@@ -42,6 +43,7 @@ def substituteACard(gameState: GameState, ch: GUIChannelInterface, f: Card[?] =>
       val updatedDeck = gameState.deck removeCard card addCard f(card)
       GameState(updatedDeck, gameState.isGameOver)
     case _ =>
+      ch.clear()
       substituteACard(gameState, ch, f)
   }
 }
@@ -98,6 +100,7 @@ def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
       GameState(updatedDeck, gameState.isGameOver)
 
     case _ =>
+      ch.clear()
       sacrifice(gameState, ch)
   }
 }
