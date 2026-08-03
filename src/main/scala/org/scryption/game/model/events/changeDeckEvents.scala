@@ -78,11 +78,15 @@ def fireCamp_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
 def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
 
 
-  ch.sendToGui(
-    GUIMessages.Cards(
-      gameState.deck.drawRandom(Math.min(cardsNumberForGui, gameState.deck.size), 42)._1
+  val cardsWithSeals = gameState.deck.toList.filter(c => c.seals.nonEmpty)
+  
+  if cardsWithSeals.nonEmpty then 
+    ch.sendToGui(
+      GUIMessages.Cards(
+        cardsWithSeals.take(cardsNumberForGui)
+      )
     )
-  )
+  else return gameState  
 
   ch.receiveFromGui match {
     case GUIMessages.SingleCard(cardToRemove) =>

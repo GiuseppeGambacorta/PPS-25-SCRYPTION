@@ -26,13 +26,8 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
   private val card1 = TestCards.card1
   private val card2 = TestCards.card2
 
-  /**
-   * Helper per simulare un thread GUI che risponde prima in modo errato
-   * e poi in modo corretto dopo il retry dell'evento.
-   */
   private def runMockGuiWithRetry(ch: GUIChannelInterface)(wrongResponses: List[GUIMessages], correctResponses: List[GUIMessages]): Thread =
     val thread = new Thread(() => {
-
       ch.receiveFromGame
       wrongResponses.foreach(ch.sendToGame)
 
@@ -42,9 +37,9 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
     thread.start()
     thread
 
-  Feature("Events that change the deck") {
+  Feature("GetANewCard event") {
 
-    Scenario("Adding a new card via GetANewCard") {
+    Scenario("Successfully adding a new card when receiving a valid SingleCard message") {
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
@@ -62,7 +57,30 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       updatedGameState.isGameOver shouldBe false
     }
 
-    Scenario("Powering up a card with the Firecamp Attack Event") {
+    Scenario("Handling an unexpected Cards message before receiving a valid SingleCard") {
+      Given("A mock GUI thread that sends Cards first, and SingleCard after retry")
+      val initialDeck = fromList(squirrel :: Nil)
+      val initialGameState = GameState(initialDeck, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+
+      val guiThread = runMockGuiWithRetry(ch)(
+        wrongResponses = List(GUIMessages.Cards(List(fox))),
+        correctResponses = List(GUIMessages.SingleCard(squirrel))
+      )
+
+      When("Executing the GetANewCard event")
+      val updatedGameState = getANewCard(initialGameState, ch)
+      guiThread.join()
+
+      Then("It should recover from the invalid message, clear the channel, and apply the valid card")
+      updatedGameState.deck.size shouldBe initialDeck.size + 1
+      updatedGameState.deck.toList should contain(squirrel)
+    }
+  }
+
+  Feature("Firecamp Attack event") {
+
+    Scenario("Powering up a card attack when receiving a valid SingleCard message") {
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
@@ -91,7 +109,31 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       updatedGameState.isGameOver shouldBe false
     }
 
-    Scenario("Powering up a card with the Firecamp Health Event") {
+    Scenario("Handling an unexpected End message before receiving a valid SingleCard") {
+      Given("A mock GUI thread that sends End first, and SingleCard after retry")
+      val initialDeck = fromList(bear :: Nil)
+      val initialGameState = GameState(initialDeck, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+
+      val guiThread = runMockGuiWithRetry(ch)(
+        wrongResponses = List(GUIMessages.End),
+        correctResponses = List(GUIMessages.SingleCard(bear))
+      )
+
+      When("Executing the Firecamp Attack event")
+      val updatedGameState = fireCamp_Attack(initialGameState, ch)
+      guiThread.join()
+
+      Then("The event should recover and process the valid card choice")
+      updatedGameState.deck.size shouldBe initialDeck.size
+      val updatedCard = updatedGameState.deck.toList.head
+      updatedCard.asInstanceOf[CreatureCard].attack shouldBe (bear.attack + 1)
+    }
+  }
+
+  Feature("Firecamp Health event") {
+
+    Scenario("Powering up a card health when receiving a valid SingleCard message") {
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
@@ -112,8 +154,11 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       And("The game should not be over")
       updatedGameState.isGameOver shouldBe false
     }
+  }
 
-    Scenario("Powering up a card with the Mushroom Expert Event") {
+  Feature("Mushroom Expert event") {
+
+    Scenario("Powering up a card health and attack when receiving a valid SingleCard message") {
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
@@ -142,8 +187,11 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       And("The game should not be over")
       updatedGameState.isGameOver shouldBe false
     }
+  }
 
-    Scenario("Powering up a card with the Sacrifice Event") {
+  Feature("Sacrifice event") {
+
+    Scenario("Transferring seals from donor card to target card when receiving valid messages") {
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(card1 :: card2 :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
@@ -169,52 +217,8 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       And("The game should not be over")
       updatedGameState.isGameOver shouldBe false
     }
-  }
 
-  Feature("Handling invalid messages and retries") {
-
-    Scenario("GetANewCard receives an unexpected Cards message before SingleCard") {
-      Given("A mock GUI thread that sends Cards first, and SingleCard after retry")
-      val initialDeck = fromList(squirrel :: Nil)
-      val initialGameState = GameState(initialDeck, isGameOver = false)
-      val ch = GUIChannel.getNewChannel
-
-      val guiThread = runMockGuiWithRetry(ch)(
-        wrongResponses = List(GUIMessages.Cards(List(fox))),
-        correctResponses = List(GUIMessages.SingleCard(squirrel))
-      )
-
-      When("Executing the GetANewCard event")
-      val updatedGameState = getANewCard(initialGameState, ch)
-      guiThread.join()
-
-      Then("It should recover from the invalid message, clear the channel, and apply the valid card")
-      updatedGameState.deck.size shouldBe initialDeck.size + 1
-      updatedGameState.deck.toList should contain(squirrel)
-    }
-
-    Scenario("Substitute card (Firecamp Attack) receives GUIMessages.End before SingleCard") {
-      Given("A mock GUI thread that sends End first, and SingleCard after retry")
-      val initialDeck = fromList(bear :: Nil)
-      val initialGameState = GameState(initialDeck, isGameOver = false)
-      val ch = GUIChannel.getNewChannel
-
-      val guiThread = runMockGuiWithRetry(ch)(
-        wrongResponses = List(GUIMessages.End),
-        correctResponses = List(GUIMessages.SingleCard(bear))
-      )
-
-      When("Executing the Firecamp Attack event")
-      val updatedGameState = fireCamp_Attack(initialGameState, ch)
-      guiThread.join()
-
-      Then("The event should recover and process the valid card choice")
-      updatedGameState.deck.size shouldBe initialDeck.size
-      val updatedCard = updatedGameState.deck.toList.head
-      updatedCard.asInstanceOf[CreatureCard].attack shouldBe (bear.attack + 1)
-    }
-
-    Scenario("Sacrifice receives an invalid message sequence before a valid pair") {
+    Scenario("Handling an invalid message sequence before receiving a valid pair of SingleCards") {
       Given("A mock GUI thread that sends SingleCard+Cards first, and two SingleCards after retry")
       val initialDeck = fromList(card1 :: card2 :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
@@ -233,5 +237,51 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       updatedGameState.deck.size shouldBe (initialDeck.size - 1)
       val updatedCard = updatedGameState.deck.toList.find(_.name == card2.name)
       updatedCard.get.asInstanceOf[CreatureCard].seals shouldBe card1.seals
+    }
+
+    Scenario("Returning the same GameState when no cards in the deck have any seals") {
+      Given("An initial GameState where no card has seals")
+      val initialDeck = fromList(squirrel :: bear :: card2 :: Nil)
+      val initialGameState = GameState(initialDeck, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+
+      When("Executing the Sacrifice event")
+      val updatedGameState = sacrifice(initialGameState, ch)
+
+      Then("The returned GameState should be identical to the initial GameState")
+      updatedGameState shouldBe initialGameState
+    }
+
+    Scenario("Ensuring only cards with seals are offered for sacrifice") {
+      Given("A deck containing cards with and without seals")
+      val deckWithMixedCards = fromList(squirrel :: bear :: card1 :: Nil)
+      val initialGameState = GameState(deckWithMixedCards, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+      
+      val guiThread = new Thread(() => {
+        val receivedMsg = ch.receiveFromGame
+        receivedMsg match {
+          case GUIMessages.Cards(offeredCards) =>
+      
+            offeredCards.forall(_.seals.nonEmpty) shouldBe true
+            offeredCards should contain(card1)
+            offeredCards should not contain squirrel
+            offeredCards should not contain bear
+            
+            ch.sendToGame(GUIMessages.SingleCard(card1))
+
+           
+            ch.receiveFromGame
+            ch.sendToGame(GUIMessages.SingleCard(bear))
+
+          case _ =>
+            fail("Expected GUIMessages.Cards from game")
+        }
+      })
+      guiThread.start()
+
+      When("Executing the Sacrifice event")
+      sacrifice(initialGameState, ch)
+      guiThread.join()
     }
   }
