@@ -44,6 +44,14 @@ sealed trait Card[C <: Card[C]]:
   infix def withSacrificeAttribute(sacrificeAttribute: SacrificeAttribute): C =
     if sacrificeAttribute.isValid then copyCard(sacrificeAttribute = sacrificeAttribute) else this.asInstanceOf[C]
 
+  /** Creates a new instance of the card with the specified rarity.
+   *
+   * @param rarity The rarity to change the card to.
+   * @return a new card instance of type C
+   */
+  infix def withRarity(rarity: Rarity): C =
+    copyCard(rarity = rarity)
+
   /** Protected template method used to internally clone the card.
    * Must be implemented by concrete classes to bridge with their native `copy` method.
    */
