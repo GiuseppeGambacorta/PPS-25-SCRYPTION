@@ -19,7 +19,7 @@ object CardLibrary:
   def adder: Card[?] =
     CreatureCard.empty named "Adder" withAttack 1 withHealth 1 withSacrificeAttribute Blood(2) addSeal TouchOfDeath
 
-  def mantisGod: Card[?] =
+  def mantis: Card[?] =
     CreatureCard.empty named "Mantis" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) addSeal BifurcatedStrike
 
   def opossum: Card[?] =
