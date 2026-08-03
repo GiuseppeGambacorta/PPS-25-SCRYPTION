@@ -132,7 +132,8 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
     Scenario("Adding multiple cards to the deck at once") {
       Given("An initial deck and a list of new cards")
-      val initialDeck = Deck.fromList(List(CreatureCard.empty named "Wolf"))
+      val baseWolf = CreatureCard.empty named "Wolf"
+      val initialDeck = Deck.fromList(List(baseWolf))
       val newCards = List(
         CreatureCard.empty named "Buffed Squirrel",
         CreatureCard.empty named "Buffed Stoat"
@@ -143,7 +144,7 @@ class DeckTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
       Then("the deck should grow by the number of added cards")
       finalDeck.size shouldBe 3
-      finalDeck.toList shouldBe newCards ::: List(CreatureCard.empty named "Wolf")
+      finalDeck.toList shouldBe newCards ::: List(baseWolf)
     }
   }
 }
