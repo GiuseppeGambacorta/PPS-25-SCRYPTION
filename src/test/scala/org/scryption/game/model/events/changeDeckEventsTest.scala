@@ -124,5 +124,43 @@ class changeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       guiThread.join(1000)
     }
 
+
+    Scenario("Powering up a card with the Mushroom Expert Event") {
+      Given("An initial GameState with 2 cards and a GUIChannel")
+      val initialDeck = fromList(CardLibrary.squirrel :: CardLibrary.bear :: Nil)
+      val initialGameState = GameState(initialDeck, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+
+      And("A Fake GUI running on a separate thread")
+      val (guiThread, getSelectedCard) = runFakeGuiThread(ch)
+
+      When("Executing the Mushroom Expert event")
+      val updatedGameState = mushRoomsExpert(initialGameState, ch)
+      val selectedCard = getSelectedCard()
+
+      Then("The deck size should remain unchanged")
+      updatedGameState.deck.size shouldBe initialDeck.size
+
+      And("The selected card should be modified with new health, but all other attributes must remain identical")
+      val updatedCard = (updatedGameState.deck.toList diff initialDeck.toList).head
+      
+      updatedCard match {
+        case updatedCreature: CreatureCard =>
+          val initialCreature = selectedCard.asInstanceOf[CreatureCard]
+          updatedCard.health shouldBe (initialCreature.health * 2)
+          updatedCreature.attack shouldBe (initialCreature.attack * 2)
+          updatedCreature.withAttack(initialCreature.attack).withHealth(initialCreature.health) shouldBe initialCreature
+
+        case _ =>
+          fail("The updated card is not a CreatureCard")
+      }
+      
+
+      And("The game should not be over")
+      updatedGameState.isGameOver shouldBe false
+
+      guiThread.join(1000)
+    }
+
   }
 }

@@ -71,7 +71,7 @@ private def modifyCreature(card: Card[?])(f: CreatureCard => Card[?]): Card[?] =
   case other           => other
 }
 
-def mushRooms(gameState: GameState, ch: GUIChannel): GameState =
+def mushRoomsExpert(gameState: GameState, ch: GUIChannel): GameState =
   substituteACard(
     gameState,
     ch,
