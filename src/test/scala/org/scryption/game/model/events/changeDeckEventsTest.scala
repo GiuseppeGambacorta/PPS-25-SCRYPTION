@@ -158,30 +158,46 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
 
   Feature("Mushroom Expert event") {
 
-    Scenario("Powering up a card health and attack when receiving a valid SingleCard message") {
-      Given("An initial GameState with 2 cards and a GUIChannel")
-      val initialDeck = fromList(squirrel :: bear :: Nil)
+    Scenario("Returning the same GameState when no duplicate cards exist in the deck") {
+      Given("An initial GameState with a deck containing no duplicates")
+      val initialDeck = fromList(squirrel :: bear :: fox :: Nil)
       val initialGameState = GameState(initialDeck, isGameOver = false)
       val ch = GUIChannel.getNewChannel
+
+      When("Executing the Mushroom Expert event")
+      val updatedGameState = mushRoomsExpert(initialGameState, ch)
+
+      Then("The returned GameState should be identical to the initial GameState")
+      updatedGameState shouldBe initialGameState
+    }
+
+    Scenario("Fusing duplicate cards when duplicate cards exist in the deck") {
+      Given("An initial GameState with a deck containing duplicates")
+      val initialDeck = fromList(bear :: bear :: squirrel :: Nil)
+      val initialGameState = GameState(initialDeck, isGameOver = false)
+      val ch = GUIChannel.getNewChannel
+
+      // Simula la risposta della GUI selezionando la carta duplicata (bear)
       ch.sendToGame(GUIMessages.SingleCard(bear))
 
       When("Executing the Mushroom Expert event")
       val updatedGameState = mushRoomsExpert(initialGameState, ch)
 
-      Then("The deck size should remain unchanged")
-      updatedGameState.deck.size shouldBe initialDeck.size
+      Then("The deck size should decrease by 1 (2 duplicates removed, 1 fused card added)")
+      updatedGameState.deck.size shouldBe (initialDeck.size - 1)
 
-      And("The selected card should be modified with new health and attack, but all other attributes must remain identical")
-      val updatedCard = (updatedGameState.deck.toList diff initialDeck.toList).head
+      And("The duplicate cards should be removed and replaced with a card with doubled stats")
+      updatedGameState.deck.toList should not contain bear
 
-      updatedCard match {
-        case updatedCreature: CreatureCard =>
-          updatedCard.health shouldBe (bear.health * 2)
-          updatedCreature.attack shouldBe (bear.attack * 2)
-          updatedCreature.withAttack(bear.attack).withHealth(bear.health) shouldBe bear
+      val fusedCard = updatedGameState.deck.toList.find(_.name == bear.name)
+
+      fusedCard match {
+        case Some(creature: CreatureCard) =>
+          creature.attack shouldBe (bear.attack * 2)
+          creature.health shouldBe (bear.health * 2)
 
         case _ =>
-          fail("The updated card is not a CreatureCard")
+          fail("Expected a fused CreatureCard with updated stats")
       }
 
       And("The game should not be over")
@@ -257,20 +273,18 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val deckWithMixedCards = fromList(squirrel :: bear :: card1 :: Nil)
       val initialGameState = GameState(deckWithMixedCards, isGameOver = false)
       val ch = GUIChannel.getNewChannel
-      
+
       val guiThread = new Thread(() => {
         val receivedMsg = ch.receiveFromGame
         receivedMsg match {
           case GUIMessages.Cards(offeredCards) =>
-      
             offeredCards.forall(_.seals.nonEmpty) shouldBe true
             offeredCards should contain(card1)
             offeredCards should not contain squirrel
             offeredCards should not contain bear
-            
+
             ch.sendToGame(GUIMessages.SingleCard(card1))
 
-           
             ch.receiveFromGame
             ch.sendToGame(GUIMessages.SingleCard(bear))
 
