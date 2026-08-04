@@ -19,31 +19,26 @@ class GuiListener(channel: GUIChannelInterface) extends Thread {
           currentCards = cards
 
           Swing.onEDT {
-            currentView.foreach(v => v.close())
+            //currentView.foreach(v => v.close())
 
-            val view = new CardSelectionView(channel, (selectedIndex: Int) => {
-              if (selectedIndex >= 0 && selectedIndex < currentCards.length) {
-                val selectedCard = currentCards(selectedIndex)
-                channel.sendToGui(GUIMessages.SingleCard(selectedCard))
-              } else {
-                println(s"Error: Invalid ID: $selectedIndex")
-              }
-            })
+            val view = new CardSelectionView(
+              channel = channel
+            )
 
             currentView = Some(view)
 
-            val viewInfos = cards.map(_.toViewInfo)
-            view.showCards(viewInfos)
+            //val viewInfos = cards.map(_.toViewInfo)
+            //view.showCards(viewInfos)
           }
 
         case GUIMessages.SingleCard(card) =>
         // println(s"Listener received echo: ${card.name}")
 
         case GUIMessages.End =>
-          running = false
-          Swing.onEDT {
-            currentView.foreach(_.close())
-          }
+          running = true
+         // Swing.onEDT {
+          //  currentView.foreach(_.close())
+         // }
       }
     }
   }

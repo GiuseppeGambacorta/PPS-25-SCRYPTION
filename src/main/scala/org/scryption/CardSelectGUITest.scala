@@ -14,11 +14,8 @@ object CardSelectGUITest {
 
     var currentState = GameState(Deck.empty, isGameOver = false)
 
-    val testEvents: List[Event] = List(
-      (state, ch) => {
-        getANewCard(state, ch)
-      }
-    )
+    val testEvents: List[Event] = List(getANewCard, getANewCard)
+    
 
     var runningState = currentState
     var eventCount = 1

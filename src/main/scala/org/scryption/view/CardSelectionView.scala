@@ -3,18 +3,18 @@ package org.scryption.view
 import org.scryption.view.CardViewAssets
 import org.scryption.view.CardViewInfo
 import org.scryption.view.ResourceLoader
-import org.scryption.GUIChannelInterface
+import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.game.model.Card
 
 import java.awt.{Cursor, Dimension}
 import java.awt.image.BufferedImage
 import java.awt.event.{MouseEvent, MouseListener}
-import javax.swing.{ImageIcon, JFrame, JLabel, Timer}
-import scala.swing.{FlowPanel, Graphics2D, MainFrame, Panel, Swing}
+import javax.swing.{ImageIcon, JLabel, Timer}
+import scala.swing.{FlowPanel, Graphics2D, Panel, Swing}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class CardSelectionView(
-                         channel: GUIChannelInterface,
-                         onSelectionConfirmed: Int => Unit
-                       ) extends MainFrame {
+class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
   private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
   private val geometry = CardGeometry(cardWidth = 380)
@@ -34,24 +34,37 @@ class CardSelectionView(
   private val tickMillis = 16
   private val slideDistance = 800
 
-  private var backgroundPanel: BackgroundPanel = _
+  private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
 
-  title = "Selección de Carta"
-  peer.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH)
+  // Stato locale gestito direttamente dalla vista
+  private var currentCards: List[Card[?]] = Nil
 
-  setupBackground()
+  opaque = false
 
-  private def setupBackground(): Unit = {
-    backgroundPanel = new BackgroundPanel()
-    contents = backgroundPanel
+  // Avvio dell'ascolto sul canale all'istanziazione
+  listenToChannel()
+
+  override protected def paintComponent(g: Graphics2D): Unit = {
+    backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
+    super.paintComponent(g)
   }
 
-  private class BackgroundPanel extends FlowPanel {
-    opaque = false
-    private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
-    override protected def paintComponent(g: Graphics2D): Unit = {
-      backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
-      super.paintComponent(g)
+  /** Ascolta i messaggi in arrivo dal canale in un thread separato.
+   * Quando riceve la lista delle carte, aggiorna la UI sull'EDT.
+   */
+  private def listenToChannel(): Unit = {
+    Future {
+      while (true) {
+        val msg = channel.receiveFromGame
+        msg match {
+          case GUIMessages.Cards(cards) =>
+            Swing.onEDT {
+              this.currentCards = cards
+              showCards(cards.map(_.toViewInfo))
+            }
+          case _ =>
+        }
+      }
     }
   }
 
@@ -139,42 +152,37 @@ class CardSelectionView(
     }
 
     private def finishSelection(): Unit = {
-      onSelectionConfirmed(index)
-
-      Swing.onEDT {
-        peer.setVisible(false)
-        peer.dispose()
+      if (index >= 0 && index < currentCards.length) {
+        val selectedCard = currentCards(index)
+        // Notifica il callback passando l'oggetto Card selezionato
+        channel.sendToGui(GUIMessages.SingleCard(selectedCard))
+      } else {
+        println(s"Error: Invalid index: $index")
       }
     }
   }
 
-  def showCards(cardsViewInfo: List[CardViewInfo]): Unit = {
-    Swing.onEDT {
-      //backgroundPanel.contents = Nil
+  private def showCards(cardsViewInfo: List[CardViewInfo]): Unit = {
+    contents.clear()
 
-      val slots: Vector[CardSlot] = cardsViewInfo.zipWithIndex.map { case (info, i) =>
-        new CardSlot(i, info, i * (geometry.cardWidth + cardGap))
-      }.toVector
+    val slots: Vector[CardSlot] = cardsViewInfo.zipWithIndex.map { case (info, i) =>
+      new CardSlot(i, info, i * (geometry.cardWidth + cardGap))
+    }.toVector
 
-      slots.foreach(_.setSiblings(slots))
+    slots.foreach(_.setSiblings(slots))
 
-      val panel = new Panel {
-        peer.setLayout(null)
-        opaque = false
-        preferredSize = new Dimension(
-          (geometry.cardWidth + cardGap) * cardsViewInfo.length - cardGap,
-          topOffset + geometry.cardHeight + slideDistance
-        )
-        slots.foreach(s => peer.add(s.label))
-      }
-
-      backgroundPanel.contents += panel
-      backgroundPanel.peer.revalidate()
-      backgroundPanel.peer.repaint()
-
-      if (!peer.isVisible()) peer.setVisible(true)
+    val panel = new Panel {
+      peer.setLayout(null)
+      opaque = false
+      preferredSize = new Dimension(
+        (geometry.cardWidth + cardGap) * cardsViewInfo.length - cardGap,
+        topOffset + geometry.cardHeight + slideDistance
+      )
+      slots.foreach(s => peer.add(s.label))
     }
-  }
 
-  override def close(): Unit = peer.dispose()
+    contents += panel
+    peer.revalidate()
+    peer.repaint()
+  }
 }
