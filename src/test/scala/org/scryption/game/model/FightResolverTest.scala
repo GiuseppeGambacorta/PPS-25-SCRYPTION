@@ -36,7 +36,7 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       Then("it should target the opposing card at column 2")
       targets shouldBe List(OpposingCard(2))
 
-  private val advancedResolver: FightResolver = new BasicResolver with AirborneResolver
+  private val advancedResolver: FightResolver = new BasicResolver with AirborneResolver with StrikeResolver
 
   Feature("Airborne and Wall Seals Resolution"):
     Scenario("Airborne card flies over a normal creature"):
@@ -62,3 +62,26 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
       Then("it should be blocked and target the opposing boulder")
       targets shouldBe List(OpposingCard(1))
+
+  Feature("Strike Seals Resolution"):
+    Scenario("Bifurcated Strike attacks left and right"):
+      Given("A mantis (BifurcatedStrike) at column 1 facing an empty row")
+      val mantis = CardLibrary.mantis
+      val opponentRow: BoardRow = x | x | x | x
+
+      When("resolving targets")
+      val targets = advancedResolver.getTargets(1, mantis, opponentRow)
+
+      Then("it should hit column 0 and 2 (Opponent directly)")
+      targets should contain theSameElementsAs List(Opponent, Opponent)
+
+    Scenario("Trifurcated Strike attacks left, center, right and respects boundaries"):
+      Given("A mantis god (Trifurcated) at column 3 (right edge)")
+      val mantisGod = CreatureCard.empty named "MantisGod" withAttack 1 withHealth 1 addSeal Seal.TrifurcatedStrike
+      val opponentRow: BoardRow = x | x | x | x
+
+      When("resolving targets")
+      val targets = advancedResolver.getTargets(3, mantisGod, opponentRow)
+
+      Then("it should hit column 2 and 3, dropping the out-of-bounds right strike")
+      targets should contain theSameElementsAs List(Opponent, Opponent)
