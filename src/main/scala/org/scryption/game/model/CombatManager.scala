@@ -4,7 +4,7 @@ import org.scryption.game.model.boardModel.BoardRow
 
 /** Represents the result of a single card's attack phase.
  */
-case class CombatResult(updatedRow: BoardRow, damageToOpponent: Int)
+case class CombatResult(updatedRow: BoardRow, damageToOpponent: Int, killedCards: List[Card[?]])
 
 object CombatManager:
 
@@ -24,7 +24,7 @@ object CombatManager:
       case creature: CreatureCard => creature.attack
       case _: SupportCard         => 0
     val targets = resolver.getTargets(attackerCol, attacker, opponentRow)
-    targets.foldLeft(CombatResult(opponentRow, 0)) { (currentResult, target) => target match
+    targets.foldLeft(CombatResult(opponentRow, 0, List.empty)) { (currentResult, target) => target match
       case HitTarget.Opponent =>
         currentResult.copy(damageToOpponent = currentResult.damageToOpponent + attackDamage)
       case HitTarget.OpposingCard(colIndex) =>
@@ -33,7 +33,10 @@ object CombatManager:
             val hasTouchOfDeath = attacker.seals.contains(Seal.TouchOfDeath) && attackDamage > 0
             val remainingHealth = targetCard.health - attackDamage
             if hasTouchOfDeath || remainingHealth <= 0 then
-              currentResult.copy(updatedRow = currentResult.updatedRow.updated(colIndex, boardModel.x))
+              currentResult.copy(
+                updatedRow = currentResult.updatedRow.updated(colIndex, boardModel.x),
+                killedCards = currentResult.killedCards :+ targetCard
+              )
             else
               val updatedTargetCard = targetCard withHealth remainingHealth
               currentResult.copy(updatedRow = currentResult.updatedRow.updated(colIndex, Some(updatedTargetCard)))

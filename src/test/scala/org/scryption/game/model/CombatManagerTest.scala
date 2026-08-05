@@ -30,6 +30,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
       And("the opposing row should remain unchanged")
       result.updatedRow shouldBe opponentRow
+      result.killedCards.isEmpty shouldBe true
 
     Scenario("Attacking a creature reduces its health without killing it"):
       Given("An opossum attacking a grizzly")
@@ -44,6 +45,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       And("the grizzly's health should be reduced by 1")
       val updatedCard = result.updatedRow(0).get
       updatedCard.health shouldBe 5
+      result.killedCards.isEmpty shouldBe true
 
     Scenario("Attacking a creature with lethal damage removes it from the board"):
       Given("A wolf attacking a stoat")
@@ -55,6 +57,9 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       Then("the stoat should be removed from the board slot")
       result.updatedRow(1) shouldBe x
 
+      And("the stoat should be added to the killedCards list")
+      result.killedCards should contain allElementsOf List(stoat)
+
     Scenario("Touch of Death instantly kills a creature regardless of health"):
       Given("An adder (with Touch of Death) attacking a grizzly")
       val opponentRow: BoardRow = x | x | Some(grizzly) | x
@@ -64,6 +69,9 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
       Then("the grizzly should be instantly removed from the slot")
       result.updatedRow(2) shouldBe x
+
+      And("the grizzly should be added to the killedCards list")
+      result.killedCards should contain allElementsOf List(grizzly)
 
     Scenario("Bifurcated Strike attacks multiple targets accumulating damage and row updates"):
       Given("A mantis (with Bifurcated Strike) attacking from column 1")
@@ -84,3 +92,4 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       result.updatedRow(1) shouldBe x
       result.updatedRow(2) shouldBe x
       result.updatedRow(3) shouldBe x
+      result.killedCards.isEmpty shouldBe true
