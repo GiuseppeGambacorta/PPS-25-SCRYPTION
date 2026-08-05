@@ -155,7 +155,7 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
       if (index >= 0 && index < currentCards.length) {
         val selectedCard = currentCards(index)
         // Notifica il callback passando l'oggetto Card selezionato
-        channel.sendToGui(GUIMessages.SingleCard(selectedCard))
+        channel.sendToGame(GUIMessages.SingleCard(selectedCard))
       } else {
         println(s"Error: Invalid index: $index")
       }
