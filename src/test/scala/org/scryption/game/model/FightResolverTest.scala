@@ -11,10 +11,16 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
   private val basicResolver: FightResolver = new BasicResolver()
 
+  private val wolf = CardLibrary.wolf
+  private val stoat = CardLibrary.stoat
+  private val sparrow = CardLibrary.sparrow
+  private val boulder = SupportCard.empty named "Boulder" withHealth 5 addSeal Seal.Wall
+  private val mantis = CardLibrary.mantis
+  private val mantisGod = CreatureCard.empty named "MantisGod" withAttack 1 withHealth 1 addSeal Seal.TrifurcatedStrike
+
   Feature("Basic Fight Resolution"):
     Scenario("Attacking an empty opposing slot"):
       Given("A wolf attacking from column 1 an empty opponent row")
-      val wolf = CardLibrary.wolf
       val opponentRow: BoardRow = x | x | x | x
 
       When("resolving the targets")
@@ -25,8 +31,6 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
     Scenario("Attacking a slot with an opposing card"):
       Given("A wolf attacking from column 2 with a stoat in front of it")
-      val wolf = CardLibrary.wolf
-      val stoat = CardLibrary.stoat
       val stoatSlot: Slot = Some(stoat)
       val opponentRow: BoardRow = x | x | stoatSlot | x
 
@@ -41,8 +45,6 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
   Feature("Airborne and Wall Seals Resolution"):
     Scenario("Airborne card flies over a normal creature"):
       Given("A sparrow (Airborne) attacking from column 0 with a stoat in front of it")
-      val sparrow = CardLibrary.sparrow
-      val stoat = CardLibrary.stoat
       val opponentRow: BoardRow = Some(stoat) | x | x | x
 
       When("resolving the target")
@@ -53,8 +55,6 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
     Scenario("Wall seal blocks an Airborne card"):
       Given("A sparrow (Airborne) attacking from column 1 with a boulder (Wall) in front of it")
-      val sparrow = CardLibrary.sparrow
-      val boulder = SupportCard.empty named "Boulder" withHealth 5 addSeal Seal.Wall
       val opponentRow: BoardRow = x | Some(boulder) | x | x
 
       When("resolving the target")
@@ -66,7 +66,6 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
   Feature("Strike Seals Resolution"):
     Scenario("Bifurcated Strike attacks left and right"):
       Given("A mantis (BifurcatedStrike) at column 1 facing an empty row")
-      val mantis = CardLibrary.mantis
       val opponentRow: BoardRow = x | x | x | x
 
       When("resolving targets")
@@ -76,8 +75,7 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       targets should contain theSameElementsAs List(Opponent, Opponent)
 
     Scenario("Trifurcated Strike attacks left, center, right and respects boundaries"):
-      Given("A mantis god (Trifurcated) at column 3 (right edge)")
-      val mantisGod = CreatureCard.empty named "MantisGod" withAttack 1 withHealth 1 addSeal Seal.TrifurcatedStrike
+      Given("A mantis god (TrifurcatedStrike) at column 3 (right edge)")
       val opponentRow: BoardRow = x | x | x | x
 
       When("resolving targets")

@@ -10,6 +10,7 @@ enum HitTarget:
 trait FightResolver:
 
   /** Gets the target of an attacking card.
+   * 
    * @param attackerCol The column of the attacker
    * @param attacker The attacking card
    * @param opponentRow The row in front of the attacking card
