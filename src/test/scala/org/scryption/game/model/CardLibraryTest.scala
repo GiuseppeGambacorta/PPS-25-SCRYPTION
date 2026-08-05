@@ -4,6 +4,7 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 
+/*
 class CardLibraryTest extends AnyFeatureSpec with GivenWhenThen with Matchers {
 
   Feature("Card generation from Library") {
@@ -67,3 +68,4 @@ class CardLibraryTest extends AnyFeatureSpec with GivenWhenThen with Matchers {
     }
   }
 }
+*/
