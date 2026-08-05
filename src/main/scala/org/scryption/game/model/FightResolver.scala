@@ -22,3 +22,13 @@ class BasicResolver extends FightResolver:
     opponentRow(attackerCol) match
       case Some(_) => List(OpposingCard(attackerCol))
       case None => List(Opponent)
+
+trait AirborneResolver extends FightResolver:
+  abstract override def getTargets(attackerCol: Int, attacker: Card[?], opponentRow: BoardRow): List[HitTarget] =
+    if !attacker.seals.contains(Seal.Airborne) then
+      super.getTargets(attackerCol, attacker, opponentRow)
+    else
+      opponentRow(attackerCol) match
+        case Some(card) if card.seals.contains(Seal.Wall) =>
+          super.getTargets(attackerCol, attacker, opponentRow)
+        case _ => List(Opponent)
