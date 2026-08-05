@@ -10,21 +10,14 @@ import org.scryption.GUIMessages
 import org.scryption.GUIChannel
 import org.scryption.GUIChannelInterface
 
-object TestCards:
-  val squirrel: CreatureCard = CreatureCard.empty withAttack(1) named("squirrel") withHealth(1)
-  val bear: CreatureCard = CreatureCard.empty withAttack(2) named("bear") withHealth(3)
-  val fox: CreatureCard = CreatureCard.empty withAttack(1) named("fox") withHealth(1)
-
-  val card1: CreatureCard = CreatureCard.empty withAttack(0) named("firstCard") withHealth(1) addSeal(Sprinter) addSeal(Wall)
-  val card2: CreatureCard = CreatureCard.empty withAttack(0) named("secondCard") withHealth(1)
-
 class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
-  private val squirrel = TestCards.squirrel
-  private val bear = TestCards.bear
-  private val fox = TestCards.fox
-  private val card1 = TestCards.card1
-  private val card2 = TestCards.card2
+  private val squirrel: CreatureCard = CreatureCard.empty withAttack 1 named ("squirrel") withHealth 1
+  private val bear: CreatureCard = CreatureCard.empty withAttack 2 named ("bear") withHealth 3
+  private val fox: CreatureCard = CreatureCard.empty withAttack 1 named ("fox") withHealth 1
+
+  private val card1: CreatureCard = CreatureCard.empty withAttack  1 named ("firstCard") withHealth 1 addSeal Sprinter addSeal Wall
+  private val card2: CreatureCard = CreatureCard.empty withAttack  0 named ("secondCard") withHealth 1
 
   private def runMockGuiWithRetry(ch: GUIChannelInterface)(wrongResponses: List[GUIMessages], correctResponses: List[GUIMessages]): Thread =
     val thread = new Thread(() => {
