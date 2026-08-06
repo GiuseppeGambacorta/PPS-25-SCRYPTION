@@ -32,10 +32,10 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       val wolf = CreatureCard.empty named "Wolf"
 
       When("added a seal")
-      val buffedWolf = wolf addSeal Seal.Immortal
+      val buffedWolf = wolf addSeal Seal.Unkillable
 
       Then("the new card should have the new seal")
-      buffedWolf.seals.head shouldBe Seal.Immortal
+      buffedWolf.seals.head shouldBe Seal.Unkillable
 
       And("the original card should remain unchanged")
       wolf.seals.isEmpty shouldBe true
@@ -115,12 +115,12 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
     Scenario("Creating and modifying a SupportCard") {
       Given("A SupportCard")
       val boulder =
-        SupportCard.empty named "Boulder" withHealth 5 withSacrificeAttribute SacrificeAttribute.Nil() addSeal Seal.Wall
+        SupportCard.empty named "Boulder" withHealth 5 withSacrificeAttribute SacrificeAttribute.Nil() addSeal Seal.MightyLeap
 
       Then("it should correctly update all valid attributes")
       boulder.name shouldBe "Boulder"
       boulder.health shouldBe 5
-      boulder.seals.head shouldBe Seal.Wall
+      boulder.seals.head shouldBe Seal.MightyLeap
     }
   }
 
