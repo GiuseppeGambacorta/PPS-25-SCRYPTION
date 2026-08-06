@@ -31,7 +31,7 @@ trait AirborneResolver extends FightResolver:
         super.getTargets(attackerCol, attacker, opponentRow)
       case _ =>
         opponentRow(attackerCol) match
-          case Some(card) if card.seals.contains(Seal.Wall) =>
+          case Some(card) if card.seals.contains(Seal.MightyLeap) =>
             super.getTargets(attackerCol, attacker, opponentRow)
           case _ => List(Opponent)
 
