@@ -1,6 +1,7 @@
 package org.scryption
 
 import org.scryption.game.model.Card
+import org.scryption.game.model.events
 
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -9,6 +10,9 @@ import java.util.concurrent.LinkedBlockingQueue
 enum GUIMessages:
   case Cards(cards: List[Card[?]])
   case SingleCard(card: Card[?])
+  case FightState(fightState: events.FightState)
+  case DrawFromSquirrel
+  case DrawFromDeck
   case End
 
 trait GUIChannelInterface:
