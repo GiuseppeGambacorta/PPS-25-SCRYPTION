@@ -50,3 +50,23 @@ object MovementManager:
             case _ => acc
         case _ => acc
     finalRow
+
+  /** Manages the Guardian seal reaction when an opponent plays a card.
+   *
+   * @param row The current state of the player's board row.
+   * @param playedCol The column index where the opponent just played a card.
+   * @return the update row if a Guardian moved, or the original row otherwise.
+   */
+  def resolveGuardianMovement(row: BoardRow, playedCol: Int): BoardRow =
+    val guardianIndexOpt = (0 until boardModel.ColsCount).find: colIndex =>
+      row(colIndex) match
+        case Some(card) => card.seals.contains(Seal.Guardian)
+        case None       => false
+    guardianIndexOpt match
+      case Some(originalIndex) =>
+        row(originalIndex) match
+          case Some(card) => row.updated(originalIndex, boardModel.x).updated(playedCol, Some(card))
+          case None => row
+      case None => row
+
+
