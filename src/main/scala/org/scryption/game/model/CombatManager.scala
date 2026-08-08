@@ -68,9 +68,11 @@ object CombatManager:
           val bonesFromAttack = combatResult.killedCards.map: deadCard =>
             if deadCard.seals.contains(Seal.BoneKing) then 4 else 1
           .sum
+          val immortals = combatResult.killedCards.filter(cards => cards.seals.contains(Seal.Unkillable))
           acc.copy(
             updatedOpponentRow = combatResult.updatedRow,
             damageDelta = acc.damageDelta + combatResult.damageToOpponent,
-            earnedBones = acc.earnedBones + bonesFromAttack
+            earnedBones = acc.earnedBones + bonesFromAttack,
+            returnedToHandCards = acc.returnedToHandCards ++ immortals
           )
         case None => acc

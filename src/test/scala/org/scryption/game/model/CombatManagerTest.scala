@@ -128,3 +128,20 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
       And("it should give exactly 4 bones thanks to the seal")
       result.earnedBones shouldBe 4
+
+    Scenario("Seal: Unkillable returns the card to the hand upon death"):
+      Given("An attacker row with a wolf and a defender row with an Unkillable cockroach")
+      val attackerRow: BoardRow = Some(wolf) | x | x | x
+      val defenderRow: BoardRow = Some(cockroach) | x | x | x
+
+      When("the full row attack is executed")
+      val result = CombatManager.executeRowAttack(attackerRow, defenderRow, resolver)
+
+      Then("the cockroach should be removed from the board")
+      result.updatedOpponentRow(0) shouldBe x
+
+      And("it should give 1 bone")
+      result.earnedBones shouldBe 1
+
+      And("the cockroach should be added to the returnedToHandCards list")
+      result.returnedToHandCards should contain theSameElementsAs List(cockroach)
