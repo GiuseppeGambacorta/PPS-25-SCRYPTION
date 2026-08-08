@@ -31,10 +31,31 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       When("resolving end of turn movements")
       val updatedRow = MovementManager.resolveRowMovements(row)
 
-      Then("the elk, blocked by the boulder, changes to Sprinter(Left) and moves to col 0")
+      Then("the elk, blocked by the boulder, should change to Sprinter(Left) and move to col 0")
       updatedRow(1) shouldBe x
       updatedRow(0) shouldBe Some(elkLeft)
 
       And("the boulder should remain unchanged in col 2")
       updatedRow(2) shouldBe Some(boulder)
 
+    Scenario("Sprinter(Left) moves to the left if the slot is empty"):
+      Given("A row with an elk moving left at column 2")
+      val row: BoardRow = x | x | Some(elkLeft) | x
+
+      When("resolving end of turn movements")
+      val updatedRow = MovementManager.resolveRowMovements(row)
+
+      Then("the elk should physically move to column 1")
+      updatedRow(2) shouldBe x
+      updatedRow(1) shouldBe Some(elkLeft)
+
+    Scenario("Sprinter(Left) at the left edge bounces and changes direction to right"):
+      Given("A row with an elk moving left at the leftmost edge (column 0)")
+      val row: BoardRow = Some(elkLeft) | x | x | x
+
+      When("resolving end of turn movements")
+      val updatedRow = MovementManager.resolveRowMovements(row)
+
+      Then("the elk should change to Sprinter(Right) and move to col 1")
+      updatedRow(0) shouldBe x
+      updatedRow(1) shouldBe Some(elkRight)
