@@ -73,33 +73,37 @@ enum SacrificeAttribute:
     case Blood(v) => v >= 0
     case Bones(v) => v >= 0
     case Nil()    => true
+    
+enum Direction:
+  case Left
+  case Right
 
 enum Seal:
-  case RabbitHole         // When this card is played, a Rabbit is created in your hand.
-  case BeesWithin         // When this card is struck, a Bee is created in your hand.
-  case Sprinter           // At the end of the owner's turn, this card moves in the sigil's direction.
-  case TouchOfDeath       // This card instantly kills any card it damages.
-  case Fledgling          // After surviving for 1 turn, this card grows into a stronger form.
-  case DamBuilder         // When this card is played, Dams are created on adjacent empty spaces.
-  case Burrower           // This card will move to any empty space that is attacked by an enemy to block it.
-  case Fecundity          // When this card is played, a copy of it enters your hand.
-  case BoneKing           // When this card dies, 4 Bones are awarded instead of 1.
-  case Waterborne         // On the opponent's turn, creatures attacking this card's space attack directly.
-  case Unkillable         // When this card perishes, a copy of it enters your hand.
-  case SharpQuills        // Once this card is struck, the striker is dealt 1 damage.
-  case Hefty              // At the end of the owner's turn, this and adjacent cards move in the sigil's direction.
-  case AntSpawner         // When this card is played, an Ant enters your hand.
-  case Guardian           // When an opposing card is played opposite an empty space, this card moves to that space.
-  case Airborne           // This card will ignore opposing cards and strike an opponent directly.
-  case ManyLives          // When this card is sacrificed, it does not perish.
-  case WorthySacrifice    // This card counts as 3 Blood rather than 1 Blood when sacrificed.
-  case MightyLeap         // This card blocks opposing Airborne creatures.
-  case BifurcatedStrike   // This card will strike each opposing space to the left and right of the spaces across it.
-  case TrifurcatedStrike  // This card will deal damage to the opposing spaces left, right, and opposite of it.
-  case FrozenAway         // When this card perishes, the creature inside takes its place.
-  case TrinketBearer      // When this card is played, you will receive an item if you have room.
-  case Leader             // Creatures adjacent to this card gain 1 Power.
-  case Stinky             // The creature opposing this card loses 1 Power.
+  case RabbitHole                       // When this card is played, a Rabbit is created in your hand.
+  case BeesWithin                       // When this card is struck, a Bee is created in your hand.
+  case Sprinter(direction: Direction)   // At the end of the owner's turn, this card moves in the sigil's direction.
+  case TouchOfDeath                     // This card instantly kills any card it damages.
+  case Fledgling                        // After surviving for 1 turn, this card grows into a stronger form.
+  case DamBuilder                       // When this card is played, Dams are created on adjacent empty spaces.
+  case Burrower                         // This card will move to any empty space that is attacked by an enemy to block it.
+  case Fecundity                        // When this card is played, a copy of it enters your hand.
+  case BoneKing                         // When this card dies, 4 Bones are awarded instead of 1.
+  case Waterborne                       // On the opponent's turn, creatures attacking this card's space attack directly.
+  case Unkillable                       // When this card perishes, a copy of it enters your hand.
+  case SharpQuills                      // Once this card is struck, the striker is dealt 1 damage.
+  case Hefty                            // At the end of the owner's turn, this and adjacent cards move in the sigil's direction.
+  case AntSpawner                       // When this card is played, an Ant enters your hand.
+  case Guardian                         // When an opposing card is played opposite an empty space, this card moves to that space.
+  case Airborne                         // This card will ignore opposing cards and strike an opponent directly.
+  case ManyLives                        // When this card is sacrificed, it does not perish.
+  case WorthySacrifice                  // This card counts as 3 Blood rather than 1 Blood when sacrificed.
+  case MightyLeap                       // This card blocks opposing Airborne creatures.
+  case BifurcatedStrike                 // This card will strike each opposing space to the left and right of the spaces across it.
+  case TrifurcatedStrike                // This card will deal damage to the opposing spaces left, right, and opposite of it.
+  case FrozenAway                       // When this card perishes, the creature inside takes its place.
+  case TrinketBearer                    // When this card is played, you will receive an item if you have room.
+  case Leader                           // Creatures adjacent to this card gain 1 Power.
+  case Stinky                           // The creature opposing this card loses 1 Power.
 
 enum Rarity:
   case Common

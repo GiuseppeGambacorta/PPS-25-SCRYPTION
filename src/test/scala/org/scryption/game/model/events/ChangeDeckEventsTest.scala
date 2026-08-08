@@ -3,9 +3,9 @@ package org.scryption.game.model.events
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.game.model.{Card, CreatureCard, Seal}
+import org.scryption.game.model.{Card, CreatureCard, Direction, Seal}
 import org.scryption.game.model.Deck.*
-import org.scryption.game.model.Seal.{Sprinter, MightyLeap}
+import org.scryption.game.model.Seal.{MightyLeap, Sprinter}
 import org.scryption.GUIMessages
 import org.scryption.GUIChannel
 import org.scryption.GUIChannelInterface
@@ -16,7 +16,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
   private val bear: CreatureCard = CreatureCard.empty withAttack 2 named ("bear") withHealth 3
   private val fox: CreatureCard = CreatureCard.empty withAttack 1 named ("fox") withHealth 1
 
-  private val card1: CreatureCard = CreatureCard.empty withAttack  1 named ("firstCard") withHealth 1 addSeal Sprinter addSeal MightyLeap
+  private val card1: CreatureCard = CreatureCard.empty withAttack  1 named ("firstCard") withHealth 1 addSeal Sprinter(Direction.Right) addSeal MightyLeap
   private val card2: CreatureCard = CreatureCard.empty withAttack  0 named ("secondCard") withHealth 1
 
   private def runMockGuiWithRetry(ch: GUIChannelInterface)(wrongResponses: List[GUIMessages], correctResponses: List[GUIMessages]): Thread =
