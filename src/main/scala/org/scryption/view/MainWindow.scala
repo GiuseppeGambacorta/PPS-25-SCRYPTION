@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object MainWindows extends SimpleSwingApplication:
 
-  type GameEvent = (Event, GUIChannelInterface => CardSelectionView)
+  type GameEvent = (Event, GUIChannelInterface => FireCampAttackView)
 
   override def top: MainFrame = new MainFrame:
     title = "Scryption - Main Window"
@@ -36,8 +36,7 @@ object MainWindows extends SimpleSwingApplication:
       val gameState = GameState(deck = Deck.getStandardDeck, isGameOver = false)
 
       val listEvents: List[GameEvent] = List(
-        (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(channel = ch)),
-        (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(channel = ch))
+        (fireCamp_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(channel = ch))
       )
 
     

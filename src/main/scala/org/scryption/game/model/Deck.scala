@@ -14,7 +14,7 @@ object Deck:
 
   /** @return a predefined standard deck starting configuration.
    */
-  def getStandardDeck: Deck = List(CardLibrary.squirrel, CardLibrary.squirrel)
+  def getStandardDeck: Deck = List(CardLibrary.stoat, CardLibrary.riverSnapper, CardLibrary.bullfrog, CardLibrary.wolf)
 
   /** Wraps a list of cards into a Deck.
    *

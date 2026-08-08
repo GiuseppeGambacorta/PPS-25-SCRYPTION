@@ -44,7 +44,6 @@ object CardLibrary:
   val ringWorm: Card[?] = CreatureCard.empty named "Ring Worm" withAttack 0 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common
   // Worker Ant Attack ?
   // Ant Queen Attack ?
-  val stinkbug: Card[?] = CreatureCard.empty named "Stinkbug" withAttack 1 withHealth 2 withSacrificeAttribute Bones(2) withRarity Common addSeal Seal.Stinky
   val cockroach: Card[?] = CreatureCard.empty named "Cockroach" withAttack 1 withHealth 1 withSacrificeAttribute Bones(4) withRarity Common addSeal Seal.Unkillable
   
   // Reptile family
