@@ -65,12 +65,12 @@ object CombatManager:
       attackerRow(colIndex) match
         case Some(attacker) =>
           val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow, resolver)
-          val baseBones = combatResult.killedCards.size
+          val bonesFromAttack = combatResult.killedCards.map: deadCard =>
+            if deadCard.seals.contains(Seal.BoneKing) then 4 else 1
+          .sum
           acc.copy(
             updatedOpponentRow = combatResult.updatedRow,
             damageDelta = acc.damageDelta + combatResult.damageToOpponent,
-            earnedBones = acc.earnedBones + baseBones
+            earnedBones = acc.earnedBones + bonesFromAttack
           )
-
         case None => acc
-

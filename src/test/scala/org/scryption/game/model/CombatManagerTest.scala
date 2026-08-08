@@ -18,6 +18,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
   private val mantis = CardLibrary.mantis
   private val cockroach = CardLibrary.cockroach
   private val coyote = CardLibrary.coyote
+  private val boneKingCreature = CreatureCard.empty withAttack 1 named "boneKing" withHealth 1 addSeal Seal.BoneKing
 
   Feature("Combat execution and damage application"):
     Scenario("Attacking an empty slot deals direct damage to the opponent"):
@@ -104,13 +105,26 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
 
       When("the full row attack is executed")
       val result = CombatManager.executeRowAttack(attackerRow, defenderRow, resolver)
-      
+
       Then("the coyote should be removed")
       result.updatedOpponentRow(0) shouldBe x
-      
+
       And("it should give exactly 1 bone")
       result.earnedBones shouldBe 1
-      
+
       And("no cards should be returned to hand")
       result.returnedToHandCards shouldBe empty
-      
+
+    Scenario("Seal: BoneKing gives 4 bones upon death"):
+      Given("An attacker row with a wolf and a defender row with a BoneKing creature")
+      val attackerRow: BoardRow = Some(wolf) | x | x | x
+      val defenderRow: BoardRow = Some(boneKingCreature) | x | x | x
+
+      When("the full row attack is executed")
+      val result = CombatManager.executeRowAttack(attackerRow, defenderRow, resolver)
+
+      Then("the BoneKing creature should be removed")
+      result.updatedOpponentRow(0) shouldBe x
+
+      And("it should give exactly 4 bones thanks to the seal")
+      result.earnedBones shouldBe 4
