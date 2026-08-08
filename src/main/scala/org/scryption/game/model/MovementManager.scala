@@ -58,15 +58,18 @@ object MovementManager:
    * @return the update row if a Guardian moved, or the original row otherwise.
    */
   def resolveGuardianMovement(row: BoardRow, playedCol: Int): BoardRow =
-    val guardianIndexOpt = (0 until boardModel.ColsCount).find: colIndex =>
-      row(colIndex) match
-        case Some(card) => card.seals.contains(Seal.Guardian)
-        case None       => false
-    guardianIndexOpt match
-      case Some(originalIndex) =>
-        row(originalIndex) match
-          case Some(card) => row.updated(originalIndex, boardModel.x).updated(playedCol, Some(card))
-          case None => row
-      case None => row
+    if playedCol < 0 || playedCol >= boardModel.ColsCount || row(playedCol).isDefined then
+      row
+    else
+      val guardianIndexOpt = (0 until boardModel.ColsCount).find: colIndex =>
+        row(colIndex) match
+          case Some(card) => card.seals.contains(Seal.Guardian)
+          case None       => false
+      guardianIndexOpt match
+        case Some(originalIndex) =>
+          row(originalIndex) match
+            case Some(card) => row.updated(originalIndex, boardModel.x).updated(playedCol, Some(card))
+            case None => row
+        case None => row
 
 

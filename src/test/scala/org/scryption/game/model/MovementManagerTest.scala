@@ -98,3 +98,16 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       updatedRow(0) shouldBe Some(boulder)
       updatedRow(2) shouldBe x
     }
+
+    Scenario("Guardian does not move if the targeted column is already occupied") {
+      Given("A row with a Bloodhound at column 3, a Boulder at column 1, and opponent plays at column 1")
+      val row: BoardRow = x | Some(boulder) | x | Some(bloodhound)
+      val playedCol = 1
+
+      When("resolving Guardian reaction")
+      val updatedRow = MovementManager.resolveGuardianMovement(row, playedCol)
+
+      Then("the row should remain unchanged because the slot is blocked")
+      updatedRow(1) shouldBe Some(boulder)
+      updatedRow(3) shouldBe Some(bloodhound)
+    }
