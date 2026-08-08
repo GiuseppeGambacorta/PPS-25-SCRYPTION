@@ -6,6 +6,15 @@ import org.scryption.game.model.boardModel.BoardRow
  */
 case class CombatResult(updatedRow: BoardRow, damageToOpponent: Int, killedCards: List[Card[?]])
 
+/** Represents the result of an entire row attack.
+ */
+case class RowAttackResult(
+    updatedOpponentRow: BoardRow,
+    damageDelta: Int,
+    earnedBones: Int,
+    returnedToHandCards: List[Card[?]]
+)
+
 object CombatManager:
 
   /** Performs an attack from a single card, resolving targets and applying damage.
@@ -42,3 +51,26 @@ object CombatManager:
               currentResult.copy(updatedRow = currentResult.updatedRow.updated(colIndex, Some(updatedTargetCard)))
           case None => currentResult
     }
+
+  /** Performs a full row attack from left to right.
+   *
+   * @param attackerRow The row of cards initiating the attack.
+   * @param defenderRow The row of cards defending.
+   * @param resolver The FightResolver to use for targeting.
+   * @return a RowAttackResult accumulating all damages, bones and board updates.
+   */
+  def executeRowAttack(attackerRow: BoardRow, defenderRow: BoardRow, resolver: FightResolver): RowAttackResult =
+    val initialResult = RowAttackResult(defenderRow, 0, 0, List.empty)
+    (0 until boardModel.ColsCount).foldLeft(initialResult): (acc, colIndex) =>
+      attackerRow(colIndex) match
+        case Some(attacker) =>
+          val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow, resolver)
+          val baseBones = combatResult.killedCards.size
+          acc.copy(
+            updatedOpponentRow = combatResult.updatedRow,
+            damageDelta = acc.damageDelta + combatResult.damageToOpponent,
+            earnedBones = acc.earnedBones + baseBones
+          )
+
+        case None => acc
+
