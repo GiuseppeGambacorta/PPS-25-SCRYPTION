@@ -36,6 +36,13 @@ sealed trait Card[C <: Card[C]]:
    */
   infix def addSeal(seal: Seal): C = copyCard(seals = this.seals + seal)
 
+  /** Creates a new instance of the card without the specified seal.
+   *
+   * @param seal The seal to remove.
+   * @return a new card instance of type C.
+   */
+  infix def removeSeal(seal: Seal): C = copyCard(seals = this.seals - seal)
+
   /** Creates a new instance of the card with an updated sacrifice cost.
    *
    * @param sacrificeAttribute The new cost (Blood, Bones, or Nil).

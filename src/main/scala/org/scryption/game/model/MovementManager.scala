@@ -12,8 +12,12 @@ object MovementManager:
     (0 until ColsCount).reverse.foldLeft(row): (currentRow, colIndex) =>
       currentRow(colIndex) match
         case Some(card) if card.seals.contains(Seal.Sprinter(Direction.Right)) =>
-          if colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty then
-            currentRow.updated(colIndex, boardModel.x).updated(colIndex + 1, Some(card))
+          val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
+          val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
+          if rightFree then currentRow.updated(colIndex, boardModel.x).updated(colIndex + 1, Some(card))
+          else if leftFree then
+            val flippedCard = card removeSeal Seal.Sprinter(Direction.Right) addSeal Seal.Sprinter(Direction.Left)
+            currentRow.updated(colIndex, boardModel.x).updated(colIndex - 1, Some(flippedCard))
           else
             currentRow
         case _ => currentRow
