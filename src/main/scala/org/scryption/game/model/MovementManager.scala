@@ -22,31 +22,31 @@ object MovementManager:
       val (currentRow, movedCards) = acc
       currentRow(colIndex) match
         case Some(card) if !movedCards.contains(card.id) =>
-          if card.seals.contains(Seal.Sprinter(Direction.Right)) then
-            val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
-            val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
-            if rightFree then
-              val newRow = getNewRowMoveRight(colIndex, currentRow, card)
-              (newRow, movedCards + card.id)
-            else if leftFree then
-              val flippedCard = card removeSeal Seal.Sprinter(Direction.Right) addSeal Seal.Sprinter(Direction.Left)
-              val newRow = getNewRowMoveLeft(colIndex, currentRow, flippedCard)
-              (newRow, movedCards + card.id)
-            else
-              acc
-          else if card.seals.contains(Seal.Sprinter(Direction.Left)) then
-            val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
-            val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
-            if leftFree then
-              val newRow = getNewRowMoveLeft(colIndex, currentRow, card)
-              (newRow, movedCards + card.id)
-            else if rightFree then
-              val flippedCard = card removeSeal Seal.Sprinter(Direction.Left) addSeal Seal.Sprinter(Direction.Right)
-              val newRow = getNewRowMoveRight(colIndex, currentRow, flippedCard)
-              (newRow, movedCards + card.id)
-            else
-              acc
-          else
-            acc
+          card.seals match
+            case seals if seals.contains(Seal.Sprinter(Direction.Right)) =>
+              val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
+              val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
+              if rightFree then
+                val newRow = getNewRowMoveRight(colIndex, currentRow, card)
+                (newRow, movedCards + card.id)
+              else if leftFree then
+                val flippedCard = card.removeSeal(Seal.Sprinter(Direction.Right)).addSeal(Seal.Sprinter(Direction.Left))
+                val newRow = getNewRowMoveLeft(colIndex, currentRow, flippedCard)
+                (newRow, movedCards + card.id)
+              else
+                acc
+            case seals if seals.contains(Seal.Sprinter(Direction.Left)) =>
+              val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
+              val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
+              if leftFree then
+                val newRow = getNewRowMoveLeft(colIndex, currentRow, card)
+                (newRow, movedCards + card.id)
+              else if rightFree then
+                val flippedCard = card.removeSeal(Seal.Sprinter(Direction.Left)).addSeal(Seal.Sprinter(Direction.Right))
+                val newRow = getNewRowMoveRight(colIndex, currentRow, flippedCard)
+                (newRow, movedCards + card.id)
+              else
+                acc
+            case _ => acc
         case _ => acc
     finalRow
