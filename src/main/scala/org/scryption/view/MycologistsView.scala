@@ -15,7 +15,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
 class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
   private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
-  private val geometry = CardGeometry(cardWidth = 380)
+  private val geometry = CardGeometry(cardWidth = 250)
   private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
   private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
   private val renderer = new CardView(geometry, nameFont, statFont)
@@ -24,7 +24,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
     new ImageIcon(new BufferedImage(geometry.cardWidth, geometry.cardHeight, BufferedImage.TYPE_INT_RGB))
 
   private val cardGap = 100
-  private val handTopOffset = 800
+  private val handTopOffset = 600
   private val hoverLiftAmount = 50
   private val slotY = 100
 

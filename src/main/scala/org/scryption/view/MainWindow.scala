@@ -16,40 +16,42 @@ object MainWindows extends SimpleSwingApplication:
 
   override def top: MainFrame = new MainFrame:
     title = "Scryption - Main Window"
-    preferredSize = new Dimension(1280, 900)
+    preferredSize = new Dimension(1920, 1080)
+    resizable = false
 
     val centerContainer = new BoxPanel(Orientation.Vertical)
     contents = centerContainer
 
-    // --- Pannello Iniziale ---
-    val startButton = new Button("Start Game")
-    val startPanel = new FlowPanel:
-      contents += startButton
+    // --- Start Screen ---
+    var gameRunning = false
 
-    // Imposta il pannello di start all'avvio dell'applicazione
-    cambiaVista(startPanel)
+    val startScreen = new StartScreenView(
+      onNewGame = () => startNewGame(),
+      onQuit = () => System.exit(0)
+    )
 
-    // Gestione del click sul pulsante Start
-    startButton.action = Action("Start Game") {
-      startButton.enabled = false // Disabilita per evitare doppi click
+    cambiaVista(startScreen)
 
-      val gameState = GameState(deck = Deck.getStandardDeck, isGameOver = false)
+    def startNewGame(): Unit =
+      if (!gameRunning) {
+        gameRunning = true
 
-      val listEvents: List[GameEvent] = List(
-        (mushRoomsExpert, (ch: GUIChannelInterface) => new MycologistsView(channel = ch))
-      )
+        val gameState = GameState(deck = Deck.getStandardDeck, isGameOver = false)
 
-    
-      Future {
-        try
-          gameLoop(gameState, listEvents)
-        finally
-          Swing.onEDT {
-            startButton.enabled = true
-            cambiaVista(startPanel)
-          }
+        val listEvents: List[GameEvent] = List(
+          (mushRoomsExpert, (ch: GUIChannelInterface) => new MycologistsView(channel = ch))
+        )
+
+        Future {
+          try
+            gameLoop(gameState, listEvents)
+          finally
+            Swing.onEDT {
+              gameRunning = false
+              cambiaVista(startScreen)
+            }
+        }
       }
-    }
 
     def cambiaVista(nuovaVista: Panel): Unit =
       Swing.onEDT {
