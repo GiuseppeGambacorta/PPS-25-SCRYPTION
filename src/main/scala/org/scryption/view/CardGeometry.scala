@@ -18,6 +18,9 @@ final case class CardGeometry(cardWidth: Int) {
   val sigilSize: Int = pct(0.35f)
   val twinSigilSize: Int = pct(0.25f)
 
+  val patchSize: Int = pct(0.4f)
+  val addedSigilSize: Int = pct(0.25f)
+
   val portraitX: Int = pct(0.1f)
   val portraitY: Int = pct(0.26f)
 
@@ -34,9 +37,19 @@ final case class CardGeometry(cardWidth: Int) {
   val sigilCenterX: Int = pct(0.35f)
   val sigilCenterY: Int = pct(1.07f)
 
+  val patchCenterX: Int = pct(0.5f)
+  val patchCenterY: Int = pct(1.25f)
+
   val sigilLeftX: Int = pct(0.27f)
   val sigilLeftY: Int = pct(1.55f)
 
   val sigilRightX: Int = pct(0.5f)
   val sigilRightY: Int = pct(1.4f)
+
+  val addedSigilSlotCenters: Vector[(Int, Int)] = Vector(
+    (pct(0.25f), pct(0.45f)),
+    (pct(0.25f), pct(0.8f)),
+    (pct(0.6f), pct(0.35f)),
+    (pct(0.65f), pct(0.7f))
+  )
 }

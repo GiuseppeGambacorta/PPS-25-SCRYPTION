@@ -83,4 +83,19 @@ object CardLibrary:
   val frozenOpossum: Card[?] = SupportCard.empty named "Frozen Opossum" withHealth 5
   val grandFir: Card[?] = SupportCard.empty named "Grand Fir" withHealth 3 addSeal Seal.MightyLeap
   val stump: Card[?] = SupportCard.empty named "Stump" withHealth 3
+
+  val allCards: List[Card[?]] = List(
+    kingfisher, ravenEgg, sparrow, raven, turkeyVulture,
+    wolfCub, bloodhound, wolf, coyote, alpha,
+    blackGoat, elkFawn, elk, pronghorn, mooseBuck,
+    mantisGod, bee, beehive, mantis, ringWorm, cockroach,
+    geck, ouroboros, bullfrog, adder, riverSnapper, rattler,
+    moleMan, packRat, urayuli, squirrel, rabbit, cat, mole,
+    porcupine, riverOtter, stoat, warren, beaver, fieldMice,
+    greatWhite, grizzly, opossum, bat,
+    boulder, dam, frozenOpossum, grandFir, stump
+  )
+
+  def byName(name: String): Option[Card[?]] =
+    allCards.find(_.name == name)
   

@@ -5,24 +5,28 @@ import org.scryption.game.model.*
 // Placeholder class to represent Cards
 
 final case class CardViewInfo(
-    name: String,
-    cost: String,
-    attack: String,
-    health: String,
-    sigils: List[String] = Nil,
-    cardType: String = ""
-)
+                               name: String,
+                               cost: String,
+                               attack: String,
+                               health: String,
+                               defaultSigils: List[String] = Nil,
+                               addedSigils: List[String] = Nil,
+                               cardType: String = ""
+                             )
 
 //  Converts a game-model Card into the view-facing CardViewInfo
 
 extension (card: Card[?])
   def toViewInfo: CardViewInfo =
+    val (defaultSeals, addedSeals) = CardViewConversions.splitSeals(card)
+
     CardViewInfo(
       name = card.name,
       cost = CardViewConversions.costLabel(card.sacrificeAttribute),
       attack = CardViewConversions.attackLabel(card),
       health = card.health.toString,
-      sigils = card.seals.toList.map(CardViewConversions.sealLabel),
+      defaultSigils = defaultSeals.toList.map(CardViewConversions.sealLabel),
+      addedSigils = addedSeals.toList.map(CardViewConversions.sealLabel),
       cardType = CardViewConversions.rarityLabel(card.rarity)
     )
 
@@ -37,10 +41,21 @@ private object CardViewConversions:
     case SacrificeAttribute.Bones(value) => s"${value}bone"
     case SacrificeAttribute.Nil()        => ""
 
+  // Splits a card's actual seals into (default, added), where "default" means
+  // present on the library's template card of the same name.
+  def splitSeals(card: Card[?]): (Set[Seal], Set[Seal]) =
+    val templateSeals: Set[Seal] =
+      CardLibrary.byName(card.name).map(_.seals).getOrElse(Set.empty)
+
+    val defaultSeals = card.seals.intersect(templateSeals)
+    val addedSeals = card.seals.diff(templateSeals)
+
+    (defaultSeals, addedSeals)
+
   def sealLabel(seal: Seal): String = seal match
     case Seal.RabbitHole        => "rabbit_hole"
     case Seal.BeesWithin        => "bees_within"
-    case Seal.Sprinter          => "sprinted"
+    case Seal.Sprinter          => "sprinter"
     case Seal.TouchOfDeath      => "touch_of_death"
     case Seal.Fledgling         => "fledgling"
     case Seal.DamBuilder        => "dam_builder"
