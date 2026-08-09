@@ -35,7 +35,7 @@ private object CardViewConversions:
   def costLabel(attribute: SacrificeAttribute): String = attribute match
     case SacrificeAttribute.Blood(value) => s"${value}blood"
     case SacrificeAttribute.Bones(value) => s"${value}bone"
-    case SacrificeAttribute.Nil()        => ""
+    case SacrificeAttribute.Nil        => ""
 
   def sealLabel(seal: Seal): String = seal match
     case Seal.RabbitHole        => "rabbit_hole"
