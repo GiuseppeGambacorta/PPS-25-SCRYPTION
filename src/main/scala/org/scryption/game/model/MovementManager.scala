@@ -1,0 +1,75 @@
+package org.scryption.game.model
+
+import org.scryption.game.model.boardModel.*
+
+import java.util.UUID
+
+object MovementManager:
+
+  private def getNewRowMoveRight(colIndex: Int, currentRow: BoardRow, card: Card[?]): BoardRow =
+    currentRow.updated(colIndex, boardModel.x).updated(colIndex + 1, Some(card))
+
+  private def getNewRowMoveLeft(colIndex: Int, currentRow: BoardRow, card: Card[?]): BoardRow =
+    currentRow.updated(colIndex, boardModel.x).updated(colIndex - 1, Some(card))
+
+  /** Manages the end of turn movements for a given row.
+   *
+   * @param row The current state of the board row.
+   * @return The updated row after all movements are resolved.*/
+  def resolveRowMovements(row: BoardRow): BoardRow =
+    val initiateState: (BoardRow, Set[UUID]) = (row, Set.empty[UUID])
+    val (finalRow, _) = (0 until ColsCount).foldLeft(initiateState): (acc, colIndex) =>
+      val (currentRow, movedCards) = acc
+      currentRow(colIndex) match
+        case Some(card) if !movedCards.contains(card.id) =>
+          card.seals match
+            case seals if seals.contains(Seal.Sprinter(Direction.Right)) =>
+              val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
+              val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
+              if rightFree then
+                val newRow = getNewRowMoveRight(colIndex, currentRow, card)
+                (newRow, movedCards + card.id)
+              else if leftFree then
+                val flippedCard = card.removeSeal(Seal.Sprinter(Direction.Right)).addSeal(Seal.Sprinter(Direction.Left))
+                val newRow = getNewRowMoveLeft(colIndex, currentRow, flippedCard)
+                (newRow, movedCards + card.id)
+              else
+                acc
+            case seals if seals.contains(Seal.Sprinter(Direction.Left)) =>
+              val leftFree = colIndex - 1 >= 0 && currentRow(colIndex - 1).isEmpty
+              val rightFree = colIndex + 1 < ColsCount && currentRow(colIndex + 1).isEmpty
+              if leftFree then
+                val newRow = getNewRowMoveLeft(colIndex, currentRow, card)
+                (newRow, movedCards + card.id)
+              else if rightFree then
+                val flippedCard = card.removeSeal(Seal.Sprinter(Direction.Left)).addSeal(Seal.Sprinter(Direction.Right))
+                val newRow = getNewRowMoveRight(colIndex, currentRow, flippedCard)
+                (newRow, movedCards + card.id)
+              else
+                acc
+            case _ => acc
+        case _ => acc
+    finalRow
+
+  /** Manages the Guardian seal reaction when an opponent plays a card.
+   *
+   * @param row The current state of the player's board row.
+   * @param playedCol The column index where the opponent just played a card.
+   * @return the update row if a Guardian moved, or the original row otherwise.
+   */
+  def resolveGuardianMovement(row: BoardRow, playedCol: Int): BoardRow =
+    if playedCol < 0 || playedCol >= boardModel.ColsCount || row(playedCol).isDefined then
+      row
+    else
+      val guardianIndexOpt = (0 until boardModel.ColsCount).find: colIndex =>
+        row(colIndex) match
+          case Some(card) => card.seals.contains(Seal.Guardian)
+          case None       => false
+      guardianIndexOpt match
+        case Some(originalIndex) =>
+          row(originalIndex) match
+            case Some(card) => row.updated(originalIndex, boardModel.x).updated(playedCol, Some(card))
+            case None => row
+        case None => row
+
+
