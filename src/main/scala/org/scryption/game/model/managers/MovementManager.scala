@@ -1,6 +1,7 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
 import org.scryption.game.model.boardModel.*
+import org.scryption.game.model.{Card, Direction, Seal, boardModel}
 
 import java.util.UUID
 

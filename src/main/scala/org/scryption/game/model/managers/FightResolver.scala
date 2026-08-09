@@ -1,7 +1,8 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
-import org.scryption.game.model.HitTarget.*
+import HitTarget.*
 import org.scryption.game.model.boardModel.{BoardRow, ColsCount}
+import org.scryption.game.model.{Card, Seal}
 
 enum HitTarget:
   case Opponent

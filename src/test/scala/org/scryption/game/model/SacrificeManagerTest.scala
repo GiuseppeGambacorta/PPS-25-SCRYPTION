@@ -4,7 +4,8 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scryption.game.model.boardModel.{BoardRow, x, |, Board}
+import org.scryption.game.model.boardModel.{Board, BoardRow, x, |}
+import org.scryption.game.model.managers.SacrificeManager
 
 class SacrificeManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
 

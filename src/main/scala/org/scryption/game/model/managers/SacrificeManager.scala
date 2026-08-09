@@ -1,6 +1,7 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
 import org.scryption.game.model.boardModel.Board
+import org.scryption.game.model.{Seal, boardModel}
 
 /** Represents the result of a sacrifice
  */

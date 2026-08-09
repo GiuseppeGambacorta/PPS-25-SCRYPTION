@@ -5,6 +5,7 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scryption.game.model.boardModel.{BoardRow, x, |}
+import org.scryption.game.model.managers.MovementManager
 
 class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
 

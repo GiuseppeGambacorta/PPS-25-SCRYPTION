@@ -1,6 +1,7 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
 import org.scryption.game.model.boardModel.BoardRow
+import org.scryption.game.model.*
 
 /** Represents the result of a single card's attack phase.
  */
