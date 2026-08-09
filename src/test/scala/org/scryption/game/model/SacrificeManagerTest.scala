@@ -19,10 +19,14 @@ class SacrificeManagerTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val sacrificedSlots = List((0, 0))
 
       When("resolving the sacrifice")
-      val updatedBoard = SacrificeManager.resolveSacrifices(board, sacrificedSlots)
+      val result = SacrificeManager.resolveSacrifices(board, sacrificedSlots)
 
       Then("the squirrel should be removed and the slot (0, 0) should be empty")
-      updatedBoard(0)(0) shouldBe x
+      result.updatedBoard(0)(0) shouldBe x
+
+      And("the generated blood should be 1 and bones should be 1")
+      result.generatedBlood shouldBe 1
+      result.generatedBones shouldBe 1
 
     Scenario("Sacrificing a card with ManyLives seal leaves it on the board"):
       Given("A board with a cat(ManyLives) at row 1, column 2")
@@ -31,7 +35,11 @@ class SacrificeManagerTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val sacrificedSlots = List((1, 2))
 
       When("resolving the sacrifices")
-      val updatedBoard = SacrificeManager.resolveSacrifices(board, sacrificedSlots)
+      val result = SacrificeManager.resolveSacrifices(board, sacrificedSlots)
 
       Then("the cat should not be removed and the slots (1,2) should still contain the cat")
-      updatedBoard(1)(2) shouldBe Some(cat)
+      result.updatedBoard(1)(2) shouldBe Some(cat)
+
+      And("the generated blood should be 1, but bones should be 0 because it did not perish")
+      result.generatedBlood shouldBe 1
+      result.generatedBones shouldBe 0
