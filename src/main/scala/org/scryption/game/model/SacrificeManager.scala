@@ -25,7 +25,8 @@ object SacrificeManager:
       currentBoard(row)(col) match
         case Some(card) if card.seals.contains(Seal.ManyLives) =>
           SacrificeResult(currentBoard, currentBlood + 1, currentBones)
-        case Some(_) =>
+        case Some(card) =>
           val newBoard = currentBoard.updatedSlot(row, col, boardModel.x)
-          SacrificeResult(newBoard, currentBlood + 1, currentBones + 1)
+          val bonesToGain = if card.seals.contains(Seal.BoneKing) then 4 else 1
+          SacrificeResult(newBoard, currentBlood + 1, currentBones + bonesToGain)
         case None => acc
