@@ -27,6 +27,8 @@ object FightViewPreview extends SimpleSwingApplication:
 
     val dummyBoard = Board(row0, row1, row2)
 
-    boardView.updateBoard(dummyBoard)
+    val fightView = new FightView(dummyChannel)
 
-    contents = boardView
+    fightView.boardView.updateBoard(dummyBoard)
+
+    contents = fightView
