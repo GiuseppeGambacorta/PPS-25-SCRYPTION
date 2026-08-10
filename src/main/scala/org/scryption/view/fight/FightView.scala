@@ -12,11 +12,7 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
   val boardView = new BoardView(channel)
 
   // Placeholder for the playerhand
-  val handPanel = new FlowPanel:
-    opaque = true
-    background = new Color(30, 30, 35)
-    preferredSize = new Dimension(0, 200)
-    contents += new Label("Player's hand") { foreground = Color.WHITE }
+  val handView = new HandView(channel)
 
   // Placeholder for the scale and bones counter
   val statsView = new StatsView(channel)
@@ -25,6 +21,6 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
   val decksView = new DecksView(channel)
 
   layout(boardView) = BorderPanel.Position.Center
-  layout(handPanel) = BorderPanel.Position.South
+  layout(handView) = BorderPanel.Position.South
   layout(statsView) = BorderPanel.Position.West
   layout(decksView) = BorderPanel.Position.East

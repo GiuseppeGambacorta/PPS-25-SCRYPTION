@@ -31,4 +31,8 @@ object FightViewPreview extends SimpleSwingApplication:
 
     fightView.boardView.updateBoard(dummyBoard)
 
+    fightView.handView.updateHand(List(
+      wolf, squirrel, mantis, wolf, squirrel, mantis, wolf
+    ))
+    
     contents = fightView
