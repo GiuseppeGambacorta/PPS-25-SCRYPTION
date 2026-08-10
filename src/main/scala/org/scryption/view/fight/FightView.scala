@@ -19,19 +19,12 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
     contents += new Label("Player's hand") { foreground = Color.WHITE }
 
   // Placeholder for the scale and bones counter
-  val statsPanel = new BoxPanel(Orientation.Vertical):
-    opaque = true
-    background = new Color(25, 25, 30)
-    preferredSize = new Dimension(220, 0)
-    border = Swing.EmptyBorder(20, 20, 20, 20)
-    contents += new Label("Damage Scale") { foreground = Color.WHITE }
-    contents += Swing.VStrut(50)
-    contents += new Label("Bones: 0") { foreground = Color.WHITE }
+  val statsView = new StatsView(channel)
 
   // Placeholder for decks and end turn button
   val decksView = new DecksView(channel)
 
-  layout(boardView)  = BorderPanel.Position.Center
-  layout(handPanel)  = BorderPanel.Position.South
-  layout(statsPanel) = BorderPanel.Position.West
+  layout(boardView) = BorderPanel.Position.Center
+  layout(handPanel) = BorderPanel.Position.South
+  layout(statsView) = BorderPanel.Position.West
   layout(decksView) = BorderPanel.Position.East
