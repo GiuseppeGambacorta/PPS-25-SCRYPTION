@@ -29,18 +29,9 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
     contents += new Label("Bones: 0") { foreground = Color.WHITE }
 
   // Placeholder for decks and end turn button
-  val decksPanel = new BoxPanel(Orientation.Vertical):
-    opaque = true
-    background = new Color(25, 25, 30)
-    preferredSize = new Dimension(220, 0)
-    border = Swing.EmptyBorder(20, 20, 20, 20)
-    contents += new Label("Main Deck") { foreground = Color.WHITE }
-    contents += Swing.VStrut(20)
-    contents += new Label("Squirrels") { foreground = Color.WHITE }
-    contents += Swing.VStrut(100)
-    contents += new Button("Pass Turn")
+  val decksView = new DecksView(channel)
 
   layout(boardView)  = BorderPanel.Position.Center
   layout(handPanel)  = BorderPanel.Position.South
   layout(statsPanel) = BorderPanel.Position.West
-  layout(decksPanel) = BorderPanel.Position.East
+  layout(decksView) = BorderPanel.Position.East
