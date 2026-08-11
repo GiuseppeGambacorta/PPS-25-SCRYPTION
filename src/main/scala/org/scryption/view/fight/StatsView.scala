@@ -14,23 +14,27 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   preferredSize = new Dimension(220, 0)
   border = Swing.EmptyBorder(60, 20, 20, 20)
 
-  private def loadBellIcon(path: String): javax.swing.ImageIcon =
+  private def loadScaledIcon(path: String, width: Int, height: Int): javax.swing.ImageIcon =
     ResourceLoader.loadTemplateImage(path) match
       case Some(img) =>
-        val size = 65
-        val scaled = img.getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH)
+        val scaled = img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH)
         new javax.swing.ImageIcon(scaled)
       case None =>
         new javax.swing.ImageIcon()
 
-  val scaleLabel = new Label("Scale"):
-    foreground = Color.WHITE
-    font = new Font("SansSerif", Font.BOLD, 16)
+  val scaleIconLabel = new Label:
+    icon = loadScaledIcon("board/scale.png", 100, 100)
     xLayoutAlignment = 0.5
+    border = Swing.EmptyBorder(0, 0, 10, 0)
 
   val scaleValueLabel = new Label("0 / 5"):
     foreground = Color.WHITE
     font = new Font("SansSerif", Font.BOLD, 24)
+    xLayoutAlignment = 0.5
+
+  val scaleStatusLabel = new Label("Draw"):
+    foreground = Color.WHITE
+    font = new Font("SansSerif", Font.BOLD, 14)
     xLayoutAlignment = 0.5
 
   val bonesLabel = new Label("Bones: 0"):
@@ -39,7 +43,7 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
     xLayoutAlignment = 0.5
 
   val endTurnButton = new Button(""):
-    icon = loadBellIcon("board/bell.png")
+    icon = loadScaledIcon("board/bell.png", 65, 65)
     cursor = new Cursor(Cursor.HAND_CURSOR)
     tooltip = "End Turn"
     xLayoutAlignment = 0.5
@@ -67,9 +71,9 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
       else
         super.paintComponent(g)
 
-  contents += scaleLabel
-  contents += Swing.VStrut(10)
+  contents += scaleIconLabel
   contents += scaleValueLabel
+  contents += scaleStatusLabel
   contents += Swing.VStrut(60)
   contents += bonesLabel
   contents += Swing.VGlue
@@ -94,10 +98,15 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   def updateScale(balance: Int): Unit =
     val displayValue = Math.abs(balance)
     scaleValueLabel.text = s"$displayValue / 5"
-
     if balance == 0 then
       scaleValueLabel.foreground = Color.WHITE
+      scaleStatusLabel.text = "Draw"
+      scaleStatusLabel.foreground = Color.WHITE
     else if balance > 0 then
       scaleValueLabel.foreground = new Color(100, 255, 100)
+      scaleStatusLabel.text = "Winning!"
+      scaleStatusLabel.foreground = new Color(100, 255, 100)
     else
       scaleValueLabel.foreground = new Color(255, 100, 100)
+      scaleStatusLabel.text = "Losing!"
+      scaleStatusLabel.foreground = new Color(255, 100, 100)
