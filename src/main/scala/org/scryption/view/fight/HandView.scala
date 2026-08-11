@@ -12,11 +12,17 @@ class HandView(channel: GUIChannelInterface) extends BorderPanel:
 
   opaque = false
 
-  val toggleButton = new Button("Hide Hand"):
+  val toggleButton = new Button("▼"):
     cursor = new Cursor(Cursor.HAND_CURSOR)
     background = new Color(50, 50, 55)
     foreground = Color.WHITE
-    font = new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14)
+    font = new java.awt.Font("SansSerif", java.awt.Font.BOLD, 16)
+    preferredSize = new Dimension(80, 30)
+    tooltip = "Hide / Show Hand"
+
+  val buttonWrapper = new FlowPanel:
+    opaque = false
+    contents += toggleButton
 
   val cardsContainer = new BoxPanel(Orientation.Horizontal):
     opaque = true
@@ -28,14 +34,14 @@ class HandView(channel: GUIChannelInterface) extends BorderPanel:
     verticalScrollBarPolicy = ScrollPane.BarPolicy.Never
     preferredSize = new Dimension(0, 320)
 
-  layout(toggleButton) = BorderPanel.Position.North
+  layout(buttonWrapper) = BorderPanel.Position.North
   layout(scrollPane) = BorderPanel.Position.Center
 
   listenTo(toggleButton)
   reactions += {
     case ButtonClicked(`toggleButton`) =>
       scrollPane.visible = !scrollPane.visible
-      toggleButton.text = if scrollPane.visible then "Hide Hand" else "Show Hand"
+      toggleButton.text = if scrollPane.visible then "▼" else "▲"
       revalidate()
       repaint()
   }
