@@ -4,10 +4,11 @@ import org.scryption.GUIChannelInterface
 import org.scryption.game.model.boardModel.*
 import org.scryption.view.{CardGeometry, CardView, CardViewAssets, ResourceLoader, toViewInfo}
 import scala.swing.*
-import scala.swing.event.MouseClicked
+import scala.swing.event.{MouseClicked, MouseEntered, MouseExited}
 import java.awt.{Color, Graphics2D}
 import java.awt.image.BufferedImage
 import java.awt.Cursor
+import javax.swing.border.LineBorder
 
 class BoardView(channel: GUIChannelInterface) extends BorderPanel:
 
@@ -60,11 +61,19 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
       opaque = false
       horizontalAlignment = Alignment.Center
       verticalAlignment = Alignment.Center
-
+      border = Swing.EmptyBorder(4, 4, 4, 4)
       if row == 2 then cursor = new Cursor(Cursor.HAND_CURSOR)
 
-    listenTo(slotLabel.mouse.clicks)
+    listenTo(slotLabel.mouse.clicks, slotLabel.mouse.moves)
+
     reactions += {
+      case MouseEntered(`slotLabel`, _, _) =>
+        if row == 2 then
+          slotLabel.border = LineBorder(new Color(100, 200, 255), 4, true)
+        else
+          slotLabel.border = LineBorder(new Color(255, 100, 100), 4, true)
+      case MouseExited(`slotLabel`, _, _) =>
+        slotLabel.border = Swing.EmptyBorder(4, 4, 4, 4)
       case MouseClicked(`slotLabel`, _, _, _, _) =>
         if row == 2 then
           println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
@@ -73,7 +82,11 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
 
     slotLabel
 
-  slots.foreach(gridPanel.contents += _)
+  for slotLabel <- slots do
+    val cellWrapper = new GridBagPanel:
+      opaque = false
+      layout(slotLabel) = new Constraints()
+    gridPanel.contents += cellWrapper
   layout(gridPanel) = BorderPanel.Position.Center
 
   /** Updates all 12 slots based on the current state of the Board.
