@@ -11,13 +11,10 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
   background = new Color(20, 20, 22)
   val boardView = new BoardView(channel)
 
-  // Placeholder for the playerhand
   val handView = new HandView(channel)
 
-  // Placeholder for the scale and bones counter
   val statsView = new StatsView(channel)
 
-  // Placeholder for decks and end turn button
   val decksView = new DecksView(channel)
 
   layout(boardView) = BorderPanel.Position.Center
