@@ -33,19 +33,12 @@ class DecksView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
     tooltip = "Draw a Squirrel"
     cursor = new Cursor(Cursor.HAND_CURSOR)
 
-  val endTurnButton = new Button("End Turn"):
-    font = new Font("SansSerif", Font.BOLD, 16)
-    background = new Color(150, 50, 50)
-    foreground = Color.WHITE
-    cursor = new Cursor(Cursor.HAND_CURSOR)
-
   contents += mainDeckLabel
   contents += Swing.VStrut(30)
   contents += squirrelDeckLabel
   contents += Swing.VGlue
-  contents += endTurnButton
 
-  listenTo(mainDeckLabel.mouse.clicks, squirrelDeckLabel.mouse.clicks, endTurnButton)
+  listenTo(mainDeckLabel.mouse.clicks, squirrelDeckLabel.mouse.clicks)
 
   reactions += {
     case MouseClicked(`mainDeckLabel`, _, _, _, _) =>
@@ -55,8 +48,4 @@ class DecksView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
     case MouseClicked(`squirrelDeckLabel`, _, _, _, _) =>
       println("UI input: player draws a squirrel")
     //channel.sendToGame(GUIMessages.DrawSquirrel)
-
-    case ButtonClicked(`endTurnButton`) =>
-      println("UI input: the player ends the turn")
-    //channel.sendToGame(GUIMessages.EndTurn)
   }
