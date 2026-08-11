@@ -1,9 +1,11 @@
 package org.scryption.view.fight
 
 import org.scryption.GUIChannelInterface
+import org.scryption.view.ResourceLoader
+
 import scala.swing.*
 import scala.swing.event.ButtonClicked
-import java.awt.{Color, Dimension, Font, Cursor}
+import java.awt.{Color, Cursor, Dimension, Font}
 
 class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Vertical):
 
@@ -11,6 +13,15 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   background = new Color(25, 25, 30)
   preferredSize = new Dimension(220, 0)
   border = Swing.EmptyBorder(60, 20, 20, 20)
+
+  private def loadBellIcon(path: String): javax.swing.ImageIcon =
+    ResourceLoader.loadTemplateImage(path) match
+      case Some(img) =>
+        val size = 65
+        val scaled = img.getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH)
+        new javax.swing.ImageIcon(scaled)
+      case None =>
+        new javax.swing.ImageIcon()
 
   val scaleLabel = new Label("Scale"):
     foreground = Color.WHITE
@@ -27,13 +38,25 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
     font = new Font("SansSerif", Font.BOLD, 18)
     xLayoutAlignment = 0.5
 
-  val endTurnButton = new Button("End Turn"):
-    font = new Font("SansSerif", Font.BOLD, 16)
-    background = new Color(150, 50, 50)
-    foreground = Color.WHITE
+  val endTurnButton = new Button(""):
+    icon = loadBellIcon("board/bell.png")
     cursor = new Cursor(Cursor.HAND_CURSOR)
-    preferredSize = new Dimension(120, 120)
+    tooltip = "End Turn"
     xLayoutAlignment = 0.5
+    val buttonSize = new Dimension(100, 100)
+    preferredSize = buttonSize
+    maximumSize = buttonSize
+    minimumSize = buttonSize
+    peer.setContentAreaFilled(false)
+    peer.setBorderPainted(false)
+    peer.setFocusPainted(false)
+
+    override protected def paintComponent(g: Graphics2D): Unit =
+      // anti-aliasing to have a smooth button
+      g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+      g.setColor(new Color(150, 50, 50))
+      g.fillOval(0, 0, size.width, size.height)
+      super.paintComponent(g)
 
   contents += scaleLabel
   contents += Swing.VStrut(10)
@@ -59,13 +82,13 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
    *
    * @param balance Positive value is damage in your favor, negative is damage sustained by the player.
    */
-  def updateScale(balance: Int): Unit = balance match
-    case balance if balance == 0 =>
-      scaleLabel.text = "Scale: Draw"
-      scaleLabel.foreground = Color.WHITE
-    case balance if balance > 0 =>
-      scaleLabel.text = s"Winning: +$balance"
-      scaleLabel.foreground = new Color(100, 255, 100)
-    case _ =>
-      scaleLabel.text = s"Losing: $balance"
-      scaleLabel.foreground = new Color(255, 100, 100)
+  def updateScale(balance: Int): Unit =
+    val displayValue = Math.abs(balance)
+    scaleValueLabel.text = s"$displayValue / 5"
+
+    if balance == 0 then
+      scaleValueLabel.foreground = Color.WHITE
+    else if balance > 0 then
+      scaleValueLabel.foreground = new Color(100, 255, 100)
+    else
+      scaleValueLabel.foreground = new Color(255, 100, 100)
