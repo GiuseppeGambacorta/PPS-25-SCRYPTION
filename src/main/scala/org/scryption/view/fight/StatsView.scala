@@ -54,9 +54,18 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
     override protected def paintComponent(g: Graphics2D): Unit =
       // anti-aliasing to have a smooth button
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      g.setColor(new Color(150, 50, 50))
+      val isPressed = peer.getModel.isPressed
+      if isPressed then
+        g.setColor(new Color(110, 30, 30))
+      else
+        g.setColor(new Color(150, 50, 50))
       g.fillOval(0, 0, size.width, size.height)
-      super.paintComponent(g)
+      if isPressed then
+        g.translate(0, 3)
+        super.paintComponent(g)
+        g.translate(0, -3)
+      else
+        super.paintComponent(g)
 
   contents += scaleLabel
   contents += Swing.VStrut(10)
