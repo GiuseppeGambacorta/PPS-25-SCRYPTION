@@ -15,6 +15,7 @@ enum GUIMessages:
   case DrawFromDeck
   case CardToPlay(card: Card[?], position: Int)
   case CardToPlayWithSacrifices(card: Card[?], position: Int, sacrificesPositions: List[BoardPosition])
+  case EndPlayerTurn
   case End
 
 trait GUIChannelInterface:
