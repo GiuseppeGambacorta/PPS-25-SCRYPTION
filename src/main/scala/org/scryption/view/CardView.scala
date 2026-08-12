@@ -101,17 +101,18 @@ private class CardView(val geo: CardGeometry) {
 
     if (addedSigils.nonEmpty) {
       val slots: Vector[(Int, Int)] = defaultSigils match {
-        case empty => (geo.patchCenterX, geo.patchCenterY) +: geo.addedSigilSlotCenters
+        case Nil   => (geo.patchCenterX, geo.patchCenterY) +: geo.addedSigilSlotCenters
         case _     => geo.addedSigilSlotCenters
       }
 
       addedSigils.zip(slots).foreach {
         case (sigilName, (centerX, centerY)) =>
           ResourceLoader.loadImage(CardViewAssets.sigilPatchPath, geo.patchSize).foreach { patch =>
-            drawImage(g2d, patch, centerPos(centerX, geo.patchSize) , centerPos(centerY, geo.patchSize), geo.patchSize)
+            drawImage(g2d, patch, centerX - geo.patchSize/2 , centerY - geo.patchSize/2, geo.patchSize)
           }
+
           ResourceLoader.loadImage(CardViewAssets.sigilPath(sigilName), geo.sigilSize).foreach { sigilImg =>
-            drawImage(g2d, emission(sigilImg, geo.addedSigilSize), centerPos(centerX, geo.sigilSize), centerPos(centerY, geo.sigilSize), geo.addedSigilSize)
+            drawImage(g2d, emission(sigilImg, geo.addedSigilSize), (centerX - geo.addedSigilSize / 2), (centerY - geo.addedSigilSize / 2), geo.addedSigilSize)
           }
       }
     }
@@ -121,7 +122,7 @@ private class CardView(val geo: CardGeometry) {
     val out = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
     val g = out.createGraphics()
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g.drawImage(img, 0, 0, NoObserver)
+    g.drawImage(img, 0, 0, size, size, NoObserver)
     g.setComposite(AlphaComposite.SrcAtop)
     g.setColor(Color.decode("#85fcc3"))
     g.fillRect(0, 0, size, size)
@@ -131,8 +132,8 @@ private class CardView(val geo: CardGeometry) {
 }
 
 object CardView {
-  def forWidth(windowWidth: Int): CardView = {
-    val geometry = CardGeometry(windowWidth)
+  def forWidth(cardWidth: Int): CardView = {
+    val geometry = CardGeometry(cardWidth)
     new CardView(geometry)
   }
 }
