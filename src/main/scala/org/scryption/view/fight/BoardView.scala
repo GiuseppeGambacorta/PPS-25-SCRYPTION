@@ -5,10 +5,9 @@ import org.scryption.game.model.boardModel.*
 import org.scryption.view.{CardGeometry, CardView, CardViewAssets, ResourceLoader, toViewInfo}
 
 import scala.swing.*
-import scala.swing.event.{MouseClicked, MouseEntered, MouseExited}
+import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
 import java.awt.{BasicStroke, Color, Cursor, Graphics2D}
 import java.awt.image.BufferedImage
-import javax.swing.border.LineBorder
 
 class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
 
@@ -64,6 +63,34 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
       val y = (size.height - h) / 2
       new Rectangle(x, y, w, h)
 
+    listenTo(mouse.clicks, mouse.moves)
+    reactions += {
+      case e: MouseMoved =>
+        val bounds = getCardBounds
+        val px = e.point.x
+        val py = e.point.y
+        val isNowHovered = checkCardBounds(bounds, px, py)
+        if isNowHovered != isHovered then
+          isHovered = isNowHovered
+          if row == 2 && isNowHovered then cursor = new Cursor(Cursor.HAND_CURSOR)
+          else cursor = Cursor.getDefaultCursor
+          repaint()
+      case MouseExited(_, _, _) =>
+        isHovered = false
+        cursor = Cursor.getDefaultCursor
+        repaint()
+      case e: MouseClicked =>
+        if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
+        val bounds = getCardBounds
+        val px = e.point.x; val py = e.point.y
+        if checkCardBounds(bounds, px, py) then
+          onSlotClicked(row, col)
+    }
+
+    private def checkCardBounds(bounds: Rectangle, px: Int, py: Int) = {
+      px >= bounds.x && px <= (bounds.x + bounds.width) && py >= bounds.y && py <= (bounds.y + bounds.height)
+    }
+
     override protected def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       val bounds = getCardBounds
@@ -93,21 +120,7 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
   private val slots: Array[ScalableSlot] = Array.tabulate(RowsCount * ColsCount): index =>
     val row = index / ColsCount
     val col = index % ColsCount
-    val slot = new ScalableSlot(row, col)
-
-    listenTo(slot.mouse.clicks, slot.mouse.moves)
-    reactions += {
-      case MouseEntered(`slot`, _, _) =>
-        slot.isHovered = true
-        slot.repaint()
-      case MouseExited(`slot`, _, _) =>
-        slot.isHovered = false
-        slot.repaint()
-      case MouseClicked(`slot`, _, _, _, _) =>
-        if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
-        onSlotClicked(row, col)
-    }
-    slot
+    new ScalableSlot(row, col)
 
   slots.foreach(gridPanel.contents += _)
   layout(gridPanel) = BorderPanel.Position.Center
