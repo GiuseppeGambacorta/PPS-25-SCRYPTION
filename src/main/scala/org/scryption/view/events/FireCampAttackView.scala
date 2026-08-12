@@ -8,5 +8,5 @@ class FireCampAttackView(channel: GUIChannelInterface)
     channel = channel,
     cardWidth = 250,
     bonus = StatBonus.Attack(1),
-    slotBgImagePath = "slots/slot_statboost_attack.png"
+    slotBgImagePath = "statboost_attack"
   )

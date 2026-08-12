@@ -1,6 +1,5 @@
 package org.scryption.view.events
 
-import org.scryption.game.model.Card
 import org.scryption.view.*
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
@@ -12,6 +11,8 @@ import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
 class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
+
+  private val viewModel: ViewModel = new ViewModel()
 
   private val setup = CardView.forWidth(250)
   private val assets = setup.assets
@@ -34,7 +35,6 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
   private val confirmIcon: Option[ImageIcon] =
     ResourceLoader.loadTemplateImage("slots/sacrifice_button.png").map(new ImageIcon(_))
 
-  private var currentCards: List[Card[?]] = Nil
   private var cardSlots: Vector[CardSlot] = Vector.empty
   private var sacrificeIndex: Int = -1
   private var upgradeIndex: Int = -1
@@ -76,15 +76,9 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
   private def listenToChannel(): Unit = {
     Future {
       while (true) {
-        channel.receiveFromGame match {
-          case GUIMessages.Cards(cards) =>
-            Swing.onEDT {
-              currentCards = cards
-              if (sacrificeIndex != -1 && cards.length <= sacrificeIndex) sacrificeIndex = -1
-              if (upgradeIndex != -1 && cards.length <= upgradeIndex) upgradeIndex = -1
-              renderHand(currentCards.map(_.toViewInfo))
-            }
-          case _ =>
+        val msg = channel.receiveFromGame
+        Swing.onEDT {
+          renderHand(viewModel.getCardsInfo(msg))
         }
       }
     }
@@ -239,16 +233,8 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
   }
 
   private def sendResultToGameModel(sacrificeCardIndex: Int, upgradeCardIndex: Int): Unit = {
-    if (
-      sacrificeCardIndex >= 0 && sacrificeCardIndex < currentCards.length &&
-        upgradeCardIndex >= 0 && upgradeCardIndex < currentCards.length
-    ) {
-      val sacrificedCard = currentCards(sacrificeCardIndex)
-      val upgradedCard = currentCards(upgradeCardIndex)
-      channel.sendToGame(GUIMessages.SingleCard(sacrificedCard))
-      channel.sendToGame(GUIMessages.SingleCard(upgradedCard))
-    }
-    // Opcional: Limpiar toda la vista o esperar la siguiente escena del juego
+    channel.sendToGame(viewModel.getModelCard(sacrificeCardIndex))
+    channel.sendToGame(viewModel.getModelCard(upgradeCardIndex))
   }
 
   private def renderHand(cardsViewInfo: List[CardViewInfo]): Unit = {

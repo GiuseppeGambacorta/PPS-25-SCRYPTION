@@ -1,6 +1,5 @@
 package org.scryption.view.events
 
-import org.scryption.game.model.Card
 import org.scryption.view.*
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
@@ -21,6 +20,8 @@ import scala.swing.{FlowPanel, Panel, Swing}
  */
 class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
+  private val viewModel: ViewModel = new ViewModel()
+
   private val setup = CardView.forWidth(250)
   private val assets = setup.assets
   private val geometry = setup.geo
@@ -35,7 +36,6 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
   private val slotBgImage: Option[ImageIcon] =
     ResourceLoader.loadTemplateImage("slots/card_slot_duplicatemerge.png").map(new ImageIcon(_))
 
-  private var currentCards: List[Card[?]] = Nil
   private var cardSlots: Vector[CardSlot] = Vector.empty
   private var slotCardIndex: Int = -1
 
@@ -69,14 +69,9 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
   private def listenToChannel(): Unit = {
     Future {
       while (true) {
-        channel.receiveFromGame match {
-          case GUIMessages.Cards(cards) =>
-            Swing.onEDT {
-              currentCards = cards
-              if (slotCardIndex != -1 && cards.length <= slotCardIndex) slotCardIndex = -1
-              renderHand(currentCards.map(_.toViewInfo))
-            }
-          case _ =>
+        val msg = channel.receiveFromGame
+        Swing.onEDT {
+          renderHand(viewModel.getCardsInfo(msg))
         }
       }
     }
@@ -217,10 +212,9 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
       refreshZOrder()
     }
 
-    private def sendCardToGameModel(): Unit =
-      if (index >= 0 && index < currentCards.length) {
-        channel.sendToGame(GUIMessages.SingleCard(currentCards(index)))
-      }
+    private def sendCardToGameModel(): Unit = {
+      channel.sendToGame(viewModel.getModelCard(index))
+    }
   }
 
   private def renderHand(cardsViewInfo: List[CardViewInfo]): Unit = {

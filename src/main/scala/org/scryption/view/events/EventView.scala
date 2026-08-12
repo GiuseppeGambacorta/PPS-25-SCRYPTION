@@ -1,8 +1,6 @@
 package org.scryption.view.events
 
-import org.scryption.game.model.Card
 import org.scryption.view.CardView
-import org.scryption.view.events.{FireCampAttackView, FireCampHealthView, StrangeStonesView}
 import org.scryption.view.*
 import org.scryption.view.GUIAssets.CardViewAssets
 import org.scryption.{GUIChannelInterface, GUIMessages}
@@ -18,12 +16,13 @@ abstract class EventView(
                           channel: GUIChannelInterface,
                           cardWidth: Int,
                           bonus: StatBonus,
-                          slotBgImagePath: String,
-                          slotFireImagePath: String = "slots/slot_campfire_f1.png"
+                          slotBgImagePath: String
                         ) extends FlowPanel {
 
   private val setup = CardView.forWidth(cardWidth)
   private val assets = CardViewAssets()
+
+  private val viewModel: ViewModel = new ViewModel()
 
   private val cardGap = 100
   private val handTopOffset = 500
@@ -31,10 +30,11 @@ abstract class EventView(
   private val slotY = 100
 
   private val backgroundImage = ResourceLoader.loadTemplateImage("table.png")
-  private val slotBgImage: Option[ImageIcon] = ResourceLoader.loadTemplateImage(slotBgImagePath).map(new ImageIcon(_))
-  private val slotFireImage: Option[ImageIcon] = ResourceLoader.loadTemplateImage(slotFireImagePath).map(new ImageIcon(_))
+  private val slotBgImage: Option[ImageIcon] =
+    ResourceLoader.loadTemplateImage(assets.slotPath(slotBgImagePath)).map(new ImageIcon(_))
+  private val slotFireImage: Option[ImageIcon] =
+    ResourceLoader.loadTemplateImage(assets.slotPath("campfire_f1")).map(new ImageIcon(_))
 
-  private var currentCards: List[Card[?]] = Nil
   private var cardSlots: Vector[CardSlot] = Vector.empty
   private var slotCardIndex: Int = -1
 
@@ -66,14 +66,9 @@ abstract class EventView(
   private def listenToChannel(): Unit = {
     Future {
       while (true) {
-        channel.receiveFromGame match {
-          case GUIMessages.Cards(cards) =>
-            Swing.onEDT {
-              currentCards = cards
-              if (slotCardIndex != -1 && cards.length <= slotCardIndex) slotCardIndex = -1
-              renderHand(currentCards.map(_.toViewInfo))
-            }
-          case _ =>
+        val msg = channel.receiveFromGame
+        Swing.onEDT {
+          renderHand(viewModel.getCardsInfo(msg))
         }
       }
     }
@@ -172,10 +167,9 @@ abstract class EventView(
       refreshZOrder()
     }
 
-    private def sendCardToGameModel(): Unit =
-      if (index >= 0 && index < currentCards.length) {
-        channel.sendToGame(GUIMessages.SingleCard(currentCards(index)))
-      }
+    private def sendCardToGameModel(): Unit = {
+        channel.sendToGame(viewModel.getModelCard(index))
+    }
 
     private[EventView] def moveToSlotCoords(): Unit = {
       if (isAnimating) return

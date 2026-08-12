@@ -9,5 +9,5 @@ class FireCampHealthView(channel: GUIChannelInterface)
     channel = channel,
     cardWidth = 250,
     bonus = StatBonus.Health(2),
-    slotBgImagePath = "slots/slot_statboost_health.png"
+    slotBgImagePath = "statboost_health"
   )

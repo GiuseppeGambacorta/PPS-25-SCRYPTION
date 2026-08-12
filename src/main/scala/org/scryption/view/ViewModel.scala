@@ -1,47 +1,32 @@
 package org.scryption.view
 
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.GUIMessages
 import org.scryption.game.model.Card
-import org.scryption.view.events.CardSelectionView
 import org.scryption.view.toViewInfo
 
-import scala.swing.Swing
+class ViewModel() {
 
-class ViewModel(channel: GUIChannelInterface) extends Thread {
-  setDaemon(true)
-
-  private var currentView: Option[CardSelectionView] = None
   private var currentCards: List[Card[?]] = Nil
 
-  override def run(): Unit = {
-    var running = true
-    while (running) {
-      channel.receiveFromGame match {
-        case GUIMessages.Cards(cards) =>
-          currentCards = cards
+  def getCardsInfo(message: GUIMessages): List[CardViewInfo] = message match {
+    case GUIMessages.Cards(cards)       => {
+      currentCards = cards
+      cards.map(_.toViewInfo)
+    }
+    case GUIMessages.SingleCard(card)   => card.toViewInfo :: Nil
+    case _                              => Nil
+  }
 
-          Swing.onEDT {
-            //currentView.foreach(v => v.close())
+  def getSingleCardInfo(message: GUIMessages): CardViewInfo = message match {
+    case GUIMessages.SingleCard(card) => card.toViewInfo
+    case GUIMessages.Cards(card :: _) => card.toViewInfo
+    case _                            => CardViewInfo("", "", "", "")
+  }
 
-            val view = new CardSelectionView(
-              channel = channel
-            )
-
-            currentView = Some(view)
-
-            //val viewInfos = cards.map(_.toViewInfo)
-            //view.showCards(viewInfos)
-          }
-
-        case GUIMessages.SingleCard(card) =>
-        // println(s"Listener received echo: ${card.name}")
-
-        case GUIMessages.End =>
-          running = true
-        // Swing.onEDT {
-        //  currentView.foreach(_.close())
-        // }
-      }
+  def getModelCard(index: Int): GUIMessages.SingleCard = index match {
+    case i if (i >= 0) => currentCards.length match {
+      case l if (l > i) => GUIMessages.SingleCard(currentCards(i))
+      case l            => GUIMessages.SingleCard(currentCards(l - 1))
     }
   }
 }

@@ -1,7 +1,6 @@
 package org.scryption.view.events
 
-import org.scryption.game.model.Card
-import org.scryption.view.CardView
+import org.scryption.view.{CardView, ViewModel}
 
 import org.scryption.view.{GUIAssets, CardViewInfo, ResourceLoader, toViewInfo}
 import org.scryption.{GUIChannelInterface, GUIMessages}
@@ -14,7 +13,9 @@ import scala.concurrent.Future
 import scala.swing.*
 
 class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
-  
+
+  val viewModel: ViewModel = new ViewModel()
+
   private val setup = CardView.forWidth(250)
   val assets: GUIAssets.CardViewAssets = setup.assets
 
@@ -28,9 +29,6 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
   private val slideDistance = 800
 
   private val backgroundImage = ResourceLoader.loadTemplateImage("table.png")
-
-  // Stato locale gestito direttamente dalla vista
-  private var currentCards: List[Card[?]] = Nil
 
   opaque = false
 
@@ -49,14 +47,9 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
     Future {
       while (true) {
         val msg = channel.receiveFromGame
-        msg match {
-          case GUIMessages.Cards(cards) =>
-            Swing.onEDT {
-              this.currentCards = cards
-              showCards(cards.map(_.toViewInfo))
-            }
-          case _ =>
-        }
+          Swing.onEDT {
+            showCards(viewModel.getCardsInfo(msg))
+          }
       }
     }
   }
@@ -145,13 +138,7 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
     }
 
     private def finishSelection(): Unit = {
-      if (index >= 0 && index < currentCards.length) {
-        val selectedCard = currentCards(index)
-        // Notifica il callback passando l'oggetto Card selezionato
-        channel.sendToGame(GUIMessages.SingleCard(selectedCard))
-      } else {
-        println(s"Error: Invalid index: $index")
-      }
+      channel.sendToGame(viewModel.getModelCard(index))
     }
   }
 

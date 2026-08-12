@@ -56,7 +56,7 @@ object GUIAssets {
     def menuHighlightedSlotPath: String = s"$menuFolder/startscreen_slot_highlighted_PART1.png"
 
     def menuCardPath(name: String): String = s"$menuFolder/menucard_$name.png"
-    
+
     def menuTextPath(name:String): String = s"$menuFolder/menutext_$name.png"
   }
 }
