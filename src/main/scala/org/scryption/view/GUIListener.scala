@@ -1,7 +1,8 @@
 package org.scryption
 
 import org.scryption.game.model.Card
-import org.scryption.view.{CardSelectionView, toViewInfo}
+import org.scryption.view.events.CardSelectionView
+import org.scryption.view.toViewInfo
 
 import scala.swing.Swing
 

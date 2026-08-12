@@ -8,89 +8,61 @@ import java.awt.Font
 import java.awt.Graphics2D
 import java.awt.AlphaComposite
 import java.awt.RenderingHints
-import java.awt.image.BufferedImage
+import java.awt.Image
+import java.awt.image.{BufferedImage, ImageObserver}
 import javax.swing.ImageIcon
 
-/** Draws a [[Card]] onto a template image using a fixed [[CardGeometry]].
- *
- * @param geometry
- *   size and position of card elements
- * @param nameFont
- *   custom Heavyweight font
- * @param statFont
- *   same font but slightly bigger
- */
+private class CardView(val geo: CardGeometry) {
 
-class CardView(geometry: CardGeometry, nameFont: Font, statFont: Font) {
+  private val nameFont: Font = ResourceLoader.loadFont(CardViewAssets.fontPath, geo.nameFontSize)
+  private val statFont: Font = ResourceLoader.loadFont(CardViewAssets.fontPath, geo.statFontSize)
+  private val NoObserver: ImageObserver = null
 
-  private val NoObserver: java.awt.image.ImageObserver = null
-
-  // TODO: move into CardViewAssets alongside the other path helpers once confirmed
-  private val sigilPatchPath: String = "sigils/sigil_patch.png"
-
-  /** Renders `card` onto the template at `templatePath`. Returns None only if the template image itself can't be
-   * loaded.
-   */
   def render(card: CardViewInfo, templatePath: String): Option[ImageIcon] =
     ResourceLoader.loadTemplateImage(templatePath).map { template =>
-      val buffer = new BufferedImage(geometry.cardWidth, geometry.cardHeight, BufferedImage.TYPE_INT_RGB)
+      val buffer = new BufferedImage(geo.cardWidth, geo.cardHeight, BufferedImage.TYPE_INT_RGB)
       val g2d = buffer.createGraphics()
 
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
       g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
 
-      g2d.drawImage(template, 0, 0, geometry.cardWidth, geometry.cardHeight, NoObserver)
+      drawImage(g2d, template, 0, 0, geo.cardWidth, Some(geo.cardHeight))
 
-      drawPortrait(g2d, card.name)
-      drawEmission(g2d, card.name, card.addedSigils)
+      drawPortrait(g2d, card.name, card.hasEmission)
       drawCost(g2d, card.cost)
       drawName(g2d, card.name)
       drawStats(g2d, card.attack, card.health)
-      drawSigils(g2d, card.defaultSigils)
-      drawAddedSigils(g2d, card.defaultSigils, card.addedSigils)
+      drawSigils(g2d, card.defaultSigils, card.addedSigils)
 
       g2d.dispose()
       new ImageIcon(buffer)
     }
 
-  private def drawPortrait(g2d: Graphics2D, name: String): Unit =
-    if (name.nonEmpty) {
-      ResourceLoader.loadImage(CardViewAssets.portraitPath(name), geometry.portraitSize).foreach { img =>
-        g2d.drawImage(
-          img,
-          geometry.portraitX,
-          geometry.portraitY,
-          geometry.portraitSize,
-          geometry.portraitSize,
-          NoObserver
-        )
-      }
+
+  private def drawImage(g2d: Graphics2D, img: Image, x: Int, y: Int, width: Int, height: Option[Int] = None): Unit =
+    height match {
+      case None    => g2d.drawImage(img, x, y, width, width, NoObserver)
+      case Some(h) => g2d.drawImage(img, x, y, width, h, NoObserver)
     }
 
+  private def drawPortrait(g2d: Graphics2D, name: String, hasEmission: Boolean): Unit =
+    ResourceLoader.loadImage(CardViewAssets.portraitPath(name), geo.portraitSize).foreach { img =>
+      drawImage(g2d, img, geo.portraitX, geo.portraitY, geo.portraitSize)}
 
-  private def drawEmission(g2d: Graphics2D, name: String, addedSigils: List[String]): Unit =
-    if (name.nonEmpty && addedSigils.nonEmpty) {
-      val emissionPath = CardViewAssets.portraitPath(s"${name}_emission")
-      ResourceLoader.loadImage(emissionPath, geometry.portraitSize).foreach { img =>
-        g2d.drawImage(
-          img,
-          geometry.portraitX,
-          geometry.portraitY,
-          geometry.portraitSize,
-          geometry.portraitSize,
-          NoObserver
-        )
+    if (hasEmission) {
+      ResourceLoader.loadImage(CardViewAssets.emissionPath(name), geo.portraitSize).foreach { img =>
+        drawImage(g2d, emission(img, geo.portraitSize), geo.portraitX, geo.portraitY, geo.portraitSize)
       }
     }
 
   private def drawCost(g2d: Graphics2D, costCode: String): Unit =
-    ResourceLoader.loadImage(CardViewAssets.costIconPath(costCode), geometry.costSize) match {
+    ResourceLoader.loadImage(CardViewAssets.costIconPath(costCode), geo.costSize) match {
       case Some(img) =>
-        g2d.drawImage(img, geometry.costX, geometry.costY, geometry.costSize, geometry.costSize, NoObserver)
+        drawImage(g2d, img, geo.costX, geo.costY, geo.costSize)
       case None =>
-        g2d.setFont(new Font("SansSerif", Font.BOLD, 20))
+        g2d.setFont(new Font("SansSerif", Font.BOLD, geo.nameFontSize))
         g2d.setColor(Color.BLACK)
-        g2d.drawString(costCode, 10, 30)
+        g2d.drawString(costCode, geo.costX, geo.costY)
     }
 
   private def drawName(g2d: Graphics2D, name: String): Unit =
@@ -98,84 +70,69 @@ class CardView(geometry: CardGeometry, nameFont: Font, statFont: Font) {
       g2d.setFont(nameFont)
       g2d.setColor(Color.BLACK)
       val textWidth = g2d.getFontMetrics.stringWidth(name)
-      val nameX = (geometry.cardWidth - textWidth) / 2
-      g2d.drawString(name, nameX, geometry.nameY)
+      val nameX = centerPos(geo.cardWidth, textWidth)
+      g2d.drawString(name, nameX, geo.nameY)
     }
+    
+  private def centerPos(containerW: Int, objectW: Int): Int = (containerW - objectW) / 2 
 
-  private def drawStats(g2d: Graphics2D, attack: String, health: String): Unit = {
+  private def drawStats(g2d: Graphics2D, attack: String, health: String): Unit =
     g2d.setFont(statFont)
     g2d.setColor(Color.BLACK)
-    if (attack.nonEmpty) g2d.drawString(attack, geometry.attackX, geometry.attackY)
-    if (health.nonEmpty) g2d.drawString(health, geometry.healthX, geometry.healthY)
-  }
+    if (attack.nonEmpty) g2d.drawString(attack, geo.attackX, geo.attackY)
+    if (health.nonEmpty) g2d.drawString(health, geo.healthX, geo.healthY)
 
-  private def drawSigils(g2d: Graphics2D, defaultSigils: List[String]): Unit = defaultSigils match {
-    case single :: Nil =>
-      ResourceLoader.loadImage(CardViewAssets.sigilPath(single), geometry.sigilSize).foreach { img =>
-        g2d.drawImage(img, geometry.sigilCenterX, geometry.sigilCenterY, NoObserver)
-      }
-    case left :: right :: _ =>
-      ResourceLoader.loadImage(CardViewAssets.sigilPath(left), geometry.twinSigilSize).foreach { img =>
-        g2d.drawImage(img, geometry.sigilLeftX, geometry.sigilLeftY - geometry.sigilSize, NoObserver)
-      }
-      ResourceLoader.loadImage(CardViewAssets.sigilPath(right), geometry.twinSigilSize).foreach { img =>
-        g2d.drawImage(img, geometry.sigilRightX, geometry.sigilRightY - geometry.sigilSize, NoObserver)
-      }
-    case Nil => ()
-  }
+  private def drawSigils(g2d: Graphics2D, defaultSigils: List[String], addedSigils: List[String]): Unit = {
 
-  private def drawAddedSigils(g2d: Graphics2D, defaultSigils: List[String], addedSigils: List[String]): Unit =
+    defaultSigils match {
+      case Nil => ()
+      case single :: Nil =>
+        ResourceLoader.loadImage(CardViewAssets.sigilPath(single), geo.sigilSize).foreach { img =>
+          drawImage(g2d, img, geo.sigilCenterX, geo.sigilCenterY, geo.sigilSize)
+        }
+      case left :: right :: _ =>
+        ResourceLoader.loadImage(CardViewAssets.sigilPath(left), geo.twinSigilSize).foreach { img =>
+          drawImage(g2d, img, geo.sigilLeftX, geo.sigilLeftY - geo.sigilSize, geo.twinSigilSize)
+        }
+        ResourceLoader.loadImage(CardViewAssets.sigilPath(right), geo.twinSigilSize).foreach { img =>
+          drawImage(g2d, img, geo.sigilRightX, geo.sigilRightY - geo.sigilSize, geo.twinSigilSize)
+        }
+    }
+
     if (addedSigils.nonEmpty) {
-      val slots: Vector[(Int, Int)] =
-        if (defaultSigils.isEmpty)
-          (geometry.patchCenterX, geometry.patchCenterY) +: geometry.addedSigilSlotCenters
-        else
-          geometry.addedSigilSlotCenters
-
-      addedSigils.zip(slots).foreach { case (sigilName, (centerX, centerY)) =>
-        drawAddedSigil(g2d, sigilName, centerX, centerY)
+      val slots: Vector[(Int, Int)] = defaultSigils match {
+        case empty => (geo.patchCenterX, geo.patchCenterY) +: geo.addedSigilSlotCenters
+        case _     => geo.addedSigilSlotCenters
       }
-    }
 
-  private def drawAddedSigil(g2d: Graphics2D, sigilName: String, centerX: Int, centerY: Int): Unit = {
-    val patchSize = geometry.patchSize
-    val sigilSize = geometry.addedSigilSize
-
-    val patchX = centerX - patchSize / 2
-    val patchY = centerY - patchSize / 2
-    val sigilX = centerX - sigilSize / 2
-    val sigilY = centerY - sigilSize / 2
-
-    ResourceLoader.loadImage(sigilPatchPath, patchSize).foreach { patch =>
-      g2d.drawImage(patch, patchX, patchY, patchSize, patchSize, NoObserver)
-    }
-
-    ResourceLoader.loadImage(CardViewAssets.sigilPath(sigilName), sigilSize).foreach { sigilImg =>
-      val lightened = emission(toBufferedImage(sigilImg, sigilSize, sigilSize))
-      g2d.drawImage(lightened, sigilX, sigilY, sigilSize, sigilSize, NoObserver)
+      addedSigils.zip(slots).foreach {
+        case (sigilName, (centerX, centerY)) =>
+          ResourceLoader.loadImage(CardViewAssets.sigilPatchPath, geo.patchSize).foreach { patch =>
+            drawImage(g2d, patch, centerPos(centerX, geo.patchSize) , centerPos(centerY, geo.patchSize), geo.patchSize)
+          }
+          ResourceLoader.loadImage(CardViewAssets.sigilPath(sigilName), geo.sigilSize).foreach { sigilImg =>
+            drawImage(g2d, emission(sigilImg, geo.addedSigilSize), centerPos(centerX, geo.sigilSize), centerPos(centerY, geo.sigilSize), geo.addedSigilSize)
+          }
+      }
     }
   }
 
-  private def emission(img: BufferedImage): BufferedImage = {
-    val out = new BufferedImage(img.getWidth, img.getHeight, BufferedImage.TYPE_INT_ARGB)
+  private def emission(img: Image, size: Int): BufferedImage = {
+    val out = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
     val g = out.createGraphics()
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.drawImage(img, 0, 0, NoObserver)
     g.setComposite(AlphaComposite.SrcAtop)
     g.setColor(Color.decode("#85fcc3"))
-    g.fillRect(0, 0, img.getWidth, img.getHeight)
+    g.fillRect(0, 0, size, size)
     g.dispose()
     out
   }
+}
 
-  private def toBufferedImage(img: java.awt.Image, w: Int, h: Int): BufferedImage =
-    img match {
-      case bi: BufferedImage => bi
-      case other =>
-        val bimg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
-        val g = bimg.createGraphics()
-        g.drawImage(other, 0, 0, w, h, NoObserver)
-        g.dispose()
-        bimg
-    }
+object CardView {
+  def forWidth(windowWidth: Int): CardView = {
+    val geometry = CardGeometry(windowWidth)
+    new CardView(geometry)
+  }
 }

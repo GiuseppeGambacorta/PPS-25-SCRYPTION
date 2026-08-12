@@ -2,8 +2,6 @@ package org.scryption.view
 
 import org.scryption.game.model.*
 
-// Placeholder class to represent Cards
-
 final case class CardViewInfo(
                                name: String,
                                cost: String,
@@ -11,6 +9,7 @@ final case class CardViewInfo(
                                health: String,
                                defaultSigils: List[String] = Nil,
                                addedSigils: List[String] = Nil,
+                               hasEmission: Boolean = false,
                                cardType: String = ""
                              )
 
@@ -18,7 +17,7 @@ final case class CardViewInfo(
 
 extension (card: Card[?])
   def toViewInfo: CardViewInfo =
-    val (defaultSeals, addedSeals) = CardViewConversions.splitSeals(card)
+    val (defaultSeals, addedSeals, hasEmission) = CardViewConversions.splitSeals(card)
 
     CardViewInfo(
       name = card.name,
@@ -27,6 +26,7 @@ extension (card: Card[?])
       health = card.health.toString,
       defaultSigils = defaultSeals.toList.map(CardViewConversions.sealLabel),
       addedSigils = addedSeals.toList.map(CardViewConversions.sealLabel),
+      hasEmission = hasEmission,
       cardType = CardViewConversions.rarityLabel(card.rarity)
     )
 
@@ -34,23 +34,23 @@ private object CardViewConversions:
 
   def attackLabel(card: Card[?]): String = card match
     case c: CreatureCard => c.attack.toString
-    case _: SupportCard  => "" // no attack stat to show
+    case _: SupportCard  => ""
 
   def costLabel(attribute: SacrificeAttribute): String = attribute match
     case SacrificeAttribute.Blood(value) => s"${value}blood"
     case SacrificeAttribute.Bones(value) => s"${value}bone"
     case SacrificeAttribute.Nil()        => ""
-
-  // Splits a card's actual seals into (default, added), where "default" means
-  // present on the library's template card of the same name.
-  def splitSeals(card: Card[?]): (Set[Seal], Set[Seal]) =
+  
+  def splitSeals(card: Card[?]): (Set[Seal], Set[Seal], Boolean) =
     val templateSeals: Set[Seal] =
       CardLibrary.byName(card.name).map(_.seals).getOrElse(Set.empty)
 
     val defaultSeals = card.seals.intersect(templateSeals)
     val addedSeals = card.seals.diff(templateSeals)
+    
+    val hasEmission: Boolean = addedSeals.nonEmpty 
 
-    (defaultSeals, addedSeals)
+    (defaultSeals, addedSeals, hasEmission)
 
   def sealLabel(seal: Seal): String = seal match
     case Seal.RabbitHole        => "rabbit_hole"

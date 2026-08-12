@@ -1,8 +1,10 @@
 package org.scryption.view
 
-// All layout proportions for a card, derived from the width
+// All layout proportions for a card, derived from the width of the window
 
-final case class CardGeometry(cardWidth: Int) {
+final case class CardGeometry(windowWidth: Int) {
+
+  val cardWidth: Int = Math.round(windowWidth * 0.13f)
 
   private def pct(factor: Float): Int = Math.round(cardWidth * factor)
 

@@ -1,35 +1,38 @@
-package org.scryption.view
+package org.scryption.view.events
 
 import org.scryption.game.model.Card
-import org.scryption.view.{CardViewAssets, CardViewInfo, ResourceLoader}
+import org.scryption.view.*
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
 import java.awt.event.{MouseEvent, MouseListener}
-import java.awt.image.BufferedImage
-import java.awt.{Color, Cursor, Dimension, Font, Graphics2D}
-import javax.swing.{ImageIcon, JLabel, SwingUtilities, Timer}
+import java.awt.{Color, Cursor, Dimension, Graphics2D}
+import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
+/** Mycologists event: pick two matching cards, merge them into one boosted card.
+ *
+ *  This doesn't fit the [[EventView]] template — the slot holds a *pair* of stacked
+ *  labels rather than one, and confirming merges them into a single icon instead of
+ *  just re-rendering the same label — so it keeps its own CardSlot. It does reuse the
+ *  shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used
+ *  to be copy-pasted here too.
+ */
 class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
-  private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
-  private val geometry = CardGeometry(cardWidth = 250)
-  private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
-  private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
-  private val renderer = new CardView(geometry, nameFont, statFont)
-
-  private val placeholderIcon: ImageIcon =
-    new ImageIcon(new BufferedImage(geometry.cardWidth, geometry.cardHeight, BufferedImage.TYPE_INT_RGB))
+  private val setup = CardView.forWidth(size.width)
+  private val geometry = setup.geo
+  private val renderer = setup
 
   private val cardGap = 100
   private val handTopOffset = 600
   private val hoverLiftAmount = 50
   private val slotY = 100
 
-  private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
-  private val slotBgImage: Option[ImageIcon] = ResourceLoader.loadTemplateImage("slots/card_slot_duplicatemerge.png").map(new ImageIcon(_))
+  private val backgroundImage = ResourceLoader.loadTemplateImage("table.png")
+  private val slotBgImage: Option[ImageIcon] =
+    ResourceLoader.loadTemplateImage("slots/card_slot_duplicatemerge.png").map(new ImageIcon(_))
 
   private var currentCards: List[Card[?]] = Nil
   private var cardSlots: Vector[CardSlot] = Vector.empty
@@ -65,11 +68,10 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
   private def listenToChannel(): Unit = {
     Future {
       while (true) {
-        val msg = channel.receiveFromGame
-        msg match {
+        channel.receiveFromGame match {
           case GUIMessages.Cards(cards) =>
             Swing.onEDT {
-              this.currentCards = cards
+              currentCards = cards
               if (slotCardIndex != -1 && cards.length <= slotCardIndex) slotCardIndex = -1
               renderHand(currentCards.map(_.toViewInfo))
             }
@@ -82,7 +84,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
     val frontIcon: ImageIcon =
-      renderer.render(info, CardViewAssets.frontTemplatePath(info.cardType)).getOrElse(placeholderIcon)
+      renderer.render(info, CardViewAssets.frontTemplatePath(info.cardType)).get
 
     var isHovered: Boolean = false
     var isInSlot: Boolean = false
@@ -90,9 +92,6 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
     var currentX: Int = baseX
     var currentY: Int = baseY
-
-    // Label para el texto flotante de "+ATK"
-    private var bonusLabel: Option[JLabel] = None
 
     val label: JLabel = new JLabel(frontIcon) {
       setBounds(baseX, baseY, geometry.cardWidth, geometry.cardHeight)
@@ -110,20 +109,16 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
     private val pairListener = new MouseListener {
       override def mouseClicked(e: MouseEvent): Unit = handleCardClick()
-
       override def mousePressed(e: MouseEvent): Unit = {}
-
       override def mouseReleased(e: MouseEvent): Unit = {}
-
       override def mouseEntered(e: MouseEvent): Unit = handleMouseEnter()
-
       override def mouseExited(e: MouseEvent): Unit = handleMouseExit()
     }
 
     label.addMouseListener(pairListener)
     label2.addMouseListener(pairListener)
 
-    private def handleMouseEnter(): Unit = {
+    private def handleMouseEnter(): Unit =
       if (!isHovered && !isInSlot && !isAnimating) {
         isHovered = true
         currentY = baseY - hoverLiftAmount
@@ -132,9 +127,8 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
         refreshZOrder()
         label.repaint()
       }
-    }
 
-    private def handleMouseExit(): Unit = {
+    private def handleMouseExit(): Unit =
       if (isHovered && !isInSlot && !isAnimating) {
         isHovered = false
         currentY = baseY
@@ -143,7 +137,6 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
         refreshZOrder()
         label.repaint()
       }
-    }
 
     private def handleCardClick(): Unit = {
       if (isAnimating) return
@@ -157,7 +150,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
           health = (info.health.toInt * visualStatBonus).toString
         )
         val mergedIcon: ImageIcon =
-          renderer.render(mergedInfo, CardViewAssets.frontTemplatePath(mergedInfo.cardType)).getOrElse(placeholderIcon)
+          renderer.render(mergedInfo, CardViewAssets.frontTemplatePath(mergedInfo.cardType)).get
 
         val parent = label.getParent
         if (parent != null) {
@@ -173,9 +166,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
         SwingUtilities.invokeLater(() => {
           Thread.sleep(800)
-          Swing.onEDT {
-            sendCardToGameModel()
-          }
+          Swing.onEDT { sendCardToGameModel() }
         })
       } else {
         moveToSlot()
@@ -191,9 +182,9 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
       val parent = label.getParent
       if (parent != null) {
         val slotX = (parent.getWidth - geometry.cardWidth * 2) / 2
-        this.isInSlot = true
-        this.currentX = slotX
-        this.currentY = MycologistsView.this.slotY
+        isInSlot = true
+        currentX = slotX
+        currentY = MycologistsView.this.slotY
         label.setLocation(currentX, currentY)
         label2.setLocation(currentX + geometry.cardWidth, currentY)
       }
@@ -206,9 +197,9 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
       val parent = label.getParent
       if (parent != null) {
         val slotX = (parent.getWidth - geometry.cardWidth * 2) / 2
-        this.isInSlot = true
-        this.currentX = slotX
-        this.currentY = MycologistsView.this.slotY
+        isInSlot = true
+        currentX = slotX
+        currentY = MycologistsView.this.slotY
         label.setLocation(currentX, currentY)
         label2.setLocation(currentX + geometry.cardWidth, currentY)
         refreshZOrder()
@@ -217,21 +208,18 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
     private[MycologistsView] def returnToHand(): Unit = {
       if (isAnimating) return
-      this.isInSlot = false
-      this.currentX = baseX
-      this.currentY = baseY
+      isInSlot = false
+      currentX = baseX
+      currentY = baseY
       label.setLocation(currentX, currentY)
       label2.setLocation(currentX + duplicateOffsetX, currentY)
       refreshZOrder()
     }
 
-    private def sendCardToGameModel(): Unit = {
+    private def sendCardToGameModel(): Unit =
       if (index >= 0 && index < currentCards.length) {
         channel.sendToGame(GUIMessages.SingleCard(currentCards(index)))
       }
-      // Opcional: Limpiar toda la vista o esperar la siguiente escena del juego
-      // Swing.onEDT { contents.clear(); peer.repaint() }
-    }
   }
 
   private def renderHand(cardsViewInfo: List[CardViewInfo]): Unit = {
@@ -251,9 +239,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
     }
 
     val slots: Vector[CardSlot] = cardsViewInfo.zipWithIndex.map { case (info, i) =>
-      val posX = i * cardGap
-      val posY = handTopOffset
-      val slot = new CardSlot(i, info, posX, posY)
+      val slot = new CardSlot(i, info, i * cardGap, handTopOffset)
       panel.peer.add(slot.label2)
       panel.peer.add(slot.label)
       slot
@@ -272,23 +258,12 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
     peer.repaint()
   }
 
-  private def refreshZOrder(): Unit = {
-    if (cardSlots.isEmpty) return
-    val parent = cardSlots.head.label.getParent
-    if (parent == null) return
-
-    val inSlot = cardSlots.find(_.isInSlot)
-    val hovered = cardSlots.find(s => s.isHovered && !s.isInSlot)
-
-    val base = cardSlots
-      .filterNot(s => s.isInSlot || hovered.contains(s))
-      .sortBy(_.index)
-
-    val backToFront = base ++ hovered.toList ++ inSlot.toList
-    val labelsBackToFront = backToFront.flatMap(s => List(s.label, s.label2))
-
-    labelsBackToFront.reverse.zipWithIndex.foreach { case (label, z) =>
-      parent.setComponentZOrder(label, z)
-    }
-  }
+  private def refreshZOrder(): Unit =
+    ZOrder(
+      cardSlots,
+      (s: CardSlot) => s.isInSlot,
+      (s: CardSlot) => s.isHovered,
+      (s: CardSlot) => s.index,
+      (s: CardSlot) => List(s.label, s.label2)
+    )
 }

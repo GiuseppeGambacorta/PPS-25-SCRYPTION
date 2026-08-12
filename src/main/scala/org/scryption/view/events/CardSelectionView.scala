@@ -1,32 +1,24 @@
-package org.scryption.view
+package org.scryption.view.events
 
-import org.scryption.view.CardViewAssets
-import org.scryption.view.CardViewInfo
-import org.scryption.view.ResourceLoader
-import org.scryption.{GUIChannelInterface, GUIMessages}
 import org.scryption.game.model.Card
+import org.scryption.view.CardView
+import org.scryption.view.{CardViewAssets, CardViewInfo, ResourceLoader, toViewInfo}
+import org.scryption.{GUIChannelInterface, GUIMessages}
 
-import java.awt.{Cursor, Dimension}
-import java.awt.image.BufferedImage
+import java.awt.Cursor
 import java.awt.event.{MouseEvent, MouseListener}
 import javax.swing.{ImageIcon, JLabel, Timer}
-import scala.swing.{FlowPanel, Graphics2D, Panel, Swing}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.swing.*
 
 class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
-  private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
-  private val geometry = CardGeometry(cardWidth = 380)
-  private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
-  private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
-  private val renderer = new CardView(geometry, nameFont, statFont)
-
-  private val placeholderIcon: ImageIcon =
-    new ImageIcon(new BufferedImage(geometry.cardWidth, geometry.cardHeight, BufferedImage.TYPE_INT_RGB))
+  
+  private val setup = CardView.forWidth(size.width)
 
   private val backIcon: ImageIcon =
-    renderer.render(CardViewInfo("", "", "", ""), CardViewAssets.backTemplatePath).getOrElse(placeholderIcon)
+    setup.render(CardViewInfo("", "", "", ""), CardViewAssets.backTemplatePath).get
 
   private val cardGap = 30
   private val topOffset = 400
@@ -34,7 +26,7 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
   private val tickMillis = 16
   private val slideDistance = 800
 
-  private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
+  private val backgroundImage = ResourceLoader.loadTemplateImage("table.png")
 
   // Stato locale gestito direttamente dalla vista
   private var currentCards: List[Card[?]] = Nil
@@ -70,14 +62,14 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
   private class CardSlot(val index: Int, info: CardViewInfo, posX: Int) {
     val frontIcon: ImageIcon =
-      renderer.render(info, CardViewAssets.frontTemplatePath(info.cardType)).getOrElse(placeholderIcon)
+      setup.render(info, CardViewAssets.frontTemplatePath(info.cardType)).get
 
     var flipped: Boolean = false
     var selected: Boolean = false
     var siblings: Vector[CardSlot] = Vector()
 
     val label: JLabel = new JLabel(backIcon) {
-      setBounds(posX, topOffset, geometry.cardWidth, geometry.cardHeight)
+      setBounds(posX, topOffset, setup.geo.cardWidth, setup.geo.cardHeight)
       setOpaque(false)
       setCursor(new Cursor(Cursor.HAND_CURSOR))
       setFocusable(false)
@@ -166,7 +158,7 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
     contents.clear()
 
     val slots: Vector[CardSlot] = cardsViewInfo.zipWithIndex.map { case (info, i) =>
-      new CardSlot(i, info, i * (geometry.cardWidth + cardGap))
+      new CardSlot(i, info, i * (setup.geo.cardWidth + cardGap))
     }.toVector
 
     slots.foreach(_.setSiblings(slots))
@@ -175,8 +167,8 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
       peer.setLayout(null)
       opaque = false
       preferredSize = new Dimension(
-        (geometry.cardWidth + cardGap) * cardsViewInfo.length - cardGap,
-        topOffset + geometry.cardHeight + slideDistance
+        (setup.geo.cardWidth + cardGap) * cardsViewInfo.length - cardGap,
+        topOffset + setup.geo.cardHeight + slideDistance
       )
       slots.foreach(s => peer.add(s.label))
     }

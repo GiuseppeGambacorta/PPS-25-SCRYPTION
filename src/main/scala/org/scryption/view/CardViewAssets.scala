@@ -8,6 +8,8 @@ object CardViewAssets {
   private val portraitFolder = "portraits"
   private val sigilFolder = "sigils"
   private val templateFolder = "cardtemplates"
+  private val fontFolder = "heavyweight-cufonfonts"
+  private val slotFolder = "slots"
 
   private val typeTemplates: Map[String, String] = Map(
     "rare" -> "rare_front.png",
@@ -29,4 +31,12 @@ object CardViewAssets {
   def portraitPath(name: String): String = s"$portraitFolder/portrait_${normalize(name)}.png"
 
   def sigilPath(sigilName: String): String = s"$sigilFolder/sigil_${normalize(sigilName)}.png"
+
+  def sigilPatchPath: String = s"$sigilFolder/sigil_patch.png"
+
+  def fontPath: String = s"$fontFolder/HEAVYWEI.TTF"
+
+  def emissionPath(name: String): String = s"$portraitFolder/portrait_${normalize(name)}_emission.png"
+
+  def slotPath(name: String): String = s"$slotFolder/slot_${normalize(name)}.png"
 }
