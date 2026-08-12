@@ -3,6 +3,7 @@ package org.scryption.game.model
 import scala.annotation.targetName
 
 type Slot = Option[Card[?]]
+type BoardPosition = (Int, Int)
 
 object boardModel:
 
@@ -13,10 +14,14 @@ object boardModel:
   val ColsCount: Int = 4
 
   val x: Slot = None
-
+  val IndexOfBotRow = 1
+  val IndexOfPlayerRow = 2
  
   extension (slot: Slot)
     infix def |(next: Slot): BoardRow = Vector(slot, next)
+
+  extension (position: BoardPosition)
+    def isValid : Boolean = (position._1 < RowsCount && position._2 < ColsCount) && (position._1 >= 0 && position._2 >= 0)
 
 
   extension (row: BoardRow)
@@ -41,9 +46,11 @@ object boardModel:
   extension (b: Board)
     def apply(row: Int): BoardRow = b(row)
 
-    def updatedSlot(row: Int, col: Int, card: Slot): Board =
+    def updatedSlot(position: BoardPosition, card: Slot): Board = 
+      val (row, col) = position
       b.updated(row, b(row).updated(col, card))
-      
+    
+    
     def updateRow(row: Int, updatedRow: BoardRow): Board =
       b.updated(row, updatedRow)
 

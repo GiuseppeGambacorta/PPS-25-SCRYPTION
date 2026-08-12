@@ -1,0 +1,85 @@
+package org.scryption.game.model.managers
+
+import org.scryption.game.model.boardModel.BoardRow
+import org.scryption.game.model.*
+
+/** Represents the result of a single card's attack phase.
+ */
+case class CombatResult(updatedRow: BoardRow, damageToOpponent: Int, killedCards: List[Card[?]])
+
+/** Represents the result of an entire row attack.
+ */
+case class RowAttackResult(
+                            updatedOpponentRow: BoardRow,
+                            damageDelta: Int,
+                            earnedBones: Int,
+                            returnedToHandCards: List[Card[?]]
+                          )
+
+object CombatManager:
+
+  /** Default resolver given implicitly if none is provided in scope. */
+  given defaultResolver: FightResolver =
+  new BasicResolver with AirborneResolver with StrikeResolver
+
+  /** Performs an attack from a single card, resolving targets and applying damage.
+   *
+   * @param attackerCol The column index of the attacking card.
+   * @param attacker The attacking card.
+   * @param opponentRow The current composition of the opponent's front row
+   * @param resolver The FightResolver to use for targeting (passed implicitly via given/using).
+   * @return a CombatResult containing the new row state and damage dealt to the opponent
+   */
+  def executeAttack(attackerCol: Int,
+                    attacker: Card[?],
+                    opponentRow: BoardRow)
+                   (using resolver: FightResolver): CombatResult =
+    val attackDamage = attacker match
+      case creature: CreatureCard => creature.attack
+      case _: SupportCard         => 0
+    val targets = resolver.getTargets(attackerCol, attacker, opponentRow)
+    targets.foldLeft(CombatResult(opponentRow, 0, List.empty)) { (currentResult, target) => target match
+      case HitTarget.Opponent =>
+        currentResult.copy(damageToOpponent = currentResult.damageToOpponent + attackDamage)
+      case HitTarget.OpposingCard(colIndex) =>
+        currentResult.updatedRow(colIndex) match
+          case Some(targetCard) =>
+            val hasTouchOfDeath = attacker.seals.contains(Seal.TouchOfDeath) && attackDamage > 0
+            val remainingHealth = targetCard.health - attackDamage
+            if hasTouchOfDeath || remainingHealth <= 0 then
+              currentResult.copy(
+                updatedRow = currentResult.updatedRow.updated(colIndex, boardModel.x),
+                killedCards = currentResult.killedCards :+ targetCard
+              )
+            else
+              val updatedTargetCard = targetCard withHealth remainingHealth
+              currentResult.copy(updatedRow = currentResult.updatedRow.updated(colIndex, Some(updatedTargetCard)))
+          case None => currentResult
+    }
+
+  /** Performs a full row attack from left to right.
+   *
+   * @param attackerRow The row of cards initiating the attack.
+   * @param defenderRow The row of cards defending.
+   * @param resolver The FightResolver to use for targeting (passed implicitly via given/using).
+   * @return a RowAttackResult accumulating all damages, bones and board updates.
+   */
+  def executeRowAttack(attackerRow: BoardRow, defenderRow: BoardRow)
+                      (using resolver: FightResolver): RowAttackResult =
+    val initialResult = RowAttackResult(defenderRow, 0, 0, List.empty)
+    (0 until boardModel.ColsCount).foldLeft(initialResult): (acc, colIndex) =>
+      attackerRow(colIndex) match
+        case Some(attacker) =>
+          // Il resolver passa automaticamente grazie alla clausola (using resolver)
+          val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow)
+          val bonesFromAttack = combatResult.killedCards.map: deadCard =>
+            if deadCard.seals.contains(Seal.BoneKing) then 4 else 1
+          .sum
+          val immortals = combatResult.killedCards.filter(cards => cards.seals.contains(Seal.Unkillable))
+          acc.copy(
+            updatedOpponentRow = combatResult.updatedRow,
+            damageDelta = acc.damageDelta + combatResult.damageToOpponent,
+            earnedBones = acc.earnedBones + bonesFromAttack,
+            returnedToHandCards = acc.returnedToHandCards ++ immortals
+          )
+        case None => acc

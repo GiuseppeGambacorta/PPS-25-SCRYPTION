@@ -4,8 +4,9 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scryption.game.model.HitTarget.*
+import org.scryption.game.model.managers.HitTarget.*
 import org.scryption.game.model.boardModel.*
+import org.scryption.game.model.managers.{AirborneResolver, BasicResolver, FightResolver, StrikeResolver}
 
 class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
 
@@ -14,7 +15,7 @@ class FightResolverTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
   private val wolf = CardLibrary.wolf
   private val stoat = CardLibrary.stoat
   private val sparrow = CardLibrary.sparrow
-  private val boulder = SupportCard.empty named "Boulder" withHealth 5 addSeal Seal.Wall
+  private val boulder = SupportCard.empty named "Boulder" withHealth 5 addSeal Seal.MightyLeap
   private val mantis = CardLibrary.mantis
   private val mantisGod = CreatureCard.empty named "MantisGod" withAttack 1 withHealth 1 addSeal Seal.TrifurcatedStrike
 

@@ -30,9 +30,9 @@ object CardLibrary:
   // Hooved family
 
   val blackGoat: Card[?] = CreatureCard.empty named "Black Goat" withAttack 0 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.WorthySacrifice
-  val elkFawn: Card[?] = CreatureCard.empty named "Elk Fawn" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.Fledgling addSeal Seal.Sprinter
-  val elk: Card[?] = CreatureCard.empty named "Elk" withAttack 2 withHealth 4 withSacrificeAttribute Blood(2) withRarity Common addSeal Seal.Sprinter
-  val pronghorn: Card[?] = CreatureCard.empty named "Pronghorn" withAttack 1 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Sprinter addSeal Seal.BifurcatedStrike
+  val elkFawn: Card[?] = CreatureCard.empty named "Elk Fawn" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.Fledgling addSeal Seal.Sprinter(Direction.Right)
+  val elk: Card[?] = CreatureCard.empty named "Elk" withAttack 2 withHealth 4 withSacrificeAttribute Blood(2) withRarity Common addSeal Seal.Sprinter(Direction.Right)
+  val pronghorn: Card[?] = CreatureCard.empty named "Pronghorn" withAttack 1 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Sprinter(Direction.Right) addSeal Seal.BifurcatedStrike
   val mooseBuck: Card[?] = CreatureCard.empty named "Moose Buck" withAttack 3 withHealth 7 withSacrificeAttribute Blood(3) withRarity Common addSeal Seal.Hefty
 
   // Insect family
