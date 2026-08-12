@@ -74,13 +74,13 @@ sealed trait Card[C <: Card[C]]:
 enum SacrificeAttribute:
   case Blood(value: Int)
   case Bones(value: Int)
-  case Nil()
+  case Nil
 
   def isValid: Boolean = this match
     case Blood(v) => v >= 0
     case Bones(v) => v >= 0
-    case Nil()    => true
-    
+    case Nil => true
+
 enum Direction:
   case Left
   case Right
@@ -119,7 +119,7 @@ enum Rarity:
 object CreatureCard:
   /** @return a new empty CreatureCard with a randomly generated UUID.
    */
-  def empty: CreatureCard = CreatureCard(UUID.randomUUID(), "", 0, 0, SacrificeAttribute.Nil(), Set.empty, Common)
+  def empty: CreatureCard = CreatureCard(UUID.randomUUID(), "", 0, 0, SacrificeAttribute.Nil, Set.empty, Common)
 
 /** Represents a standard creature card that can attack.
  */
@@ -155,7 +155,7 @@ case class CreatureCard(
 object SupportCard:
   /** @return a new empty SupportCard with a randomly generated UUID.
    */
-  def empty: SupportCard = SupportCard(UUID.randomUUID(), "", 0, SacrificeAttribute.Nil(), Set.empty, Common)
+  def empty: SupportCard = SupportCard(UUID.randomUUID(), "", 0, SacrificeAttribute.Nil, Set.empty, Common)
 
 /** Represents a support card that cannot attack.
  */

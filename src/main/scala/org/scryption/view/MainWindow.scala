@@ -16,6 +16,7 @@ object MainWindows extends SimpleSwingApplication:
 
   override def top: MainFrame = new MainFrame:
     title = "Scryption - Main Window"
+    
     preferredSize = new Dimension(1280, 900)
 
     val centerContainer = new BoxPanel(Orientation.Vertical)
