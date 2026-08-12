@@ -24,7 +24,7 @@ abstract class EventView(
   private val setup = CardView.forWidth(cardWidth)
 
   private val cardGap = 100
-  private val handTopOffset = 800
+  private val handTopOffset = 500
   private val hoverLiftAmount = 50
   private val slotY = 100
 

@@ -21,7 +21,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
  */
 class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
-  private val setup = CardView.forWidth(size.width)
+  private val setup = CardView.forWidth(250)
   private val geometry = setup.geo
   private val renderer = setup
 

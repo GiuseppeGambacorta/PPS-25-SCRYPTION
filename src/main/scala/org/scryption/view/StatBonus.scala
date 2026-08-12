@@ -2,11 +2,6 @@ package org.scryption.view
 
 import org.scryption.view.events.EventView
 
-/** The stat bonus applied when a card is confirmed inside an [[EventView]] slot.
- *  Replaces the copy-pasted `visualAttackBonus`/`visualHealthBonus` field plus the
- *  `info.copy(attack = ...)` / `info.copy(health = ...)` line that differed between
- *  Strange Stones and the two fire camp views.
- */
 sealed trait StatBonus {
   def apply(info: CardViewInfo): CardViewInfo
 }
@@ -18,5 +13,16 @@ object StatBonus {
 
   final case class Health(amount: Int) extends StatBonus {
     def apply(info: CardViewInfo): CardViewInfo = info.copy(health = (info.health.toInt + amount).toString)
+  }
+
+  final case class Merge(duplicateCard: CardViewInfo) extends StatBonus {
+    def apply(info: CardViewInfo): CardViewInfo =
+      info.copy(attack = (info.attack.toInt + duplicateCard.attack.toInt).toString,
+                health = (info.health.toInt + duplicateCard.health.toInt).toString,
+                addedSigils = info.addedSigils.concat(duplicateCard.defaultSigils).concat(duplicateCard.addedSigils))
+  }
+
+  final case class Sigils(newSigils: List[String]) extends StatBonus {
+    def apply(info: CardViewInfo): CardViewInfo = info.copy(addedSigils = info.addedSigils.concat(newSigils))
   }
 }

@@ -28,7 +28,7 @@ private class CardView(val geo: CardGeometry) {
 
       drawImage(g2d, template, 0, 0, geo.cardWidth, Some(geo.cardHeight))
 
-      drawPortrait(g2d, card.name, card.hasEmission)
+      drawPortrait(g2d, card.name, card.addedSigils)
       drawCost(g2d, card.cost)
       drawName(g2d, card.name)
       drawStats(g2d, card.attack, card.health)
@@ -45,11 +45,11 @@ private class CardView(val geo: CardGeometry) {
       case Some(h) => g2d.drawImage(img, x, y, width, h, NoObserver)
     }
 
-  private def drawPortrait(g2d: Graphics2D, name: String, hasEmission: Boolean): Unit =
+  private def drawPortrait(g2d: Graphics2D, name: String, addedSigils: List[String]): Unit =
     ResourceLoader.loadImage(CardViewAssets.portraitPath(name), geo.portraitSize).foreach { img =>
       drawImage(g2d, img, geo.portraitX, geo.portraitY, geo.portraitSize)}
 
-    if (hasEmission) {
+    if (addedSigils.nonEmpty) {
       ResourceLoader.loadImage(CardViewAssets.emissionPath(name), geo.portraitSize).foreach { img =>
         drawImage(g2d, emission(img, geo.portraitSize), geo.portraitX, geo.portraitY, geo.portraitSize)
       }

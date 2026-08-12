@@ -7,7 +7,7 @@ import org.scryption.view.StatBonus
 class FireCampHealthView(channel: GUIChannelInterface)
   extends EventView(
     channel = channel,
-    cardWidth = 380,
+    cardWidth = 250,
     bonus = StatBonus.Health(2),
     slotBgImagePath = "slots/slot_statboost_health.png"
   )

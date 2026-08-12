@@ -11,32 +11,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
-/** Strange Stones event: sacrifice one card to upgrade another. The upgraded card gains
- *  the sacrificed card's seals (both its default seals and any it had already picked up)
- *  as added seals.
- *
- *  Two independent slots instead of one, so this doesn't extend [[EventView]]:
- *   - clicking a hand card sends it to the sacrifice slot if that's empty, otherwise to
- *     the upgrade slot if that's empty, otherwise nothing happens (a slot has to be
- *     freed first);
- *   - clicking a card already sitting in either slot returns it to the hand;
- *   - a confirm icon appears once both slots are filled. Clicking it deletes the
- *     sacrificed card, applies its seals to the upgraded card, and sends the result to
- *     the game.
- *
- *  Placeholder asset paths below ("slots/sacrifice.png", "slots/upgrade.png",
- *  "slots/confirm_sacrifice.png") — swap in the real filenames whenever they exist;
- *  missing files just fall back to a colored rectangle like every other slot view.
- *
- *  ASSUMPTION: sending the result needs a message carrying *two* cards, which none of
- *  the existing `GUIMessages` cases do (they only ever send one `SingleCard`). This
- *  assumes a `GUIMessages.Sacrifice(sacrificed, upgraded)` case — add it next to
- *  `Cards`/`SingleCard`/`End` if it doesn't exist yet, or update the one call in
- *  `sendResultToGameModel` below to match whatever you add instead.
- */
 class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
 
-  private val setup = CardView.forWidth(size.width)
+  private val setup = CardView.forWidth(250)
   private val geometry = setup.geo
   private val renderer = setup
 

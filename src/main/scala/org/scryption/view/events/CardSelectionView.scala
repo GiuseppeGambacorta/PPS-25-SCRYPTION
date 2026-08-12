@@ -14,14 +14,14 @@ import scala.swing.*
 
 class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
-  
-  private val setup = CardView.forWidth(size.width)
+
+  private val setup = CardView.forWidth(250)
 
   private val backIcon: ImageIcon =
     setup.render(CardViewInfo("", "", "", ""), CardViewAssets.backTemplatePath).get
 
   private val cardGap = 30
-  private val topOffset = 400
+  private val topOffset = 300
   private val slideStep = 60
   private val tickMillis = 16
   private val slideDistance = 800

@@ -9,7 +9,6 @@ final case class CardViewInfo(
                                health: String,
                                defaultSigils: List[String] = Nil,
                                addedSigils: List[String] = Nil,
-                               hasEmission: Boolean = false,
                                cardType: String = ""
                              )
 
@@ -17,7 +16,7 @@ final case class CardViewInfo(
 
 extension (card: Card[?])
   def toViewInfo: CardViewInfo =
-    val (defaultSeals, addedSeals, hasEmission) = CardViewConversions.splitSeals(card)
+    val (defaultSeals, addedSeals) = CardViewConversions.splitSeals(card)
 
     CardViewInfo(
       name = card.name,
@@ -26,7 +25,6 @@ extension (card: Card[?])
       health = card.health.toString,
       defaultSigils = defaultSeals.toList.map(CardViewConversions.sealLabel),
       addedSigils = addedSeals.toList.map(CardViewConversions.sealLabel),
-      hasEmission = hasEmission,
       cardType = CardViewConversions.rarityLabel(card.rarity)
     )
 
@@ -41,16 +39,14 @@ private object CardViewConversions:
     case SacrificeAttribute.Bones(value) => s"${value}bone"
     case SacrificeAttribute.Nil()        => ""
   
-  def splitSeals(card: Card[?]): (Set[Seal], Set[Seal], Boolean) =
+  def splitSeals(card: Card[?]): (Set[Seal], Set[Seal]) =
     val templateSeals: Set[Seal] =
       CardLibrary.byName(card.name).map(_.seals).getOrElse(Set.empty)
 
     val defaultSeals = card.seals.intersect(templateSeals)
     val addedSeals = card.seals.diff(templateSeals)
-    
-    val hasEmission: Boolean = addedSeals.nonEmpty 
 
-    (defaultSeals, addedSeals, hasEmission)
+    (defaultSeals, addedSeals)
 
   def sealLabel(seal: Seal): String = seal match
     case Seal.RabbitHole        => "rabbit_hole"
