@@ -3,11 +3,11 @@ package org.scryption.view.fight
 import org.scryption.GUIChannelInterface
 import org.scryption.game.model.boardModel.*
 import org.scryption.view.{CardGeometry, CardView, CardViewAssets, ResourceLoader, toViewInfo}
+
 import scala.swing.*
 import scala.swing.event.{MouseClicked, MouseEntered, MouseExited}
-import java.awt.{Color, Graphics2D}
+import java.awt.{BasicStroke, Color, Cursor, Graphics2D}
 import java.awt.image.BufferedImage
-import java.awt.Cursor
 import javax.swing.border.LineBorder
 
 class BoardView(channel: GUIChannelInterface) extends BorderPanel:
@@ -16,29 +16,25 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
   private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
 
   private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
-  private val geometry = CardGeometry(cardWidth = 180)
+  private val geometry = CardGeometry(cardWidth = 200)
   private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
   private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
   private val renderer = new CardView(geometry, nameFont, statFont)
 
-  private def loadSlotIcon(path: String): javax.swing.ImageIcon =
-    ResourceLoader.loadTemplateImage(path) match
-      case Some(img) =>
-        val height = (geometry.cardWidth * 1.52).toInt
-        val scaled = img.getScaledInstance(geometry.cardWidth, height, java.awt.Image.SCALE_SMOOTH)
-        new javax.swing.ImageIcon(scaled)
-      case None =>
-        new javax.swing.ImageIcon()
+  private def loadSlotIcon(path: String): Option[java.awt.Image] =
+    ResourceLoader.loadTemplateImage(path).map: img =>
+      val height = (geometry.cardWidth * 1.52).toInt
+      img.getScaledInstance(geometry.cardWidth, height, java.awt.Image.SCALE_SMOOTH)
 
   private val iconBotPrep = loadSlotIcon("board/slot_bot_prep.png")
   private val iconBotAttack = loadSlotIcon("board/slot_bot_attack.png")
   private val iconPlayer = loadSlotIcon("board/slot_player.png")
 
-  private def getDefaultIcon(row: Int): javax.swing.ImageIcon = row match
+  private def getDefaultIcon(row: Int): Option[java.awt.Image] = row match
     case 0 => iconBotPrep
     case 1 => iconBotAttack
     case 2 => iconPlayer
-    case _ => new javax.swing.ImageIcon()
+    case _ => None
 
   override protected def paintComponent(g: Graphics2D): Unit =
     backgroundImage.foreach { img =>
@@ -46,47 +42,65 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
     }
     super.paintComponent(g)
 
+  private class ScalableSlot(val row: Int, val col: Int) extends Panel:
+    opaque = false
+    if row == 2 then cursor = new Cursor(Cursor.HAND_CURSOR)
+    var currentImage: Option[java.awt.Image] = getDefaultIcon(row)
+    var isHovered: Boolean = false
+
+    private def getCardBounds: Rectangle =
+      val aspect = 1.52
+      var w = size.width
+      var h = (w * aspect).toInt
+      if h > size.height then
+        h = size.height
+        w = (h / aspect).toInt
+      val x = (size.width - w) / 2
+      val y = (size.height - h) / 2
+      new Rectangle(x, y, w, h)
+
+    override protected def paintComponent(g: Graphics2D): Unit =
+      super.paintComponent(g)
+      val bounds = getCardBounds
+
+      currentImage.foreach { img =>
+        // interpolation to scale properly the image in smaller dimensions
+        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+        g.drawImage(img, bounds.x, bounds.y, bounds.width, bounds.height, null)
+      }
+
+      if isHovered then
+        g.setStroke(new BasicStroke(4))
+        if row == 2 then g.setColor(new Color(100, 200, 255))
+        else g.setColor(new Color(255, 100, 100))
+        g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
+
   private val gridPanel = new GridPanel(RowsCount, ColsCount):
     opaque = false
     hGap = 15
     vGap = 15
     border = Swing.EmptyBorder(40, 80, 40, 80)
 
-  private val slots: Array[Label] = Array.tabulate(RowsCount * ColsCount): index =>
+  private val slots: Array[ScalableSlot] = Array.tabulate(RowsCount * ColsCount): index =>
     val row = index / ColsCount
     val col = index % ColsCount
+    val slot = new ScalableSlot(row, col)
 
-    val slotLabel = new Label:
-      icon = getDefaultIcon(row)
-      opaque = false
-      horizontalAlignment = Alignment.Center
-      verticalAlignment = Alignment.Center
-      border = Swing.EmptyBorder(4, 4, 4, 4)
-      if row == 2 then cursor = new Cursor(Cursor.HAND_CURSOR)
-
-    listenTo(slotLabel.mouse.clicks, slotLabel.mouse.moves)
-
+    listenTo(slot.mouse.clicks, slot.mouse.moves)
     reactions += {
-      case MouseEntered(`slotLabel`, _, _) =>
-        if row == 2 then
-          slotLabel.border = LineBorder(new Color(100, 200, 255), 4, true)
-        else
-          slotLabel.border = LineBorder(new Color(255, 100, 100), 4, true)
-      case MouseExited(`slotLabel`, _, _) =>
-        slotLabel.border = Swing.EmptyBorder(4, 4, 4, 4)
-      case MouseClicked(`slotLabel`, _, _, _, _) =>
-        if row == 2 then
-          println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
+      case MouseEntered(`slot`, _, _) =>
+        slot.isHovered = true
+        slot.repaint()
+      case MouseExited(`slot`, _, _) =>
+        slot.isHovered = false
+        slot.repaint()
+      case MouseClicked(`slot`, _, _, _, _) =>
+        if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
       //channel.sendToGame(GUIMessages.InteractWithBoard(row, col))
     }
+    slot
 
-    slotLabel
-
-  for slotLabel <- slots do
-    val cellWrapper = new GridBagPanel:
-      opaque = false
-      layout(slotLabel) = new Constraints()
-    gridPanel.contents += cellWrapper
+  slots.foreach(gridPanel.contents += _)
   layout(gridPanel) = BorderPanel.Position.Center
 
   /** Updates all 12 slots based on the current state of the Board.
@@ -101,11 +115,11 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
             val template = CardViewAssets.frontTemplatePath(viewInfo.cardType)
             renderer.render(viewInfo, template) match
               case Some(cardIcon) =>
-                slots(slotIndex).icon = cardIcon
+                slots(slotIndex).currentImage = Some(cardIcon.getImage)
               case None =>
                 println(s"Error in the card rendering: ${card.name}")
           case None =>
-            slots(slotIndex).icon = getDefaultIcon(row)
+            slots(slotIndex).currentImage = getDefaultIcon(row)
 
     revalidate()
     repaint()
