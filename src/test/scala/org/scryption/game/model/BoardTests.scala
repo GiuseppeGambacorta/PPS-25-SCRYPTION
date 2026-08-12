@@ -166,7 +166,7 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       initialBoard.numberOfCards shouldBe 2
 
       When("updating slot at row 2, col 3 with a wolf")
-      val updatedBoard = initialBoard.updatedSlot(2, 3, Some(wolf))
+      val updatedBoard = initialBoard.updatedSlot((2, 3), Some(wolf))
 
       Then("the new board should reflect the added card while leaving the original board unchanged")
       initialBoard(2)(3) shouldBe None
@@ -205,4 +205,6 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       And("the total number of cards on the board should equal the new row's card count")
       updatedBoard.numberOfCards shouldBe newRow.numberOfCards
     }
+
+  
   }

@@ -1,7 +1,7 @@
 package org.scryption.game.model.managers
 
 import org.scryption.game.model.boardModel.Board
-import org.scryption.game.model.{Seal, boardModel}
+import org.scryption.game.model.{BoardPosition, Seal, boardModel}
 
 /** Represents the result of a sacrifice
  */
@@ -16,7 +16,7 @@ object SacrificeManager:
    * @param sacrificedSlots A list of (row, col) coordinates representing the cards for sacrifice.
    * @return the updated board after sacrifices are applied.
    */
-  def resolveSacrifices(board: Board, sacrificedSlots: List[(Int, Int)]): SacrificeResult =
+  def resolveSacrifices(board: Board, sacrificedSlots: List[BoardPosition]): SacrificeResult =
     val initialState = SacrificeResult(board, 0, 0)
     sacrificedSlots.foldLeft(initialState): (acc, coordinates) =>
       val (row, col) = coordinates
@@ -27,7 +27,7 @@ object SacrificeManager:
         case Some(card) if card.seals.contains(Seal.ManyLives) =>
           SacrificeResult(currentBoard, currentBlood + 1, currentBones)
         case Some(card) =>
-          val newBoard = currentBoard.updatedSlot(row, col, boardModel.x)
+          val newBoard = currentBoard.updatedSlot((row,col), boardModel.x)
           val bonesToGain = if card.seals.contains(Seal.BoneKing) then 4 else 1
           SacrificeResult(newBoard, currentBlood + 1, currentBones + bonesToGain)
         case None => acc

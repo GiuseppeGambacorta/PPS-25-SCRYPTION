@@ -10,26 +10,30 @@ case class CombatResult(updatedRow: BoardRow, damageToOpponent: Int, killedCards
 /** Represents the result of an entire row attack.
  */
 case class RowAttackResult(
-    updatedOpponentRow: BoardRow,
-    damageDelta: Int,
-    earnedBones: Int,
-    returnedToHandCards: List[Card[?]]
-)
+                            updatedOpponentRow: BoardRow,
+                            damageDelta: Int,
+                            earnedBones: Int,
+                            returnedToHandCards: List[Card[?]]
+                          )
 
 object CombatManager:
+
+  /** Default resolver given implicitly if none is provided in scope. */
+  given defaultResolver: FightResolver =
+  new BasicResolver with AirborneResolver with StrikeResolver
 
   /** Performs an attack from a single card, resolving targets and applying damage.
    *
    * @param attackerCol The column index of the attacking card.
    * @param attacker The attacking card.
    * @param opponentRow The current composition of the opponent's front row
-   * @param resolver The FightResolver to use for targeting.
+   * @param resolver The FightResolver to use for targeting (passed implicitly via given/using).
    * @return a CombatResult containing the new row state and damage dealt to the opponent
    */
   def executeAttack(attackerCol: Int,
                     attacker: Card[?],
-                    opponentRow: BoardRow,
-                    resolver: FightResolver): CombatResult =
+                    opponentRow: BoardRow)
+                   (using resolver: FightResolver): CombatResult =
     val attackDamage = attacker match
       case creature: CreatureCard => creature.attack
       case _: SupportCard         => 0
@@ -57,15 +61,17 @@ object CombatManager:
    *
    * @param attackerRow The row of cards initiating the attack.
    * @param defenderRow The row of cards defending.
-   * @param resolver The FightResolver to use for targeting.
+   * @param resolver The FightResolver to use for targeting (passed implicitly via given/using).
    * @return a RowAttackResult accumulating all damages, bones and board updates.
    */
-  def executeRowAttack(attackerRow: BoardRow, defenderRow: BoardRow, resolver: FightResolver): RowAttackResult =
+  def executeRowAttack(attackerRow: BoardRow, defenderRow: BoardRow)
+                      (using resolver: FightResolver): RowAttackResult =
     val initialResult = RowAttackResult(defenderRow, 0, 0, List.empty)
     (0 until boardModel.ColsCount).foldLeft(initialResult): (acc, colIndex) =>
       attackerRow(colIndex) match
         case Some(attacker) =>
-          val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow, resolver)
+          // Il resolver passa automaticamente grazie alla clausola (using resolver)
+          val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow)
           val bonesFromAttack = combatResult.killedCards.map: deadCard =>
             if deadCard.seals.contains(Seal.BoneKing) then 4 else 1
           .sum
