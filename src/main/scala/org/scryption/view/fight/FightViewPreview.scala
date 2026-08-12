@@ -13,7 +13,7 @@ object FightViewPreview extends SimpleSwingApplication:
     preferredSize = new Dimension(1280, 900)
 
     val dummyChannel = GUIChannel.getNewChannel
-    val boardView = new BoardView(dummyChannel)
+    //val boardView = new BoardView(dummyChannel)
 
     // creating dummy cards
     val wolf = CreatureCard.empty named "Wolf" withAttack 3 withHealth 2 withSacrificeAttribute SacrificeAttribute.Blood(2)

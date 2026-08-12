@@ -10,7 +10,7 @@ import java.awt.{BasicStroke, Color, Cursor, Graphics2D}
 import java.awt.image.BufferedImage
 import javax.swing.border.LineBorder
 
-class BoardView(channel: GUIChannelInterface) extends BorderPanel:
+class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
 
   opaque = false
   private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
@@ -20,7 +20,12 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
   private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
   private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
   private val renderer = new CardView(geometry, nameFont, statFont)
+  private var highlightedSacrifices: List[(Int, Int)] = List.empty
 
+  def updateSacrificeHighlights(sacrifices: List[(Int, Int)]): Unit =
+    highlightedSacrifices = sacrifices
+    repaint()
+  
   private def loadSlotIcon(path: String): Option[java.awt.Image] =
     ResourceLoader.loadTemplateImage(path).map: img =>
       val height = (geometry.cardWidth * 1.52).toInt
@@ -69,7 +74,11 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
         g.drawImage(img, bounds.x, bounds.y, bounds.width, bounds.height, null)
       }
 
-      if isHovered then
+      if highlightedSacrifices.contains((row, col)) then
+        g.setStroke(new BasicStroke(5))
+        g.setColor(new Color(255, 30, 30))
+        g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
+      else if isHovered then
         g.setStroke(new BasicStroke(4))
         if row == 2 then g.setColor(new Color(100, 200, 255))
         else g.setColor(new Color(255, 100, 100))
@@ -96,7 +105,7 @@ class BoardView(channel: GUIChannelInterface) extends BorderPanel:
         slot.repaint()
       case MouseClicked(`slot`, _, _, _, _) =>
         if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
-      //channel.sendToGame(GUIMessages.InteractWithBoard(row, col))
+        onSlotClicked(row, col)
     }
     slot
 

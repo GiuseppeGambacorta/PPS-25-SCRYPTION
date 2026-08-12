@@ -1,6 +1,6 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
+import org.scryption.{GUIChannelInterface, GUIMessages}
 import org.scryption.view.ResourceLoader
 
 import scala.swing.*
@@ -83,7 +83,7 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   reactions += {
     case ButtonClicked(`endTurnButton`) =>
       println("UI input: end turn")
-    //channel.sendToGame(GUIMessages.EndTurn)
+      channel.sendToGame(GUIMessages.EndPlayerTurn)
   }
 
   /** Updates the bones counter.

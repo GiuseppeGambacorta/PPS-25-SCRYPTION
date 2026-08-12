@@ -1,14 +1,14 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
+import org.scryption.{GUIChannelInterface, GUIMessages}
 import org.scryption.game.model.Card
 import org.scryption.view.{CardGeometry, CardView, CardViewAssets, ResourceLoader, toViewInfo}
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked, MouseEntered, MouseExited}
-import java.awt.{Color, Dimension, Cursor}
+import java.awt.{Color, Cursor, Dimension}
 import javax.swing.border.LineBorder
 
-class HandView(channel: GUIChannelInterface) extends BorderPanel:
+class HandView(channel: GUIChannelInterface, onCardSelected: Card[?] => Unit) extends BorderPanel:
 
   opaque = false
 
@@ -79,7 +79,7 @@ class HandView(channel: GUIChannelInterface) extends BorderPanel:
 
             case MouseClicked(`cardLabel`, _, _, _, _) =>
               println(s"UI input: the player has selected [${card.name}] from the hand!")
-            //channel.sendToGame(GUIMessages.PlayCard(card))
+              onCardSelected(card)
           }
 
           cardsContainer.contents += cardLabel

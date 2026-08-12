@@ -1,6 +1,7 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
+import org.scryption.game.model.Deck.Deck
+import org.scryption.{GUIChannelInterface, GUIMessages}
 import org.scryption.view.ResourceLoader
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked}
@@ -43,9 +44,14 @@ class DecksView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   reactions += {
     case MouseClicked(`mainDeckLabel`, _, _, _, _) =>
       println("UI input: player draws from main deck")
-    //channel.sendToGame(GUIMessages.DrawMainDeck)
+      channel.sendToGame(GUIMessages.DrawFromDeck)
 
     case MouseClicked(`squirrelDeckLabel`, _, _, _, _) =>
       println("UI input: player draws a squirrel")
-    //channel.sendToGame(GUIMessages.DrawSquirrel)
+      channel.sendToGame(GUIMessages.DrawFromSquirrel)
   }
+
+  def updateDeck(deck: Deck): Unit =
+    if deck.isEmpty then {
+      println(s"[${deck.toList}]")
+    }

@@ -1,17 +1,60 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
+import org.scryption.game.model.{Card, SacrificeAttribute}
+import org.scryption.game.model.boardModel.Board
+import org.scryption.{GUIChannelInterface, GUIMessages}
+
 import scala.swing.*
 import java.awt.{Color, Dimension}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class FightView(channel: GUIChannelInterface) extends BorderPanel:
+
+  var selectedCard: Option[Card[?]] = None
+  var selectedSacrifices: List[(Int, Int)] = List.empty
+  var currentBoard: Option[Board] = None
+
+  def onCardSelectedFromHand(card: Card[?]): Unit =
+    selectedCard = Some(card)
+    selectedSacrifices = List.empty
+    boardView.updateSacrificeHighlights(selectedSacrifices)
+
+  def onSlotClicked(row: Int, col: Int): Unit =
+    if row == 2 then
+      selectedCard.foreach { card =>
+        val isSlotEmpty = currentBoard.exists(b => b(row)(col).isEmpty)
+
+        card.sacrificeAttribute match
+          case SacrificeAttribute.Blood(_) =>
+            if !isSlotEmpty then
+              if selectedSacrifices.contains((row, col)) then
+                selectedSacrifices = selectedSacrifices.filterNot(_ == (row, col))
+              else
+                selectedSacrifices = selectedSacrifices :+ (row, col)
+              boardView.updateSacrificeHighlights(selectedSacrifices)
+              println(s"FightView: sacrifices as of now: $selectedSacrifices")
+            else
+              channel.sendToGame(GUIMessages.CardToPlayWithSacrifices(card, col, selectedSacrifices))
+              resetSelection()
+          case _ =>
+            if isSlotEmpty then
+              channel.sendToGame(GUIMessages.CardToPlay(card, col))
+              resetSelection()
+      }
+
+  private def resetSelection(): Unit =
+    selectedCard = None
+    selectedSacrifices = List.empty
+    boardView.updateSacrificeHighlights(selectedSacrifices)
+
 
   // To fill empty borders of board
   opaque = true
   background = new Color(20, 20, 22)
-  val boardView = new BoardView(channel)
+  val boardView = new BoardView(channel, onSlotClicked)
 
-  val handView = new HandView(channel)
+  val handView = new HandView(channel, onCardSelectedFromHand)
 
   val statsView = new StatsView(channel)
 
@@ -21,3 +64,25 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
   layout(handView) = BorderPanel.Position.South
   layout(statsView) = BorderPanel.Position.West
   layout(decksView) = BorderPanel.Position.East
+
+  listenToChannel()
+
+  private def listenToChannel(): Unit = {
+    Future {
+      while (true) {
+        val msg = channel.receiveFromGame
+        msg match {
+          case GUIMessages.FightState(fightState) =>
+            Swing.onEDT {
+              currentBoard = Some(fightState.board)
+              boardView.updateBoard(fightState.board)
+              decksView.updateDeck(fightState.deck)
+              handView.updateHand(fightState.playerHand.toList)
+              statsView.updateScale(fightState.scalePoints)
+              statsView.updateBones(fightState.bones)
+            }
+          case _ =>
+        }
+      }
+    }
+  }

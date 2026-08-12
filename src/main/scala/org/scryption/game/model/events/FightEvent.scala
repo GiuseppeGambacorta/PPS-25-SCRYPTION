@@ -39,7 +39,7 @@ def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
     bones = 0,
     deck = remainingDeck,
     playerHand = PlayerHand.fromList(initialCards),
-    board = Board.empty
+    board = Board.empty.updateRow(1, x | Some(CardLibrary.wolf) | x | x )
   )
 
   GameState(gameState.deck, isGameOver = loop(TurnState.draw, initialFightState, ch))
