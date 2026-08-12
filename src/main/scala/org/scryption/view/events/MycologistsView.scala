@@ -22,6 +22,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
 class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
 
   private val setup = CardView.forWidth(250)
+  private val assets = setup.assets
   private val geometry = setup.geo
   private val renderer = setup
 
@@ -84,7 +85,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
     val frontIcon: ImageIcon =
-      renderer.render(info, CardViewAssets.frontTemplatePath(info.cardType)).get
+      renderer.render(info, assets.frontTemplatePath(info.cardType)).get
 
     var isHovered: Boolean = false
     var isInSlot: Boolean = false
@@ -150,7 +151,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
           health = (info.health.toInt * visualStatBonus).toString
         )
         val mergedIcon: ImageIcon =
-          renderer.render(mergedInfo, CardViewAssets.frontTemplatePath(mergedInfo.cardType)).get
+          renderer.render(mergedInfo, assets.frontTemplatePath(mergedInfo.cardType)).get
 
         val parent = label.getParent
         if (parent != null) {

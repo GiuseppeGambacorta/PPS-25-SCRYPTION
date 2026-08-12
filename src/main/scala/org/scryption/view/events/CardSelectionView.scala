@@ -2,7 +2,8 @@ package org.scryption.view.events
 
 import org.scryption.game.model.Card
 import org.scryption.view.CardView
-import org.scryption.view.{CardViewAssets, CardViewInfo, ResourceLoader, toViewInfo}
+
+import org.scryption.view.{GUIAssets, CardViewInfo, ResourceLoader, toViewInfo}
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
 import java.awt.Cursor
@@ -13,12 +14,12 @@ import scala.concurrent.Future
 import scala.swing.*
 
 class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
-
-
+  
   private val setup = CardView.forWidth(250)
+  val assets: GUIAssets.CardViewAssets = setup.assets
 
   private val backIcon: ImageIcon =
-    setup.render(CardViewInfo("", "", "", ""), CardViewAssets.backTemplatePath).get
+    setup.render(CardViewInfo("", "", "", ""), assets.backTemplatePath).get
 
   private val cardGap = 30
   private val topOffset = 300
@@ -62,7 +63,7 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
   private class CardSlot(val index: Int, info: CardViewInfo, posX: Int) {
     val frontIcon: ImageIcon =
-      setup.render(info, CardViewAssets.frontTemplatePath(info.cardType)).get
+      setup.render(info, assets.frontTemplatePath(info.cardType)).get
 
     var flipped: Boolean = false
     var selected: Boolean = false

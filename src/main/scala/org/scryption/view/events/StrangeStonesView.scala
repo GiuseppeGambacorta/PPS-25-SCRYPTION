@@ -14,6 +14,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
 class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
 
   private val setup = CardView.forWidth(250)
+  private val assets = setup.assets
   private val geometry = setup.geo
   private val renderer = setup
 
@@ -99,7 +100,7 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
   private class CardSlot(val index: Int, val info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
     private val baseIcon: ImageIcon =
-      renderer.render(info, CardViewAssets.frontTemplatePath(info.cardType)).get
+      renderer.render(info, assets.frontTemplatePath(info.cardType)).get
 
     var isHovered: Boolean = false
     var isAnimating: Boolean = false
@@ -206,7 +207,7 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
 
     private[StrangeStonesView] def applyMergedIcon(mergedInfo: CardViewInfo): Unit = {
       val mergedIcon =
-        renderer.render(mergedInfo, CardViewAssets.frontTemplatePath(mergedInfo.cardType)).get
+        renderer.render(mergedInfo, assets.frontTemplatePath(mergedInfo.cardType)).get
       label.setIcon(mergedIcon)
       label.repaint()
     }

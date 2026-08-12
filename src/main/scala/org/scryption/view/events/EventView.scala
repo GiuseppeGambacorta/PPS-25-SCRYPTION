@@ -4,6 +4,7 @@ import org.scryption.game.model.Card
 import org.scryption.view.CardView
 import org.scryption.view.events.{FireCampAttackView, FireCampHealthView, StrangeStonesView}
 import org.scryption.view.*
+import org.scryption.view.GUIAssets.CardViewAssets
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
 import java.awt.event.{MouseEvent, MouseListener}
@@ -22,6 +23,7 @@ abstract class EventView(
                         ) extends FlowPanel {
 
   private val setup = CardView.forWidth(cardWidth)
+  private val assets = CardViewAssets()
 
   private val cardGap = 100
   private val handTopOffset = 500
@@ -80,7 +82,7 @@ abstract class EventView(
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
     private val frontIcon: ImageIcon =
-      setup.render(info, CardViewAssets.frontTemplatePath(info.cardType)).get
+      setup.render(info, assets.frontTemplatePath(info.cardType)).get
 
     var isHovered: Boolean = false
     var isInSlot: Boolean = false
@@ -131,7 +133,7 @@ abstract class EventView(
 
         val newInfo = bonus.apply(info)
         val newIcon: ImageIcon =
-          setup.render(newInfo, CardViewAssets.frontTemplatePath(newInfo.cardType)).get
+          setup.render(newInfo, assets.frontTemplatePath(newInfo.cardType)).get
         label.setIcon(newIcon)
 
         SwingUtilities.invokeLater(() => {

@@ -1,46 +1,35 @@
 package org.scryption.view
 
+import org.scryption.view.GUIAssets.StartScreenViewAssets
 import org.scryption.view.ResourceLoader
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.view.GUIGeometry.StartScreenGeometry
 
 import java.awt.event.{MouseAdapter, MouseEvent}
 import java.awt.image.BufferedImage
 import java.awt.{Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel}
-import scala.swing.Panel
+import scala.swing.{FlowPanel, Panel}
 
-class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
+class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onQuit: () => Unit) extends FlowPanel {
 
-  // ----- Layout config: TUNE to match the real art -----
-  // Must come before any val that uses these sizes.
-  private val slotWidth = 48 * 5
-  private val slotHeight = 62 * 5
-  private val buttonWidth = 42 * 5
-  private val buttonHeight = 56 * 5
-  private val buttonGap = 80
-  private val textWidth = 214 * 3
-  private val textHeight = 28 * 3
+  val assets = StartScreenViewAssets()
 
-  // ----- Icon scaling helpers -----
   private def scaledIcon(img: BufferedImage, w: Int, h: Int): ImageIcon =
     new ImageIcon(img.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH))
 
   private def loadIcon(path: String, w: Int, h: Int): Option[ImageIcon] =
     ResourceLoader.loadTemplateImage(path).map(img => scaledIcon(img, w, h))
 
-  private def loadCardIcon(path: String): ImageIcon =
-    loadIcon(path, buttonWidth, buttonHeight).orNull
-
   // ----- Assets -----
-  private val introBackgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("menu/startscreen.png")
-  private val menuBackgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("menu/startscreen_background_PART1.png")
+  private val introBackgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage(assets.startScreenPath)
+  private val menuBackgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage(assets.menuBackgroundPath)
 
   private val slotImage: Option[ImageIcon] =
-    loadIcon("menu/startscreen_slot_PART1.png", slotWidth, slotHeight)
+    loadIcon(assets.menuSlotPath, geo.slotWidth, geo.slotHeight)
   private val slotHighlightedImage: Option[ImageIcon] =
-    loadIcon("menu/startscreen_slot_highlighted_PART1.png", slotWidth, slotHeight)
+    loadIcon(assets.menuHighlightedSlotPath, geo.slotWidth, geo.slotHeight)
 
-  // ----- Menu definitions: add more entries here later, nothing else needs to change -----
+
   private case class MenuCardDef(
                                   id: String,
                                   cardIcon: ImageIcon,
@@ -51,19 +40,17 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
   private val menuDefs: Vector[MenuCardDef] = Vector(
     MenuCardDef(
       "newgame",
-      loadCardIcon("menu/menucard_newgame.png"),
-      loadIcon("menu/menutext_newgame.png", textWidth, textHeight),
+      loadIcon(assets.menuCardPath("newgame"), geo.buttonWidth, geo.buttonHeight).orNull,
+      loadIcon(assets.menuTextPath("newgame"), geo.textWidth, geo.textHeight),
       () => startGame()
     ),
     MenuCardDef(
       "startscreen",
-      loadCardIcon("menu/menucard_startscreen.png"),
-      loadIcon("menu/menutext_quit.png", textWidth, textHeight),
+      loadIcon(assets.menuCardPath("startscreen"), geo.buttonWidth, geo.buttonHeight).orNull,
+      loadIcon(assets.menuTextPath("quit"), geo.textWidth, geo.textHeight),
       () => quitGame()
     )
   )
-
-  slotImage.foreach(icon => println(s"slot loaded size: ${icon.getIconWidth} x ${icon.getIconHeight}"))
 
   // ----- State -----
   private var menuVisible: Boolean = false
@@ -75,7 +62,6 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
   opaque = false
   peer.setLayout(null)
   focusable = true
-  preferredSize = new Dimension(1920, 1080)
 
   peer.addMouseListener(new MouseAdapter {
     override def mouseClicked(e: MouseEvent): Unit = {
@@ -112,7 +98,7 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
     val bg = if (menuVisible) menuBackgroundImage else introBackgroundImage
-    bg.foreach(img => g.drawImage(img, 0, 0, preferredSize.width, preferredSize.height, peer))
+    bg.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
   }
 
   private def showMenu(): Unit = {
@@ -123,26 +109,22 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
   }
 
   private def buildMenu(): Unit = {
-    val w = preferredSize.width
-    val h = preferredSize.height
+    val w = size.width
+    val h = size.height
 
-    val part1Y = (h * 0.06).toInt
-    val part2Y = (h * 0.3).toInt
-    val part3Y = (h * 0.7).toInt
-
-    textLabel.setBounds((w - textWidth) / 2, part1Y, textWidth, textHeight)
+    textLabel.setBounds((w - geo.textWidth) / 2, geo.part1Y, geo.textWidth, geo.textHeight)
     textLabel.setVisible(true)
 
-    slotLabel.setBounds((w - slotWidth) / 2, part2Y, slotWidth, slotHeight)
+    slotLabel.setBounds((w - geo.slotWidth) / 2, geo.part2Y, geo.slotWidth, geo.slotHeight)
     slotLabel.setIcon(slotImage.orNull)
     slotLabel.setVisible(true)
 
-    val totalButtonsWidth = menuDefs.length * buttonWidth + (menuDefs.length - 1) * buttonGap
+    val totalButtonsWidth = menuDefs.length * geo.buttonWidth + (menuDefs.length - 1) * geo.buttonGap
     val startX = (w - totalButtonsWidth) / 2
 
-    buttons = menuDefs.zipWithIndex.map { case (defn, i) =>
-      val baseX = startX + i * (buttonWidth + buttonGap)
-      val btn = new MenuButton(defn, baseX, part3Y)
+    buttons = menuDefs.zipWithIndex.map { case (cardDef, i) =>
+      val baseX = startX + i * (geo.buttonWidth + geo.buttonGap)
+      val btn = new MenuButton(cardDef, baseX, geo.part3Y)
       peer.add(btn.label)
       btn
     }
@@ -153,12 +135,12 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
     peer.repaint()
   }
 
-  private class MenuButton(val defn: MenuCardDef, val baseX: Int, val baseY: Int) {
+  private class MenuButton(val cardDef: MenuCardDef, val baseX: Int, val baseY: Int) {
 
-    var isInSlot: Boolean = false
+    private var isInSlot: Boolean = false
 
-    val label: JLabel = new JLabel(defn.cardIcon) {
-      setBounds(baseX, baseY, buttonWidth, buttonHeight)
+    val label: JLabel = new JLabel(cardDef.cardIcon) {
+      setBounds(baseX, baseY, geo.buttonWidth, geo.buttonHeight)
       setOpaque(false)
       setCursor(new Cursor(Cursor.HAND_CURSOR))
       setFocusable(false)
@@ -170,7 +152,7 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
           slotHovered = true
           refreshSlotIcon()
         } else {
-          hoveredButtonId = Some(defn.id)
+          hoveredButtonId = Some(cardDef.id)
           refreshTextPreview()
         }
       }
@@ -179,7 +161,7 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
         if (isInSlot) {
           slotHovered = false
           refreshSlotIcon()
-        } else if (hoveredButtonId.contains(defn.id)) {
+        } else if (hoveredButtonId.contains(cardDef.id)) {
           hoveredButtonId = None
           refreshTextPreview()
         }
@@ -187,7 +169,7 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
 
       override def mouseClicked(e: MouseEvent): Unit = {
         if (isInSlot) {
-          defn.onChosen()
+          cardDef.onChosen()
         } else {
           moveToSlot()
         }
@@ -196,24 +178,24 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
 
     private def moveToSlot(): Unit = {
       slotCardId.foreach { previousId =>
-        buttons.find(_.defn.id == previousId).foreach(_.returnToOriginalPosition())
+        buttons.find(_.cardDef.id == previousId).foreach(_.returnToOriginalPosition())
       }
 
-      val slotX = slotLabel.getX + (slotWidth - buttonWidth) / 2
-      val slotY = slotLabel.getY + (slotHeight - buttonHeight) / 2
+      val slotX = slotLabel.getX + (geo.slotWidth - geo.buttonWidth) / 2
+      val slotY = slotLabel.getY + (geo.slotHeight - geo.buttonHeight) / 2
       isInSlot = true
       label.setLocation(slotX, slotY)
       label.getParent.setComponentZOrder(label, 0)
 
-      slotCardId = Some(defn.id)
+      slotCardId = Some(cardDef.id)
       hoveredButtonId = None
-      slotHovered = true // <-- cursor is presumably still over it right after the click
+      slotHovered = true
       refreshTextPreview()
       refreshSlotIcon()
       label.getParent.repaint()
     }
 
-    def returnToOriginalPosition(): Unit = {
+    private def returnToOriginalPosition(): Unit = {
       isInSlot = false
       label.setLocation(baseX, baseY)
       label.getParent.repaint()
@@ -233,8 +215,6 @@ class StartScreenView(onNewGame: () => Unit, onQuit: () => Unit) extends Panel {
     slotLabel.setIcon(icon.orNull)
     slotLabel.repaint()
   }
-
-  // ----- Actions -----
 
   private def startGame(): Unit = {
     onNewGame()

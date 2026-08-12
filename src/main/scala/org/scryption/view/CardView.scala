@@ -1,6 +1,6 @@
 package org.scryption.view
 
-import org.scryption.view.CardViewAssets
+import org.scryption.view.GUIAssets.CardViewAssets
 import org.scryption.view.ResourceLoader
 
 import java.awt.Color
@@ -12,10 +12,10 @@ import java.awt.Image
 import java.awt.image.{BufferedImage, ImageObserver}
 import javax.swing.ImageIcon
 
-private class CardView(val geo: CardGeometry) {
+private class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
 
-  private val nameFont: Font = ResourceLoader.loadFont(CardViewAssets.fontPath, geo.nameFontSize)
-  private val statFont: Font = ResourceLoader.loadFont(CardViewAssets.fontPath, geo.statFontSize)
+  private val nameFont: Font = ResourceLoader.loadFont(assets.fontPath, geo.nameFontSize)
+  private val statFont: Font = ResourceLoader.loadFont(assets.fontPath, geo.statFontSize)
   private val NoObserver: ImageObserver = null
 
   def render(card: CardViewInfo, templatePath: String): Option[ImageIcon] =
@@ -46,17 +46,17 @@ private class CardView(val geo: CardGeometry) {
     }
 
   private def drawPortrait(g2d: Graphics2D, name: String, addedSigils: List[String]): Unit =
-    ResourceLoader.loadImage(CardViewAssets.portraitPath(name), geo.portraitSize).foreach { img =>
+    ResourceLoader.loadImage(assets.portraitPath(name), geo.portraitSize).foreach { img =>
       drawImage(g2d, img, geo.portraitX, geo.portraitY, geo.portraitSize)}
 
     if (addedSigils.nonEmpty) {
-      ResourceLoader.loadImage(CardViewAssets.emissionPath(name), geo.portraitSize).foreach { img =>
+      ResourceLoader.loadImage(assets.emissionPath(name), geo.portraitSize).foreach { img =>
         drawImage(g2d, emission(img, geo.portraitSize), geo.portraitX, geo.portraitY, geo.portraitSize)
       }
     }
 
   private def drawCost(g2d: Graphics2D, costCode: String): Unit =
-    ResourceLoader.loadImage(CardViewAssets.costIconPath(costCode), geo.costSize) match {
+    ResourceLoader.loadImage(assets.costIconPath(costCode), geo.costSize) match {
       case Some(img) =>
         drawImage(g2d, img, geo.costX, geo.costY, geo.costSize)
       case None =>
@@ -87,14 +87,14 @@ private class CardView(val geo: CardGeometry) {
     defaultSigils match {
       case Nil => ()
       case single :: Nil =>
-        ResourceLoader.loadImage(CardViewAssets.sigilPath(single), geo.sigilSize).foreach { img =>
+        ResourceLoader.loadImage(assets.sigilPath(single), geo.sigilSize).foreach { img =>
           drawImage(g2d, img, geo.sigilCenterX, geo.sigilCenterY, geo.sigilSize)
         }
       case left :: right :: _ =>
-        ResourceLoader.loadImage(CardViewAssets.sigilPath(left), geo.twinSigilSize).foreach { img =>
+        ResourceLoader.loadImage(assets.sigilPath(left), geo.twinSigilSize).foreach { img =>
           drawImage(g2d, img, geo.sigilLeftX, geo.sigilLeftY - geo.sigilSize, geo.twinSigilSize)
         }
-        ResourceLoader.loadImage(CardViewAssets.sigilPath(right), geo.twinSigilSize).foreach { img =>
+        ResourceLoader.loadImage(assets.sigilPath(right), geo.twinSigilSize).foreach { img =>
           drawImage(g2d, img, geo.sigilRightX, geo.sigilRightY - geo.sigilSize, geo.twinSigilSize)
         }
     }
@@ -107,11 +107,11 @@ private class CardView(val geo: CardGeometry) {
 
       addedSigils.zip(slots).foreach {
         case (sigilName, (centerX, centerY)) =>
-          ResourceLoader.loadImage(CardViewAssets.sigilPatchPath, geo.patchSize).foreach { patch =>
+          ResourceLoader.loadImage(assets.sigilPatchPath, geo.patchSize).foreach { patch =>
             drawImage(g2d, patch, centerX - geo.patchSize/2 , centerY - geo.patchSize/2, geo.patchSize)
           }
 
-          ResourceLoader.loadImage(CardViewAssets.sigilPath(sigilName), geo.sigilSize).foreach { sigilImg =>
+          ResourceLoader.loadImage(assets.sigilPath(sigilName), geo.sigilSize).foreach { sigilImg =>
             drawImage(g2d, emission(sigilImg, geo.addedSigilSize), (centerX - geo.addedSigilSize / 2), (centerY - geo.addedSigilSize / 2), geo.addedSigilSize)
           }
       }
@@ -134,6 +134,7 @@ private class CardView(val geo: CardGeometry) {
 object CardView {
   def forWidth(cardWidth: Int): CardView = {
     val geometry = CardGeometry(cardWidth)
-    new CardView(geometry)
+    val assets = CardViewAssets()
+    new CardView(geometry, assets)
   }
 }
