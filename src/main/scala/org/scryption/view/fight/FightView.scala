@@ -2,6 +2,7 @@ package org.scryption.view.fight
 
 import org.scryption.game.model.{Card, SacrificeAttribute}
 import org.scryption.game.model.boardModel.Board
+//import org.scryption.game.model.managers.SacrificeManager
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
 import scala.swing.*
@@ -22,26 +23,37 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
 
   def onSlotClicked(row: Int, col: Int): Unit =
     if row == 2 then
-      selectedCard.foreach { card =>
+      selectedCard.foreach: card =>
         val isSlotEmpty = currentBoard.exists(b => b(row)(col).isEmpty)
 
         card.sacrificeAttribute match
-          case SacrificeAttribute.Blood(_) =>
-            if !isSlotEmpty then
-              if selectedSacrifices.contains((row, col)) then
-                selectedSacrifices = selectedSacrifices.filterNot(_ == (row, col))
-              else
-                selectedSacrifices = selectedSacrifices :+ (row, col)
-              boardView.updateSacrificeHighlights(selectedSacrifices)
-              println(s"FightView: sacrifices as of now: $selectedSacrifices")
-            else
+          case SacrificeAttribute.Blood(amount) =>
+            val hasEnoughBlood = selectedSacrifices.length >= amount
+            /* alternative approach:
+            val currentBlood = currentBoard.map { board =>
+              SacrificeManager.resolveSacrifices(board, selectedSacrifices).generatedBlood
+            }.getOrElse(0)
+             */
+            val isTargetingSacrifice = selectedSacrifices.contains((row, col))
+            if hasEnoughBlood && (isSlotEmpty || isTargetingSacrifice) then
               channel.sendToGame(GUIMessages.CardToPlayWithSacrifices(card, col, selectedSacrifices))
               resetSelection()
+            else if !isSlotEmpty then
+              if isTargetingSacrifice then
+                selectedSacrifices = selectedSacrifices.filterNot(_ == (row, col))
+                boardView.updateSacrificeHighlights(selectedSacrifices)
+              else if !hasEnoughBlood then
+                selectedSacrifices = selectedSacrifices :+ (row, col)
+                boardView.updateSacrificeHighlights(selectedSacrifices)
+                println(s"FightView: sacrifices as of now: $selectedSacrifices")
+              else
+                println(s"FightView: enough blood already, choose a slot to place the card.")
+            else
+              println(s"FightView: not enough blood, currently: $amount.")
           case _ =>
             if isSlotEmpty then
               channel.sendToGame(GUIMessages.CardToPlay(card, col))
               resetSelection()
-      }
 
   private def resetSelection(): Unit =
     selectedCard = None
