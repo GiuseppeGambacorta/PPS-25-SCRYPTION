@@ -6,7 +6,7 @@ import org.scryption.game.model.events.TurnState
 
 import scala.swing.*
 import scala.swing.event.ButtonClicked
-import java.awt.{Color, Cursor, Dimension, Font}
+import java.awt.{Color, Cursor, Dimension}
 
 class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Vertical):
 
