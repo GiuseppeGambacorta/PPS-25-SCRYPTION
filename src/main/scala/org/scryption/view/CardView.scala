@@ -1,6 +1,7 @@
 package org.scryption.view
 
 import org.scryption.view.GUIAssets.CardViewAssets
+import org.scryption.view.GUIGeometry.CardGeometry
 import org.scryption.view.ResourceLoader
 
 import java.awt.Color

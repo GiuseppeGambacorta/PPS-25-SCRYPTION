@@ -37,7 +37,7 @@ private object CardViewConversions:
   def costLabel(attribute: SacrificeAttribute): String = attribute match
     case SacrificeAttribute.Blood(value) => s"${value}blood"
     case SacrificeAttribute.Bones(value) => s"${value}bone"
-    case SacrificeAttribute.Nil()        => ""
+    case _        => ""
   
   def splitSeals(card: Card[?]): (Set[Seal], Set[Seal]) =
     val templateSeals: Set[Seal] =

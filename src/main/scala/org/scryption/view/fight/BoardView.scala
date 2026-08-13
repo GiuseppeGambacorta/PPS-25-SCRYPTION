@@ -2,7 +2,9 @@ package org.scryption.view.fight
 
 import org.scryption.GUIChannelInterface
 import org.scryption.game.model.boardModel.*
-import org.scryption.view.{CardGeometry, CardView, CardViewAssets, ResourceLoader, toViewInfo}
+import org.scryption.view.{CardView, ResourceLoader, toViewInfo}
+import org.scryption.view.GUIGeometry.CardGeometry
+import org.scryption.view.GUIAssets.CardViewAssets
 
 import scala.swing.*
 import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
@@ -18,7 +20,7 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
   private val geometry = CardGeometry(cardWidth = 200)
   private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
   private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
-  private val renderer = new CardView(geometry, nameFont, statFont)
+  private val renderer = new CardView(geometry, new CardViewAssets)
   private var highlightedSacrifices: List[(Int, Int)] = List.empty
   var interactable = true
 
@@ -137,7 +139,7 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
         board(row)(col) match
           case Some(card) =>
             val viewInfo = card.toViewInfo
-            val template = CardViewAssets.frontTemplatePath(viewInfo.cardType)
+            val template = renderer.assets.frontTemplatePath(viewInfo.cardType)
             renderer.render(viewInfo, template) match
               case Some(cardIcon) =>
                 slots(slotIndex).currentImage = Some(cardIcon.getImage)

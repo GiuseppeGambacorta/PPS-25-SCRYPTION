@@ -2,7 +2,9 @@ package org.scryption.view.fight
 
 import org.scryption.GUIChannelInterface
 import org.scryption.game.model.Card
-import org.scryption.view.{CardGeometry, CardView, CardViewAssets, ResourceLoader, toViewInfo}
+import org.scryption.view.{CardView, ResourceLoader, toViewInfo}
+import org.scryption.view.GUIGeometry.CardGeometry
+import org.scryption.view.GUIAssets.CardViewAssets
 
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked, MouseExited, MouseMoved}
@@ -62,7 +64,7 @@ class HandView(channel: GUIChannelInterface, onCardSelected: Option[Card[?]] => 
   private val geometry = CardGeometry(cardWidth = 180)
   private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
   private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
-  private val renderer = new CardView(geometry, nameFont, statFont)
+  private val renderer = new CardView(geometry, new CardViewAssets)
 
   private class HandCardPanel(val card: Card[?], img: java.awt.Image) extends Panel:
     opaque = false
@@ -117,7 +119,7 @@ class HandView(channel: GUIChannelInterface, onCardSelected: Option[Card[?]] => 
     selectedPanel = None
     for card <- cards do
       val viewInfo = card.toViewInfo
-      val template = CardViewAssets.frontTemplatePath(viewInfo.cardType)
+      val template = renderer.assets.frontTemplatePath(viewInfo.cardType)
       renderer.render(viewInfo, template) match
         case Some(cardIcon) =>
           cardsContainer.contents += new HandCardPanel(card, cardIcon.getImage)

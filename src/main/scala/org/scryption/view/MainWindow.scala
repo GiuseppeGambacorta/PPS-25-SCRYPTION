@@ -51,7 +51,7 @@ object MainWindows extends SimpleSwingApplication:
 
         val listEvents: List[GameEvent] = List(
           (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(channel = ch)),
-          (fight, (ch: GUIChannelInterface) => new FightView(channel = ch))
+          (fight, (ch: GUIChannelInterface) => new FightView(channel = ch)),
           (fireCamp_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(channel = ch)),
           (fireCamp_Health, (ch: GUIChannelInterface) => new FireCampHealthView(channel = ch)),
           (mushRoomsExpert, (ch: GUIChannelInterface) => new MycologistsView(channel = ch)),

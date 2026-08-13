@@ -18,7 +18,7 @@ object Deck:
   /** @return a predefined standard deck starting configuration.
    */
   def getStandardDeck: Deck = {
-    val stoat: Card[?] = CreatureCard.empty named "Stoat" withAttack 1 withHealth 2 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.Fledgling addSeal Seal.Sprinter addSeal Seal.Hefty addSeal Seal.Leader addSeal Seal.BoneKing addSeal Seal.Burrower
+    val stoat: Card[?] = CreatureCard.empty named "Stoat" withAttack 1 withHealth 2 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.Fledgling addSeal Seal.Sprinter(Direction.Right) addSeal Seal.Hefty addSeal Seal.Leader addSeal Seal.BoneKing addSeal Seal.Burrower
     List(stoat, stoat, CardLibrary.bullfrog, CardLibrary.wolf, CardLibrary.wolf)
   }
 
