@@ -29,8 +29,8 @@ case class FightState(
 private val PlayerWinningPoints = 6
 private val BotWinningPoints = -6
 private val NumberOfCardsAtTheStartOfTheFight = 4
-private val PlayerWon = true
-private val PlayerLost = false
+private val PlayerWon = false
+private val PlayerLost = true
 
 def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
