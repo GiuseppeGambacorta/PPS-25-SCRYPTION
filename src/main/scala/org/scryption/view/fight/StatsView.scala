@@ -2,6 +2,7 @@ package org.scryption.view.fight
 
 import org.scryption.{GUIChannelInterface, GUIMessages}
 import org.scryption.view.ResourceLoader
+import org.scryption.game.model.events.TurnState
 
 import scala.swing.*
 import scala.swing.event.ButtonClicked
@@ -15,6 +16,12 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   preferredSize = new Dimension(220, 0)
   border = Swing.EmptyBorder(60, 20, 20, 20)
 
+  private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
+  private val scaleValFont = ResourceLoader.loadFont(fontPath, 24f)
+  private val scaleStatFont = ResourceLoader.loadFont(fontPath, 14f)
+  private val turnFont = ResourceLoader.loadFont(fontPath, 16f)
+  private val bonesFont = ResourceLoader.loadFont(fontPath, 18f)
+
   private def loadScaledIcon(path: String, width: Int, height: Int): javax.swing.ImageIcon =
     ResourceLoader.loadTemplateImage(path) match
       case Some(img) =>
@@ -23,27 +30,32 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
       case None =>
         new javax.swing.ImageIcon()
 
-  val scaleIconLabel = new Label:
+  private val scaleIconLabel = new Label:
     icon = loadScaledIcon("board/scale.png", 100, 100)
     xLayoutAlignment = 0.5
     border = Swing.EmptyBorder(0, 0, 10, 0)
 
-  val scaleValueLabel = new Label("0 / 5"):
+  private val scaleValueLabel = new Label("0 / 5"):
     foreground = Color.WHITE
-    font = new Font("SansSerif", Font.BOLD, 24)
+    font = scaleValFont
     xLayoutAlignment = 0.5
 
-  val scaleStatusLabel = new Label("Draw"):
+  private val scaleStatusLabel = new Label("Draw"):
     foreground = Color.WHITE
-    font = new Font("SansSerif", Font.BOLD, 14)
+    font = scaleValFont
     xLayoutAlignment = 0.5
 
-  val bonesLabel = new Label("Bones: 0"):
+  private val bonesLabel = new Label("Bones 0"):
     foreground = new Color(220, 220, 200)
-    font = new Font("SansSerif", Font.BOLD, 18)
+    font = scaleValFont
     xLayoutAlignment = 0.5
 
-  val endTurnButton = new Button(""):
+  private val turnPhaseLabel = new Label("Phase Draw"):
+    foreground = new Color(100, 200, 255)
+    font = scaleValFont
+    xLayoutAlignment = 0.5
+
+  private val endTurnButton = new Button(""):
     icon = loadScaledIcon("board/bell.png", 65, 65)
     cursor = new Cursor(Cursor.HAND_CURSOR)
     tooltip = "End Turn"
@@ -75,7 +87,9 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   contents += scaleIconLabel
   contents += scaleValueLabel
   contents += scaleStatusLabel
-  contents += Swing.VStrut(60)
+  contents += Swing.VStrut(40)
+  contents += turnPhaseLabel
+  contents += Swing.VStrut(20)
   contents += bonesLabel
   contents += Swing.VGlue
   contents += endTurnButton
@@ -91,7 +105,7 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   /** Updates the bones counter.
    */
   def updateBones(bones: Int): Unit =
-    bonesLabel.text = s"Bones: $bones"
+    bonesLabel.text = s"Bones $bones"
 
   /** Updates the scale text.
    *
@@ -112,3 +126,21 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
       scaleValueLabel.foreground = new Color(255, 100, 100)
       scaleStatusLabel.text = "Losing!"
       scaleStatusLabel.foreground = new Color(255, 100, 100)
+
+  def updateTurn(turn: TurnState): Unit =
+    turn match
+      case TurnState.draw =>
+        turnPhaseLabel.text = "Phase Draw"
+        turnPhaseLabel.foreground = new Color(100, 200, 255)
+      case TurnState.playerTurn =>
+        turnPhaseLabel.text = "Phase Play Cards"
+        turnPhaseLabel.foreground = new Color(100, 255, 100)
+      case TurnState.playerFight =>
+        turnPhaseLabel.text = "Phase Player Attack"
+        turnPhaseLabel.foreground = new Color(255, 200, 100)
+      case TurnState.botTurn =>
+        turnPhaseLabel.text = "Phase Bot Plays"
+        turnPhaseLabel.foreground = new Color(255, 100, 100)
+      case TurnState.botFight =>
+        turnPhaseLabel.text = "Phase Bot Attack"
+        turnPhaseLabel.foreground = new Color(200, 50, 50)
