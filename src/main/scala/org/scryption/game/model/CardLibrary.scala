@@ -30,9 +30,9 @@ object CardLibrary:
   // Hooved family
 
   val blackGoat: Card[?] = CreatureCard.empty named "Black Goat" withAttack 0 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.WorthySacrifice
-  val elkFawn: Card[?] = CreatureCard.empty named "Elk Fawn" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.Fledgling addSeal Seal.Sprinter
-  val elk: Card[?] = CreatureCard.empty named "Elk" withAttack 2 withHealth 4 withSacrificeAttribute Blood(2) withRarity Common addSeal Seal.Sprinter
-  val pronghorn: Card[?] = CreatureCard.empty named "Pronghorn" withAttack 1 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Sprinter addSeal Seal.BifurcatedStrike
+  val elkFawn: Card[?] = CreatureCard.empty named "Elk Fawn" withAttack 1 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common addSeal Seal.Fledgling addSeal Seal.Sprinter(Direction.Right)
+  val elk: Card[?] = CreatureCard.empty named "Elk" withAttack 2 withHealth 4 withSacrificeAttribute Blood(2) withRarity Common addSeal Seal.Sprinter(Direction.Right)
+  val pronghorn: Card[?] = CreatureCard.empty named "Pronghorn" withAttack 1 withHealth 3 withSacrificeAttribute Blood(2) addSeal Seal.Sprinter(Direction.Right) addSeal Seal.BifurcatedStrike
   val mooseBuck: Card[?] = CreatureCard.empty named "Moose Buck" withAttack 3 withHealth 7 withSacrificeAttribute Blood(3) withRarity Common addSeal Seal.Hefty
 
   // Insect family
@@ -44,7 +44,6 @@ object CardLibrary:
   val ringWorm: Card[?] = CreatureCard.empty named "Ring Worm" withAttack 0 withHealth 1 withSacrificeAttribute Blood(1) withRarity Common
   // Worker Ant Attack ?
   // Ant Queen Attack ?
-  val stinkbug: Card[?] = CreatureCard.empty named "Stinkbug" withAttack 1 withHealth 2 withSacrificeAttribute Bones(2) withRarity Common addSeal Seal.Stinky
   val cockroach: Card[?] = CreatureCard.empty named "Cockroach" withAttack 1 withHealth 1 withSacrificeAttribute Bones(4) withRarity Common addSeal Seal.Unkillable
   
   // Reptile family
@@ -84,4 +83,19 @@ object CardLibrary:
   val frozenOpossum: Card[?] = SupportCard.empty named "Frozen Opossum" withHealth 5
   val grandFir: Card[?] = SupportCard.empty named "Grand Fir" withHealth 3 addSeal Seal.MightyLeap
   val stump: Card[?] = SupportCard.empty named "Stump" withHealth 3
+
+  val allCards: List[Card[?]] = List(
+    kingfisher, ravenEgg, sparrow, raven, turkeyVulture,
+    wolfCub, bloodhound, wolf, coyote, alpha,
+    blackGoat, elkFawn, elk, pronghorn, mooseBuck,
+    mantisGod, bee, beehive, mantis, ringWorm, cockroach,
+    geck, ouroboros, bullfrog, adder, riverSnapper, rattler,
+    moleMan, packRat, urayuli, squirrel, rabbit, cat, mole,
+    porcupine, riverOtter, stoat, warren, beaver, fieldMice,
+    greatWhite, grizzly, opossum, bat,
+    boulder, dam, frozenOpossum, grandFir, stump
+  )
+
+  def byName(name: String): Option[Card[?]] =
+    allCards.find(_.name == name)
   

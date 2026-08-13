@@ -19,7 +19,7 @@ val cardsNumberForGui = 5
  */
 @tailrec
 def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
-  ch.sendToGui(GUIMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3, 42)._1))
+  ch.sendToGui(GUIMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3)._1))
   val message = ch.receiveFromGui
  
   message match {

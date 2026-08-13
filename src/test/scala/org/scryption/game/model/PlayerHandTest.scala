@@ -33,11 +33,11 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
 
     Scenario("Removing a card from the hand by ID") {
       Given("A hand with a card")
-      val bear = CardLibrary.bear
-      val hand = PlayerHand.empty addCard bear
+      val grizzly = CardLibrary.grizzly
+      val hand = PlayerHand.empty addCard grizzly
 
       When("the card is removed")
-      val emptyHand = hand removeCard bear
+      val emptyHand = hand removeCard grizzly
 
       Then("the hand should be empty")
       emptyHand.isEmpty shouldBe true
@@ -46,9 +46,9 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
     Scenario("Adding multiple cards to the hand") {
       Given("A hand with one card and a list of new cards")
       val squirrel = CardLibrary.squirrel
-      val bear = CardLibrary.bear
+      val grizzly = CardLibrary.grizzly
       val hand = PlayerHand.empty addCard squirrel
-      val newCards = List(bear, bear)
+      val newCards = List(grizzly, grizzly)
 
       When("the multiple cards are added to the hand")
       val updatedHand = hand addCards newCards
@@ -57,35 +57,35 @@ class PlayerHandTest extends AnyFeatureSpec with GivenWhenThen with Matchers wit
       updatedHand.size shouldBe 3
 
       And("it should contain all the cards")
-      updatedHand.toList should contain theSameElementsAs (bear :: bear :: squirrel :: Nil)
+      updatedHand.toList should contain theSameElementsAs (grizzly :: grizzly :: squirrel :: Nil)
     }
 
     Scenario("Extracting a specific card from the hand") {
       Given("A hand with two different cards")
       val squirrel = CardLibrary.squirrel
-      val bear = CardLibrary.bear
-      val hand = PlayerHand.empty addCard squirrel addCard bear
+      val grizzly = CardLibrary.grizzly
+      val hand = PlayerHand.empty addCard squirrel addCard grizzly
 
-      When("extracting the bear card using its ID")
-      val extractionResult = hand.extractCard(bear)
+      When("extracting the grizzly card using its ID")
+      val extractionResult = hand.extractCard(grizzly)
 
-      Then("it should return the bear card and a new hand without it")
+      Then("it should return the grizzly card and a new hand without it")
       extractionResult.isDefined shouldBe true
       val (extractedCard, updatedHand) = extractionResult.get
-      extractedCard.id shouldBe bear.id
+      extractedCard.id shouldBe grizzly.id
       updatedHand.size shouldBe 1
       updatedHand.toList should contain(squirrel)
-      updatedHand.toList shouldNot contain(bear)
+      updatedHand.toList shouldNot contain(grizzly)
     }
 
     Scenario("Failing to extract a card that is not in the hand") {
       Given("A hand with a squirrel")
       val squirrel = CardLibrary.squirrel
-      val bear = CardLibrary.bear
+      val grizzly = CardLibrary.grizzly
       val hand = PlayerHand.empty addCard squirrel
 
-      When("attempting to extract the bear")
-      val extractionResult = hand.extractCard(bear)
+      When("attempting to extract the grizzly")
+      val extractionResult = hand.extractCard(grizzly)
 
       Then("it should safely return None")
       extractionResult.isEmpty shouldBe true

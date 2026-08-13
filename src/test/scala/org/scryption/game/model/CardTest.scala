@@ -32,10 +32,10 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       val wolf = CreatureCard.empty named "Wolf"
 
       When("added a seal")
-      val buffedWolf = wolf addSeal Seal.Immortal
+      val buffedWolf = wolf addSeal Seal.Unkillable
 
       Then("the new card should have the new seal")
-      buffedWolf.seals.head shouldBe Seal.Immortal
+      buffedWolf.seals.head shouldBe Seal.Unkillable
 
       And("the original card should remain unchanged")
       wolf.seals.isEmpty shouldBe true
@@ -52,7 +52,7 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
       costWolf.sacrificeAttribute shouldBe SacrificeAttribute.Blood(2)
 
       And("the original card should remain unchanged")
-      wolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil()
+      wolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil
     }
 
     Scenario("Setting a Bones sacrifice attribute should return a new instance") {
@@ -103,10 +103,10 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
 
       Then("it should return the exact same card unchanged")
       invalidBloodWolf shouldBe baseWolf
-      invalidBloodWolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil()
+      invalidBloodWolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil
 
       invalidBonesWolf shouldBe baseWolf
-      invalidBonesWolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil()
+      invalidBonesWolf.sacrificeAttribute shouldBe SacrificeAttribute.Nil
     }
   }
 
@@ -115,12 +115,12 @@ class CardTest extends AnyFeatureSpec with GivenWhenThen with Matchers with Scal
     Scenario("Creating and modifying a SupportCard") {
       Given("A SupportCard")
       val boulder =
-        SupportCard.empty named "Boulder" withHealth 5 withSacrificeAttribute SacrificeAttribute.Nil() addSeal Seal.Wall
+        SupportCard.empty named "Boulder" withHealth 5 addSeal Seal.MightyLeap
 
       Then("it should correctly update all valid attributes")
       boulder.name shouldBe "Boulder"
       boulder.health shouldBe 5
-      boulder.seals.head shouldBe Seal.Wall
+      boulder.seals.head shouldBe Seal.MightyLeap
     }
   }
 
