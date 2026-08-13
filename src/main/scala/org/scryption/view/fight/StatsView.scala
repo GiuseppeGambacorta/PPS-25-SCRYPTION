@@ -9,6 +9,7 @@ import java.awt.{Color, Cursor, Dimension, Font}
 
 class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Vertical):
 
+  var interactable = true
   opaque = true
   background = new Color(25, 25, 30)
   preferredSize = new Dimension(220, 0)
@@ -82,8 +83,9 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
   listenTo(endTurnButton)
   reactions += {
     case ButtonClicked(`endTurnButton`) =>
-      println("UI input: end turn")
-      channel.sendToGame(GUIMessages.EndPlayerTurn)
+      if interactable then
+        println("UI input: end turn")
+        channel.sendToGame(GUIMessages.EndPlayerTurn)
   }
 
   /** Updates the bones counter.

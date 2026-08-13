@@ -46,7 +46,7 @@ def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
 
 @tailrec
 private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInterface): Boolean =
-  ch.sendToGui(GUIMessages.FightState(fightState))
+  ch.sendToGui(GUIMessages.FightState(fightState, turnState))
 
   turnState match
     case TurnState.draw =>

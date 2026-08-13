@@ -9,6 +9,8 @@ import java.awt.{Color, Cursor, Dimension, Font}
 
 class DecksView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Vertical):
 
+  var interactable = true
+  private var isMainDeckEmpty = false
   opaque = true
   background = new Color(25, 25, 30)
   preferredSize = new Dimension(220, 0)
@@ -43,15 +45,23 @@ class DecksView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
 
   reactions += {
     case MouseClicked(`mainDeckLabel`, _, _, _, _) =>
-      println("UI input: player draws from main deck")
-      channel.sendToGame(GUIMessages.DrawFromDeck)
+      if interactable && !isMainDeckEmpty then
+        println("UI input: player draws from main deck")
+        channel.sendToGame(GUIMessages.DrawFromDeck)
 
     case MouseClicked(`squirrelDeckLabel`, _, _, _, _) =>
-      println("UI input: player draws a squirrel")
-      channel.sendToGame(GUIMessages.DrawFromSquirrel)
+      if interactable then
+        println("UI input: player draws a squirrel")
+        channel.sendToGame(GUIMessages.DrawFromSquirrel)
   }
 
   def updateDeck(deck: Deck): Unit =
-    if deck.isEmpty then {
-      println(s"[${deck.toList}]")
-    }
+    isMainDeckEmpty = deck.isEmpty
+    if isMainDeckEmpty then
+      mainDeckLabel.icon = null
+      mainDeckLabel.tooltip = "Deck is empty!"
+      mainDeckLabel.cursor = Cursor.getDefaultCursor
+    else
+      mainDeckLabel.icon = loadDeckIcon("cardtemplates/back.png")
+      mainDeckLabel.tooltip = "Draw from Main Deck"
+      mainDeckLabel.cursor = new Cursor(Cursor.HAND_CURSOR)

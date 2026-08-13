@@ -20,6 +20,7 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
   private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
   private val renderer = new CardView(geometry, nameFont, statFont)
   private var highlightedSacrifices: List[(Int, Int)] = List.empty
+  var interactable = true
 
   def updateSacrificeHighlights(sacrifices: List[(Int, Int)]): Unit =
     highlightedSacrifices = sacrifices
@@ -66,25 +67,27 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
     listenTo(mouse.clicks, mouse.moves)
     reactions += {
       case e: MouseMoved =>
-        val bounds = getCardBounds
-        val px = e.point.x
-        val py = e.point.y
-        val isNowHovered = checkCardBounds(bounds, px, py)
-        if isNowHovered != isHovered then
-          isHovered = isNowHovered
-          if row == 2 && isNowHovered then cursor = new Cursor(Cursor.HAND_CURSOR)
-          else cursor = Cursor.getDefaultCursor
-          repaint()
+        if interactable then
+          val bounds = getCardBounds
+          val px = e.point.x
+          val py = e.point.y
+          val isNowHovered = checkCardBounds(bounds, px, py)
+          if isNowHovered != isHovered then
+            isHovered = isNowHovered
+            if row == 2 && isNowHovered then cursor = new Cursor(Cursor.HAND_CURSOR)
+            else cursor = Cursor.getDefaultCursor
+            repaint()
       case MouseExited(_, _, _) =>
         isHovered = false
         cursor = Cursor.getDefaultCursor
         repaint()
       case e: MouseClicked =>
-        if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
-        val bounds = getCardBounds
-        val px = e.point.x; val py = e.point.y
-        if checkCardBounds(bounds, px, py) then
-          onSlotClicked(row, col)
+        if interactable then
+          if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
+          val bounds = getCardBounds
+          val px = e.point.x; val py = e.point.y
+          if checkCardBounds(bounds, px, py) then
+            onSlotClicked(row, col)
     }
 
     private def checkCardBounds(bounds: Rectangle, px: Int, py: Int) = {

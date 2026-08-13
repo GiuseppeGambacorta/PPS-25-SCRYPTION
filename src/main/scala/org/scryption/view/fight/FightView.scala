@@ -2,6 +2,7 @@ package org.scryption.view.fight
 
 import org.scryption.game.model.{Card, SacrificeAttribute}
 import org.scryption.game.model.boardModel.Board
+import org.scryption.game.model.events.TurnState
 //import org.scryption.game.model.managers.SacrificeManager
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
@@ -16,8 +17,8 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
   var selectedSacrifices: List[(Int, Int)] = List.empty
   var currentBoard: Option[Board] = None
 
-  def onCardSelectedFromHand(card: Card[?]): Unit =
-    selectedCard = Some(card)
+  private def onCardSelectedFromHand(cardOpt: Option[Card[?]]): Unit =
+    selectedCard = cardOpt
     selectedSacrifices = List.empty
     boardView.updateSacrificeHighlights(selectedSacrifices)
 
@@ -84,8 +85,14 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
       while (true) {
         val msg = channel.receiveFromGame
         msg match {
-          case GUIMessages.FightState(fightState) =>
+          case GUIMessages.FightState(fightState, turn) =>
             Swing.onEDT {
+              val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
+              boardView.interactable = isPlayerActive
+              handView.interactable = isPlayerActive
+              statsView.interactable = isPlayerActive
+              decksView.interactable = isPlayerActive
+              if !isPlayerActive then resetSelection()
               currentBoard = Some(fightState.board)
               boardView.updateBoard(fightState.board)
               decksView.updateDeck(fightState.deck)
