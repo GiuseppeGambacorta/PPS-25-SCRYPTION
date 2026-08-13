@@ -1,5 +1,6 @@
 package org.scryption
 
+import org.scryption.game.model.events.TurnState
 import org.scryption.game.model.{BoardPosition, Card, events}
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -10,7 +11,7 @@ enum GUIMessages:
   case Cards(cards: List[Card[?]])
   case SingleCard(card: Card[?])
   ///// for fight
-  case FightState(fightState: events.FightState)
+  case FightState(fightState: events.FightState, turn: TurnState)
   case DrawFromSquirrel
   case DrawFromDeck
   case CardToPlay(card: Card[?], position: Int)
