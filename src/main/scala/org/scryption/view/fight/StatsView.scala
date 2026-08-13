@@ -18,9 +18,9 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
 
   private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
   private val scaleValFont = ResourceLoader.loadFont(fontPath, 24f)
-  private val scaleStatFont = ResourceLoader.loadFont(fontPath, 14f)
-  private val turnFont = ResourceLoader.loadFont(fontPath, 16f)
-  private val bonesFont = ResourceLoader.loadFont(fontPath, 18f)
+  private val scaleStatFont = ResourceLoader.loadFont(fontPath, 20f)
+  private val turnFont = ResourceLoader.loadFont(fontPath, 20f)
+  private val bonesFont = ResourceLoader.loadFont(fontPath, 20f)
 
   private def loadScaledIcon(path: String, width: Int, height: Int): javax.swing.ImageIcon =
     ResourceLoader.loadTemplateImage(path) match
@@ -42,17 +42,17 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
 
   private val scaleStatusLabel = new Label("Draw"):
     foreground = Color.WHITE
-    font = scaleValFont
+    font = scaleStatFont
     xLayoutAlignment = 0.5
 
   private val bonesLabel = new Label("Bones 0"):
     foreground = new Color(220, 220, 200)
-    font = scaleValFont
+    font = bonesFont
     xLayoutAlignment = 0.5
 
   private val turnPhaseLabel = new Label("Phase Draw"):
     foreground = new Color(100, 200, 255)
-    font = scaleValFont
+    font = turnFont
     xLayoutAlignment = 0.5
 
   private val endTurnButton = new Button(""):
