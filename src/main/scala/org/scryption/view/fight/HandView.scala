@@ -2,7 +2,7 @@ package org.scryption.view.fight
 
 import org.scryption.GUIChannelInterface
 import org.scryption.game.model.Card
-import org.scryption.view.{CardView, ResourceLoader, toViewInfo}
+import org.scryption.view.{CardView, toViewInfo}
 import org.scryption.view.GUIGeometry.CardGeometry
 import org.scryption.view.GUIAssets.CardViewAssets
 
@@ -60,17 +60,17 @@ class HandView(channel: GUIChannelInterface, onCardSelected: Option[Card[?]] => 
       repaint()
   }
 
-  private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
   private val geometry = CardGeometry(cardWidth = 180)
-  private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
-  private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
   private val renderer = new CardView(geometry, new CardViewAssets)
 
   private class HandCardPanel(val card: Card[?], img: java.awt.Image) extends Panel:
     opaque = false
     private val cardW = 180
     private val cardH: Int = (180 * 1.52).toInt
-    preferredSize = new Dimension(cardW, cardH + 20)
+    private val panelSize = new Dimension(cardW, cardH + 20)
+    preferredSize = panelSize
+    minimumSize = panelSize
+    maximumSize = panelSize
     private var isHovered: Boolean = false
 
     listenTo(mouse.clicks, mouse.moves)

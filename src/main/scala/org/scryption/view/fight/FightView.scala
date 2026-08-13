@@ -99,6 +99,8 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
               handView.updateHand(fightState.playerHand.toList)
               statsView.updateScale(fightState.scalePoints)
               statsView.updateBones(fightState.bones)
+              statsView.updateTurn(turn)
+              currentBoard = Some(fightState.board)
             }
           case _ =>
         }
