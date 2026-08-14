@@ -172,7 +172,7 @@ private def playCardWithSacrifices(
       val isValidTarget = currentSlot.isEmpty || sacrificesPositions.contains((IndexOfPlayerRow, position))
 
       if isValidTarget then
-        val sacrificeResult = SacrificeManager.resolveSacrifices(fightState.board, sacrificesPositions)
+        val sacrificeResult = SacrificeManager().resolveSacrifices(fightState.board, sacrificesPositions)
         if sacrificeResult.generatedBlood >= amount then
           val newBoard = sacrificeResult.updatedBoard.updatedSlot((IndexOfPlayerRow, position), Some(card))
           fightState.copy(board = newBoard, bones = fightState.bones + sacrificeResult.generatedBones, playerHand = fightState.playerHand.removeCard(card))
