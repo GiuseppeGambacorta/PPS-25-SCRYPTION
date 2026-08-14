@@ -16,11 +16,9 @@ case class RowAttackResult(
                             returnedToHandCards: List[Card[?]]
                           )
 
-object CombatManager:
-
-  /** Default resolver given implicitly if none is provided in scope. */
-  given defaultResolver: FightResolver =
-  new BasicResolver with AirborneResolver with StrikeResolver
+/** A trait representing a manager for combat resolution.
+ */
+trait CombatManager:
 
   /** Performs an attack from a single card, resolving targets and applying damage.
    *
@@ -33,29 +31,7 @@ object CombatManager:
   def executeAttack(attackerCol: Int,
                     attacker: Card[?],
                     opponentRow: BoardRow)
-                   (using resolver: FightResolver): CombatResult =
-    val attackDamage = attacker match
-      case creature: CreatureCard => creature.attack
-      case _: SupportCard         => 0
-    val targets = resolver.getTargets(attackerCol, attacker, opponentRow)
-    targets.foldLeft(CombatResult(opponentRow, 0, List.empty)) { (currentResult, target) => target match
-      case HitTarget.Opponent =>
-        currentResult.copy(damageToOpponent = currentResult.damageToOpponent + attackDamage)
-      case HitTarget.OpposingCard(colIndex) =>
-        currentResult.updatedRow(colIndex) match
-          case Some(targetCard) =>
-            val hasTouchOfDeath = attacker.seals.contains(Seal.TouchOfDeath) && attackDamage > 0
-            val remainingHealth = targetCard.health - attackDamage
-            if hasTouchOfDeath || remainingHealth <= 0 then
-              currentResult.copy(
-                updatedRow = currentResult.updatedRow.updated(colIndex, boardModel.x),
-                killedCards = currentResult.killedCards :+ targetCard
-              )
-            else
-              val updatedTargetCard = targetCard withHealth remainingHealth
-              currentResult.copy(updatedRow = currentResult.updatedRow.updated(colIndex, Some(updatedTargetCard)))
-          case None => currentResult
-    }
+                   (using resolver: FightResolver): CombatResult
 
   /** Performs a full row attack from left to right.
    *
@@ -65,21 +41,65 @@ object CombatManager:
    * @return a RowAttackResult accumulating all damages, bones and board updates.
    */
   def executeRowAttack(attackerRow: BoardRow, defenderRow: BoardRow)
-                      (using resolver: FightResolver): RowAttackResult =
-    val initialResult = RowAttackResult(defenderRow, 0, 0, List.empty)
-    (0 until boardModel.ColsCount).foldLeft(initialResult): (acc, colIndex) =>
-      attackerRow(colIndex) match
-        case Some(attacker) =>
-          // Il resolver passa automaticamente grazie alla clausola (using resolver)
-          val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow)
-          val bonesFromAttack = combatResult.killedCards.map: deadCard =>
-            if deadCard.seals.contains(Seal.BoneKing) then 4 else 1
-          .sum
-          val immortals = combatResult.killedCards.filter(cards => cards.seals.contains(Seal.Unkillable))
-          acc.copy(
-            updatedOpponentRow = combatResult.updatedRow,
-            damageDelta = acc.damageDelta + combatResult.damageToOpponent,
-            earnedBones = acc.earnedBones + bonesFromAttack,
-            returnedToHandCards = acc.returnedToHandCards ++ immortals
-          )
-        case None => acc
+                      (using resolver: FightResolver): RowAttackResult
+
+
+object CombatManager:
+
+  /** Default resolver given implicitly if none is provided in scope. */
+  given defaultResolver: FightResolver =
+  new BasicResolver with AirborneResolver with StrikeResolver
+
+  /** Creates a [[CombatManager]] with the default implementation.
+   *
+   * @return the default combat manager.
+   */
+  def apply(): CombatManager = new CombatManagerImpl()
+
+  private class CombatManagerImpl extends CombatManager:
+
+    override def executeAttack(attackerCol: Int,
+                               attacker: Card[?],
+                               opponentRow: BoardRow)
+                              (using resolver: FightResolver): CombatResult =
+      val attackDamage = attacker match
+        case creature: CreatureCard => creature.attack
+        case _: SupportCard         => 0
+      val targets = resolver.getTargets(attackerCol, attacker, opponentRow)
+      targets.foldLeft(CombatResult(opponentRow, 0, List.empty)) { (currentResult, target) => target match
+        case HitTarget.Opponent =>
+          currentResult.copy(damageToOpponent = currentResult.damageToOpponent + attackDamage)
+        case HitTarget.OpposingCard(colIndex) =>
+          currentResult.updatedRow(colIndex) match
+            case Some(targetCard) =>
+              val hasTouchOfDeath = attacker.seals.contains(Seal.TouchOfDeath) && attackDamage > 0
+              val remainingHealth = targetCard.health - attackDamage
+              if hasTouchOfDeath || remainingHealth <= 0 then
+                currentResult.copy(
+                  updatedRow = currentResult.updatedRow.updated(colIndex, boardModel.x),
+                  killedCards = currentResult.killedCards :+ targetCard
+                )
+              else
+                val updatedTargetCard = targetCard withHealth remainingHealth
+                currentResult.copy(updatedRow = currentResult.updatedRow.updated(colIndex, Some(updatedTargetCard)))
+            case None => currentResult
+      }
+
+    override def executeRowAttack(attackerRow: BoardRow, defenderRow: BoardRow)
+                                 (using resolver: FightResolver): RowAttackResult =
+      val initialResult = RowAttackResult(defenderRow, 0, 0, List.empty)
+      (0 until boardModel.ColsCount).foldLeft(initialResult): (acc, colIndex) =>
+        attackerRow(colIndex) match
+          case Some(attacker) =>
+            val combatResult = executeAttack(colIndex, attacker, acc.updatedOpponentRow)
+            val bonesFromAttack = combatResult.killedCards.map: deadCard =>
+              if deadCard.seals.contains(Seal.BoneKing) then 4 else 1
+            .sum
+            val immortals = combatResult.killedCards.filter(cards => cards.seals.contains(Seal.Unkillable))
+            acc.copy(
+              updatedOpponentRow = combatResult.updatedRow,
+              damageDelta = acc.damageDelta + combatResult.damageToOpponent,
+              earnedBones = acc.earnedBones + bonesFromAttack,
+              returnedToHandCards = acc.returnedToHandCards ++ immortals
+            )
+          case None => acc

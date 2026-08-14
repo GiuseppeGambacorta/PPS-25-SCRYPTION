@@ -1,9 +1,10 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scryption.game.model.CardLibrary
 import org.scryption.game.model.boardModel.{Board, BoardRow, x, |}
 import org.scryption.game.model.managers.SacrificeManager
 

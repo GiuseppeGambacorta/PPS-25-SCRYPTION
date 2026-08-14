@@ -127,7 +127,7 @@ private def handleFightPhase(
 
   val attackerRow = fightState.board(attackerRowIdx)
   val defenderRow = fightState.board(defenderRowIdx)
-  val result = CombatManager.executeRowAttack(attackerRow, defenderRow)
+  val result = CombatManager().executeRowAttack(attackerRow, defenderRow)
 
   val deltaPoints = if isPlayerAttacking then result.damageDelta else -result.damageDelta
   val nextTurn = if isPlayerAttacking then TurnState.botTurn else TurnState.draw
