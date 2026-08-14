@@ -7,7 +7,7 @@ import org.scryption.GUIChannelInterface
 
 import scala.annotation.tailrec
 
-case class GameState(deck: Deck.Deck, isGameOver: Boolean)
+
 type Event = (GameState, GUIChannelInterface) => GameState
 
 // Maximum number of cards sent to the GUI for selection
