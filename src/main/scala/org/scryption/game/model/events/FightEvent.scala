@@ -9,6 +9,8 @@ import org.scryption.game.model.SacrificeAttribute.{Blood, Bones}
 import org.scryption.game.model.managers.{CombatManager, SacrificeManager}
 import org.scryption.game.model.managers.CombatManager.given
 
+import org.scryption.game.model.GameState
+
 import scala.annotation.tailrec
 
 enum TurnState:

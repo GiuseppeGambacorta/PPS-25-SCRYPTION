@@ -1,6 +1,6 @@
 package org.scryption.view
 
-import org.scryption.game.model.events.GameState
+import org.scryption.game.model.GameState
 import org.scryption.{GUIChannel, GUIChannelInterface, GUIMessages}
 import org.scryption.game.model.{Card, CardLibrary, Deck}
 import org.scryption.game.model.events.*
