@@ -26,6 +26,14 @@ trait MovementManager:
    */
   def resolveGuardianMovement(row: BoardRow, playedCol: Int): BoardRow
 
+  /** Moves cards from the bot's preparation row (row 0) to the attack row (row 1)
+   * if the attack slot in front of them is empty.
+   *
+   * @param board The current state of the board.
+   * @return The updated board.
+   */
+  def resolveBotQueueMovement(board: Board): Board
+
 
 object MovementManager:
 
@@ -92,3 +100,14 @@ object MovementManager:
               case Some(card) => row.updated(originalIndex, boardModel.x).updated(playedCol, Some(card))
               case None => row
           case None => row
+
+    override def resolveBotQueueMovement(board: Board): Board =
+      val IndexOfBotPrepRow = 0
+      (0 until boardModel.ColsCount).foldLeft(board): (currentBoard, col) =>
+        if currentBoard(IndexOfBotRow)(col).isEmpty && currentBoard(IndexOfBotPrepRow)(col).isDefined then
+          val cardToMove = currentBoard(IndexOfBotPrepRow)(col)
+          currentBoard
+            .updatedSlot((IndexOfBotRow, col), cardToMove)
+            .updatedSlot((IndexOfBotPrepRow, col), None)
+        else
+          currentBoard
