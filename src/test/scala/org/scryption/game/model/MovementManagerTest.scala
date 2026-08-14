@@ -13,6 +13,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
   private val elkLeft = elkRight removeSeal Seal.Sprinter(Direction.Right) addSeal Seal.Sprinter(Direction.Left)
   private val boulder = CardLibrary.boulder
   private val bloodhound = CardLibrary.bloodhound
+  private val movementManager = MovementManager()
 
   Feature("Sprinter seal movement resolution"):
     Scenario("Sprinter(Right) moves to the right if the slot is empty"):
@@ -20,7 +21,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val row: BoardRow = x | Some(elkRight) | x | x
 
       When("resolving end of turn movements")
-      val updatedRow = MovementManager.resolveRowMovements(row)
+      val updatedRow = movementManager.resolveRowMovements(row)
 
       Then("the elk should physically move to column 2")
       updatedRow(1) shouldBe x
@@ -31,7 +32,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val row: BoardRow = x | Some(elkRight) | Some(boulder) | x
 
       When("resolving end of turn movements")
-      val updatedRow = MovementManager.resolveRowMovements(row)
+      val updatedRow = movementManager.resolveRowMovements(row)
 
       Then("the elk, blocked by the boulder, should change to Sprinter(Left) and move to col 0")
       updatedRow(1) shouldBe x
@@ -45,7 +46,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val row: BoardRow = x | x | Some(elkLeft) | x
 
       When("resolving end of turn movements")
-      val updatedRow = MovementManager.resolveRowMovements(row)
+      val updatedRow = movementManager.resolveRowMovements(row)
 
       Then("the elk should physically move to column 1")
       updatedRow(2) shouldBe x
@@ -56,7 +57,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val row: BoardRow = Some(elkLeft) | x | x | x
 
       When("resolving end of turn movements")
-      val updatedRow = MovementManager.resolveRowMovements(row)
+      val updatedRow = movementManager.resolveRowMovements(row)
 
       Then("the elk should change to Sprinter(Right) and move to col 1")
       updatedRow(0) shouldBe x
@@ -67,7 +68,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val row: BoardRow = Some(boulder) | Some(elkLeft) | Some(boulder) | x
 
       When("resolving end of turn movements")
-      val updatedRow = MovementManager.resolveRowMovements(row)
+      val updatedRow = movementManager.resolveRowMovements(row)
 
       Then("the elk should stay in column 1 without changing direction")
       updatedRow(0) shouldBe Some(boulder)
@@ -81,7 +82,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val playedCol = 1
 
       When("resolving Guardian reaction")
-      val updatedRow = MovementManager.resolveGuardianMovement(row, playedCol)
+      val updatedRow = movementManager.resolveGuardianMovement(row, playedCol)
 
       Then("the bloodhound should move from column 3 to column 1 to block")
       updatedRow(3) shouldBe x
@@ -93,7 +94,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val playedCol = 2
 
       When("resolving Guardian reaction")
-      val updatedRow = MovementManager.resolveGuardianMovement(row, playedCol)
+      val updatedRow = movementManager.resolveGuardianMovement(row, playedCol)
 
       Then("the row should remain exactly the same")
       updatedRow(0) shouldBe Some(boulder)
@@ -106,7 +107,7 @@ class MovementManagerTest extends AnyFeatureSpec with GivenWhenThen with Matcher
       val playedCol = 1
 
       When("resolving Guardian reaction")
-      val updatedRow = MovementManager.resolveGuardianMovement(row, playedCol)
+      val updatedRow = movementManager.resolveGuardianMovement(row, playedCol)
 
       Then("the row should remain unchanged because the slot is blocked")
       updatedRow(1) shouldBe Some(boulder)
