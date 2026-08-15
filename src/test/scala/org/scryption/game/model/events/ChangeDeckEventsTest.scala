@@ -3,7 +3,7 @@ package org.scryption.game.model.events
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.game.model.{Card, CreatureCard, Direction, Seal}
+import org.scryption.game.model.{Card, CreatureCard, Direction, GameState, Seal}
 import org.scryption.game.model.Deck.*
 import org.scryption.game.model.Seal.{MightyLeap, Sprinter}
 import org.scryption.GUIMessages

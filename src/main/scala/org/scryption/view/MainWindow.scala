@@ -1,5 +1,5 @@
 package org.scryption.view
-
+/*
 import org.scryption.game.model.events.GameState
 import org.scryption.{GUIChannel, GUIChannelInterface, GUIMessages}
 import org.scryption.game.model.{Card, CardLibrary, Deck}
@@ -14,8 +14,6 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object MainWindows extends SimpleSwingApplication:
-
-  type GameEvent = (Event, GUIChannelInterface => Panel)
 
   override def top: MainFrame = new MainFrame:
     title = "Scryption - Main Window"
@@ -95,3 +93,5 @@ object MainWindows extends SimpleSwingApplication:
           println("avvio evento")
           val nextState = event(gameState, ch)
           gameLoop(nextState, remainingEvents)
+          
+ */

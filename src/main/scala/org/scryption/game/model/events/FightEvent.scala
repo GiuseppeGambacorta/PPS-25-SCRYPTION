@@ -2,7 +2,7 @@ package org.scryption.game.model.events
 
 import org.scryption.{GUIChannelInterface, GUIMessages}
 import org.scryption.game.model.Deck.Deck
-import org.scryption.game.model.{Card, CardLibrary, DrawDecks, PlayerHand, SacrificeAttribute}
+import org.scryption.game.model.{Card, CardLibrary, DrawDecks, GameState, PlayerHand, SacrificeAttribute}
 import org.scryption.game.model.PlayerHand.PlayerHand
 import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.SacrificeAttribute.{Blood, Bones}
