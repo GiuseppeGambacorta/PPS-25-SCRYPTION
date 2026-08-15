@@ -11,6 +11,7 @@ object Maps:
   object Path:
 
     def createFromList(events: List[Event]): Path[Event] = events match {
+      case first :: next => Node(first, createFromList(next))
       case empty => End()
     }
 
