@@ -16,10 +16,7 @@ class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit)
   opaque = false
   private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")
 
-  private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
   private val geometry = CardGeometry(cardWidth = 200)
-  private val nameFont = ResourceLoader.loadFont(fontPath, geometry.nameFontSize)
-  private val statFont = ResourceLoader.loadFont(fontPath, geometry.statFontSize)
   private val renderer = new CardView(geometry, new CardViewAssets)
   private var highlightedSacrifices: List[(Int, Int)] = List.empty
   var interactable = true

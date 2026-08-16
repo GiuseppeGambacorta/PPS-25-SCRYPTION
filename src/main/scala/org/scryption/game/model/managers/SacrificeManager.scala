@@ -1,7 +1,7 @@
 package org.scryption.game.model.managers
 
 import org.scryption.game.model.boardModel.Board
-import org.scryption.game.model.{BoardPosition, Seal, boardModel}
+import org.scryption.game.model.{BoardPosition, CreatureCard, Seal, boardModel}
 
 /** Represents the result of a sacrifice phase.
  *
@@ -44,10 +44,12 @@ object SacrificeManager:
         val currentBlood = acc.generatedBlood
         val currentBones = acc.generatedBones
         currentBoard(row)(col) match
-          case Some(card) if card.seals.contains(Seal.ManyLives) =>
-            SacrificeResult(currentBoard, currentBlood + 1, currentBones)
-          case Some(card) =>
-            val newBoard = currentBoard.updatedSlot((row, col), boardModel.x)
-            val bonesToGain = if card.seals.contains(Seal.BoneKing) then 4 else 1
-            SacrificeResult(newBoard, currentBlood + 1, currentBones + bonesToGain)
-          case None => acc
+          case Some(card: CreatureCard) =>
+            val bloodYield = if card.seals.contains(Seal.WorthySacrifice) then 3 else 1
+            if card.seals.contains(Seal.ManyLives) then
+              SacrificeResult(currentBoard, currentBlood + bloodYield, currentBones)
+            else
+              val newBoard = currentBoard.updatedSlot((row, col), boardModel.x)
+              val bonesToGain = if card.seals.contains(Seal.BoneKing) then 4 else 1
+              SacrificeResult(newBoard, currentBlood + bloodYield, currentBones + bonesToGain)
+          case _ => acc
