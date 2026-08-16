@@ -197,14 +197,16 @@ private def playCardWithSacrifices(
 
 private def generateRandomStartingBoard(): Board =
   val random = new Random()
-  val possibleCards = CardLibrary.getADeckWithAllTheLibrary.toList
-  val numCards = random.nextInt(2) + 1
-  val targetCols = random.shuffle((0 until ColsCount).toList).take((numCards))
-  val initialPlacements =
-    for col <- targetCols
-    yield
-      val randomCard = possibleCards(random.nextInt(possibleCards.length))
-      (col, randomCard)
-  initialPlacements.foldLeft(Board.empty): (board, placement) =>
-    val (col, card) = placement
-    board.updatedSlot((IndexOfBotRow, col), Some(card))
+  val possibleBotCards = CardLibrary.getADeckWithAllTheLibrary.toList
+  val numBotCards = random.nextInt(2) + 1
+  val botTargetCols = random.shuffle((0 until ColsCount).toList).take(numBotCards)
+
+  val boardWithEnemies = botTargetCols.foldLeft(Board.empty): (board, col) =>
+    val randomCard = possibleBotCards(random.nextInt(possibleBotCards.length))
+    board.updatedSlot((IndexOfBotRow, col), Some(randomCard))
+
+  val obstacles = List(CardLibrary.boulder, CardLibrary.stump, CardLibrary.grandFir)
+  val playerTargetCols = (0 until ColsCount).filter(_ => random.nextDouble() < 0.25)
+  playerTargetCols.foldLeft(boardWithEnemies): (board, col) =>
+    val randomObstacle = obstacles(random.nextInt(obstacles.length))
+    board.updatedSlot((IndexOfPlayerRow, col), Some(randomObstacle))
