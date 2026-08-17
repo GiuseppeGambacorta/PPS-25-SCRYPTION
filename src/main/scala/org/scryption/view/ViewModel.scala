@@ -2,7 +2,8 @@ package org.scryption.view
 
 import org.scryption.GUIMessages
 import org.scryption.game.model.Card
-import org.scryption.view.toViewInfo
+import org.scryption.view.common.CardViewInfo
+import org.scryption.view.common.toViewInfo
 
 class ViewModel() {
 

@@ -1,4 +1,4 @@
-package org.scryption.view
+package org.scryption.view.common
 
 import java.awt.Font
 import java.awt.image.BufferedImage

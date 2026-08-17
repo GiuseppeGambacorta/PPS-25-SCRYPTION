@@ -1,7 +1,7 @@
 package org.scryption.view.events
 
 import org.scryption.GUIChannelInterface
-import org.scryption.view.StatBonus
+import org.scryption.view.common.StatBonus
 
 /** Fire camp event: pick a card, boost its health by 2. */
 class FireCampHealthView(channel: GUIChannelInterface)

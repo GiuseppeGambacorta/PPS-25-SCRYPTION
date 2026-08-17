@@ -1,19 +1,14 @@
-package org.scryption.view
+package org.scryption.view.common
 
-import org.scryption.view.GUIAssets.CardViewAssets
-import org.scryption.view.GUIGeometry.CardGeometry
-import org.scryption.view.ResourceLoader
+import GUIAssets.CardViewAssets
+import GUIGeometry.CardGeometry
+import org.scryption.view.common.{CardView, ResourceLoader}
 
-import java.awt.Color
-import java.awt.Font
-import java.awt.Graphics2D
-import java.awt.AlphaComposite
-import java.awt.RenderingHints
-import java.awt.Image
+import java.awt.{AlphaComposite, Color, Font, Graphics2D, Image, RenderingHints}
 import java.awt.image.{BufferedImage, ImageObserver}
 import javax.swing.ImageIcon
 
-private class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
+class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
 
   private val nameFont: Font = ResourceLoader.loadFont(assets.fontPath, geo.nameFontSize)
   private val statFont: Font = ResourceLoader.loadFont(assets.fontPath, geo.statFontSize)

@@ -1,8 +1,9 @@
 package org.scryption.view.events
 
-import org.scryption.view.{CardView, ViewModel}
+import org.scryption.view.common.{CardView, CardViewInfo, GUIAssets, ResourceLoader}
+import org.scryption.view.ViewModel
 
-import org.scryption.view.{GUIAssets, CardViewInfo, ResourceLoader, toViewInfo}
+import org.scryption.view.common.toViewInfo
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
 import java.awt.Cursor

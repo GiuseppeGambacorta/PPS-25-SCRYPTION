@@ -5,7 +5,7 @@ import org.scryption.{GUIChannel, GUIChannelInterface, GUIMessages}
 import org.scryption.game.model.{Card, CardLibrary, Deck}
 import org.scryption.game.model.events.*
 import org.scryption.view.fight.FightView
-import org.scryption.view.GUIGeometry.StartScreenGeometry
+import org.scryption.view.common.GUIGeometry.StartScreenGeometry
 import org.scryption.view.events.{CardSelectionView, FireCampAttackView, FireCampHealthView, MycologistsView, StrangeStonesView}
 
 import java.awt.Dimension

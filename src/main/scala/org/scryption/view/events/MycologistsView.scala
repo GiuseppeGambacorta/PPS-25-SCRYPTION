@@ -1,6 +1,7 @@
 package org.scryption.view.events
 
 import org.scryption.view.*
+import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, ZOrder}
 import org.scryption.{GUIChannelInterface, GUIMessages}
 
 import java.awt.event.{MouseEvent, MouseListener}

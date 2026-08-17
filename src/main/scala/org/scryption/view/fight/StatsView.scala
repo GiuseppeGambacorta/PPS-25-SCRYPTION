@@ -1,8 +1,8 @@
 package org.scryption.view.fight
 
 import org.scryption.{GUIChannelInterface, GUIMessages}
-import org.scryption.view.ResourceLoader
 import org.scryption.game.model.events.TurnState
+import org.scryption.view.common.ResourceLoader
 
 import scala.swing.*
 import scala.swing.event.ButtonClicked

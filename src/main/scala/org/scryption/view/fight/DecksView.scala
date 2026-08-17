@@ -1,8 +1,8 @@
 package org.scryption.view.fight
 
 import org.scryption.game.model.Deck.Deck
+import org.scryption.view.common.ResourceLoader
 import org.scryption.{GUIChannelInterface, GUIMessages}
-import org.scryption.view.ResourceLoader
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked}
 import java.awt.{Color, Cursor, Dimension, Font}

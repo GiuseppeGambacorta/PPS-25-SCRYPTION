@@ -2,9 +2,9 @@ package org.scryption.view.fight
 
 import org.scryption.GUIChannelInterface
 import org.scryption.game.model.boardModel.*
-import org.scryption.view.{CardView, ResourceLoader, toViewInfo}
-import org.scryption.view.GUIGeometry.CardGeometry
-import org.scryption.view.GUIAssets.CardViewAssets
+import org.scryption.view.common.GUIGeometry.CardGeometry
+import org.scryption.view.common.GUIAssets.CardViewAssets
+import org.scryption.view.common.*
 
 import scala.swing.*
 import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}

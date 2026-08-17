@@ -1,7 +1,7 @@
 package org.scryption.view.events
 
 import org.scryption.GUIChannelInterface
-import org.scryption.view.StatBonus
+import org.scryption.view.common.StatBonus
 
 class FireCampAttackView(channel: GUIChannelInterface)
   extends EventView(
