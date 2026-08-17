@@ -1,9 +1,10 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scryption.game.model.CardLibrary
 import org.scryption.game.model.boardModel.{Board, BoardRow, x, |}
 import org.scryption.game.model.managers.SacrificeManager
 
@@ -20,7 +21,7 @@ class SacrificeManagerTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val sacrificedSlots = List((0, 0))
 
       When("resolving the sacrifice")
-      val result = SacrificeManager.resolveSacrifices(board, sacrificedSlots)
+      val result = SacrificeManager().resolveSacrifices(board, sacrificedSlots)
 
       Then("the squirrel should be removed and the slot (0, 0) should be empty")
       result.updatedBoard(0)(0) shouldBe x
@@ -36,7 +37,7 @@ class SacrificeManagerTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val sacrificedSlots = List((1, 2))
 
       When("resolving the sacrifices")
-      val result = SacrificeManager.resolveSacrifices(board, sacrificedSlots)
+      val result = SacrificeManager().resolveSacrifices(board, sacrificedSlots)
 
       Then("the cat should not be removed and the slots (1,2) should still contain the cat")
       result.updatedBoard(1)(2) shouldBe Some(cat)

@@ -6,12 +6,13 @@ import org.scryption.game.model.{Card, CardLibrary, DrawDecks, PlayerHand, Sacri
 import org.scryption.game.model.PlayerHand.PlayerHand
 import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.SacrificeAttribute.{Blood, Bones}
-import org.scryption.game.model.managers.{CombatManager, SacrificeManager}
+import org.scryption.game.model.managers.{CombatManager, MovementManager, SacrificeManager}
 import org.scryption.game.model.managers.CombatManager.given
 
 import org.scryption.game.model.GameState
 
 import scala.annotation.tailrec
+import scala.util.Random
 
 enum TurnState:
   case draw
@@ -41,7 +42,7 @@ def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
     bones = 0,
     deck = remainingDeck,
     playerHand = PlayerHand.fromList(initialCards),
-    board = Board.empty.updateRow(1, x | Some(CardLibrary.wolf) | x | x )
+    board = generateRandomStartingBoard()
   )
 
   GameState(gameState.deck, isGameOver = loop(TurnState.draw, initialFightState, ch))
@@ -129,14 +130,24 @@ private def handleFightPhase(
 
   val attackerRow = fightState.board(attackerRowIdx)
   val defenderRow = fightState.board(defenderRowIdx)
-  val result = CombatManager.executeRowAttack(attackerRow, defenderRow)
+  val result = CombatManager().executeRowAttack(attackerRow, defenderRow)
+
+  val movedAttackerRow = MovementManager().resolveRowMovements(attackerRow)
+  val finalBoard = fightState.board
+    .updateRow(defenderRowIdx, result.updatedOpponentRow)
+    .updateRow(attackerRowIdx, movedAttackerRow)
+
+  val boardAfterQueue = if !isPlayerAttacking then
+    MovementManager().resolveBotQueueMovement(finalBoard)
+  else
+    finalBoard
 
   val deltaPoints = if isPlayerAttacking then result.damageDelta else -result.damageDelta
   val nextTurn = if isPlayerAttacking then TurnState.botTurn else TurnState.draw
 
   val newState = fightState.copy(
     scalePoints = fightState.scalePoints + deltaPoints,
-    board = fightState.board.updateRow(defenderRowIdx, result.updatedOpponentRow),
+    board = boardAfterQueue,
     bones = fightState.bones + result.earnedBones,
     playerHand = fightState.playerHand.addCards(result.returnedToHandCards),
     deck = fightState.deck
@@ -154,7 +165,9 @@ private def playCardWithoutSacrifice(fightState: FightState, card: Card[?], posi
     case None =>
       card.sacrificeAttribute match
         case SacrificeAttribute.Nil =>
-          fightState.copy(board = fightState.board.updatedSlot((IndexOfPlayerRow, position), Some(card)), playerHand = fightState.playerHand.removeCard(card))
+          val newBoard = fightState.board.updatedSlot((IndexOfPlayerRow, position), Some(card))
+          val boardWithGuardian = newBoard.updateRow(IndexOfBotRow, MovementManager().resolveGuardianMovement(newBoard(IndexOfBotRow), position))
+          fightState.copy(board = boardWithGuardian, playerHand = fightState.playerHand.removeCard(card))
 
         case SacrificeAttribute.Bones(amount) if fightState.bones >= amount =>
           val newBoard = fightState.board.updatedSlot((IndexOfPlayerRow, position), Some(card))
@@ -174,11 +187,28 @@ private def playCardWithSacrifices(
       val isValidTarget = currentSlot.isEmpty || sacrificesPositions.contains((IndexOfPlayerRow, position))
 
       if isValidTarget then
-        val sacrificeResult = SacrificeManager.resolveSacrifices(fightState.board, sacrificesPositions)
+        val sacrificeResult = SacrificeManager().resolveSacrifices(fightState.board, sacrificesPositions)
         if sacrificeResult.generatedBlood >= amount then
           val newBoard = sacrificeResult.updatedBoard.updatedSlot((IndexOfPlayerRow, position), Some(card))
-          fightState.copy(board = newBoard, bones = fightState.bones + sacrificeResult.generatedBones, playerHand = fightState.playerHand.removeCard(card))
+          val boardWithGuardian = newBoard.updateRow(IndexOfBotRow, MovementManager().resolveGuardianMovement(newBoard(IndexOfBotRow), position))
+          fightState.copy(board = boardWithGuardian, bones = fightState.bones + sacrificeResult.generatedBones, playerHand = fightState.playerHand.removeCard(card))
         else fightState
       else fightState
 
     case _ => fightState
+
+private def generateRandomStartingBoard(): Board =
+  val random = new Random()
+  val possibleBotCards = CardLibrary.getADeckWithAllTheLibrary.toList
+  val numBotCards = random.nextInt(2) + 1
+  val botTargetCols = random.shuffle((0 until ColsCount).toList).take(numBotCards)
+
+  val boardWithEnemies = botTargetCols.foldLeft(Board.empty): (board, col) =>
+    val randomCard = possibleBotCards(random.nextInt(possibleBotCards.length))
+    board.updatedSlot((IndexOfBotRow, col), Some(randomCard))
+
+  val obstacles = List(CardLibrary.boulder, CardLibrary.stump, CardLibrary.grandFir)
+  val playerTargetCols = (0 until ColsCount).filter(_ => random.nextDouble() < 0.25)
+  playerTargetCols.foldLeft(boardWithEnemies): (board, col) =>
+    val randomObstacle = obstacles(random.nextInt(obstacles.length))
+    board.updatedSlot((IndexOfPlayerRow, col), Some(randomObstacle))
