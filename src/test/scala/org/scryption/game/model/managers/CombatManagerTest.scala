@@ -1,13 +1,13 @@
-package org.scryption.game.model
+package org.scryption.game.model.managers
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scryption.game.model.boardModel.*
+import org.scryption.game.model.managers.CombatManager.given
 import org.scryption.game.model.managers.{AirborneResolver, BasicResolver, CombatManager, FightResolver, StrikeResolver}
-
-import org.scryption.game.model.managers.CombatManager.given 
+import org.scryption.game.model.{CardLibrary, CreatureCard, Seal}
 class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
   
 
@@ -20,6 +20,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
   private val cockroach = CardLibrary.cockroach
   private val coyote = CardLibrary.coyote
   private val boneKingCreature = CreatureCard.empty withAttack 1 named "boneKing" withHealth 1 addSeal Seal.BoneKing
+  private val combatManager = CombatManager()
 
   Feature("Combat execution and damage application"):
     Scenario("Attacking an empty slot deals direct damage to the opponent"):
@@ -27,7 +28,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val opponentRow: BoardRow = x | x | x | x
 
       When("the attack is executed")
-      val result = CombatManager.executeAttack(1, wolf, opponentRow)
+      val result = combatManager.executeAttack(1, wolf, opponentRow)
 
       Then("it should deal 3 damage to the opponent")
       result.damageToOpponent shouldBe 3
@@ -41,7 +42,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val opponentRow: BoardRow = Some(grizzly) | x | x | x
 
       When("the attack is executed")
-      val result = CombatManager.executeAttack(0, opossum, opponentRow)
+      val result = combatManager.executeAttack(0, opossum, opponentRow)
 
       Then("the opponent should take 0 damage")
       result.damageToOpponent shouldBe 0
@@ -56,7 +57,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val opponentRow: BoardRow = x | Some(stoat) | x | x
 
       When("the attack is executed")
-      val result = CombatManager.executeAttack(1, wolf, opponentRow)
+      val result = combatManager.executeAttack(1, wolf, opponentRow)
 
       Then("the stoat should be removed from the board slot")
       result.updatedRow(1) shouldBe x
@@ -69,7 +70,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val opponentRow: BoardRow = x | x | Some(grizzly) | x
 
       When("the attack is executed")
-      val result = CombatManager.executeAttack(2, adder, opponentRow)
+      val result = combatManager.executeAttack(2, adder, opponentRow)
 
       Then("the grizzly should be instantly removed from the slot")
       result.updatedRow(2) shouldBe x
@@ -83,7 +84,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val opponentRow: BoardRow = Some(stoat) | x | x | x
 
       When("the attack is executed")
-      val result = CombatManager.executeAttack(1, mantis, opponentRow)
+      val result = combatManager.executeAttack(1, mantis, opponentRow)
 
       Then("the opponent should take 1 damage from the right strike at empty column 2")
       result.damageToOpponent shouldBe 1
@@ -105,7 +106,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val defenderRow: BoardRow = Some(coyote) | x | x | x
 
       When("the full row attack is executed")
-      val result = CombatManager.executeRowAttack(attackerRow, defenderRow)
+      val result = combatManager.executeRowAttack(attackerRow, defenderRow)
 
       Then("the coyote should be removed")
       result.updatedOpponentRow(0) shouldBe x
@@ -122,7 +123,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val defenderRow: BoardRow = Some(boneKingCreature) | x | x | x
 
       When("the full row attack is executed")
-      val result = CombatManager.executeRowAttack(attackerRow, defenderRow)
+      val result = combatManager.executeRowAttack(attackerRow, defenderRow)
 
       Then("the BoneKing creature should be removed")
       result.updatedOpponentRow(0) shouldBe x
@@ -136,7 +137,7 @@ class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers 
       val defenderRow: BoardRow = Some(cockroach) | x | x | x
 
       When("the full row attack is executed")
-      val result = CombatManager.executeRowAttack(attackerRow, defenderRow)
+      val result = combatManager.executeRowAttack(attackerRow, defenderRow)
 
       Then("the cockroach should be removed from the board")
       result.updatedOpponentRow(0) shouldBe x

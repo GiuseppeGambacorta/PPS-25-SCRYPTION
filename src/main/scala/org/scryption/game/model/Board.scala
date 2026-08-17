@@ -14,6 +14,7 @@ object boardModel:
   val ColsCount: Int = 4
 
   val x: Slot = None
+  val IndexOfBotPrepRow = 0
   val IndexOfBotRow = 1
   val IndexOfPlayerRow = 2
  

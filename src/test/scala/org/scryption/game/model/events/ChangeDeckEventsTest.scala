@@ -9,6 +9,7 @@ import org.scryption.game.model.Seal.{MightyLeap, Sprinter}
 import org.scryption.GUIMessages
 import org.scryption.GUIChannel
 import org.scryption.GUIChannelInterface
+import org.scryption.game.model.GameState
 
 class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
