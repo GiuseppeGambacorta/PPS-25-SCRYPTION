@@ -3,7 +3,7 @@ package org.scryption.game.model.events
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.{GUIChannel, GUIChannelInterface, GUIMessages}
+import org.scryption.{GUIChannel, GUIChannelInterface, FightMessages}
 import org.scryption.game.model.*
 import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -28,7 +28,7 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       val channel: GUIChannelInterface = GUIChannel.getNewChannel
       val initialFightState = createInitialFightState()
 
-      channel.sendToGame(GUIMessages.DrawFromSquirrel)
+      channel.sendToGame(FightMessages.DrawFromSquirrel)
 
       When("handleDrawPhase is called directly")
       val (nextTurn, updatedFightState) = handleDrawPhase(initialFightState, channel)
@@ -47,7 +47,7 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       val initialHandSize = initialFightState.playerHand.toList.size
       val initialDeckSize = initialFightState.deck.toList.size
 
-      channel.sendToGame(GUIMessages.DrawFromDeck)
+      channel.sendToGame(FightMessages.DrawFromDeck)
 
       When("handleDrawPhase is called directly")
       val (nextTurn, updatedFightState) = handleDrawPhase(initialFightState, channel)
@@ -70,7 +70,7 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       // Creiamo uno stato con mazzo vuoto
       val emptyDeckState = createInitialFightState().copy(deck = Deck.empty)
 
-      channel.sendToGame(GUIMessages.DrawFromDeck)
+      channel.sendToGame(FightMessages.DrawFromDeck)
 
       When("handleDrawPhase is called directly")
       val (nextTurn, updatedFightState) = handleDrawPhase(emptyDeckState, channel)

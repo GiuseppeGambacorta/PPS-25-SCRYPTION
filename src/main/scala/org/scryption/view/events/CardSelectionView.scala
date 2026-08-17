@@ -4,7 +4,7 @@ import org.scryption.view.common.{CardView, CardViewInfo, GUIAssets, ResourceLoa
 import org.scryption.view.ViewModel
 
 import org.scryption.view.common.toViewInfo
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.{GUIChannelInterface, EventMessages}
 
 import java.awt.Cursor
 import java.awt.event.{MouseEvent, MouseListener}
@@ -48,9 +48,12 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
     Future {
       while (true) {
         val msg = channel.receiveFromGame
-          Swing.onEDT {
-            showCards(viewModel.getCardsInfo(msg))
+          msg match {
+            case msg: EventMessages =>  Swing.onEDT {
+              showCards(viewModel.getCardsInfo(msg))
+            }
           }
+
       }
     }
   }

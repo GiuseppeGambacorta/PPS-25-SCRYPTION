@@ -1,33 +1,33 @@
 package org.scryption.view
 
-import org.scryption.GUIMessages
+import org.scryption.EventMessages
 import org.scryption.game.model.Card
-import org.scryption.view.common.CardViewInfo
-import org.scryption.view.common.toViewInfo
+import org.scryption.view.common.{CardViewInfo, toViewInfo}
 
-class ViewModel() {
+class ViewModel:
 
   private var currentCards: List[Card[?]] = Nil
 
-  def getCardsInfo(message: GUIMessages): List[CardViewInfo] = message match {
-    case GUIMessages.Cards(cards)       => {
+  def getCardsInfo(message: EventMessages): List[CardViewInfo] = message match
+    case EventMessages.Cards(cards) =>
       currentCards = cards
       cards.map(_.toViewInfo)
-    }
-    case GUIMessages.SingleCard(card)   => card.toViewInfo :: Nil
-    case _                              => Nil
-  }
+    case EventMessages.SingleCard(card) =>
+      card.toViewInfo :: Nil
+    case EventMessages.End =>
+      Nil
 
-  def getSingleCardInfo(message: GUIMessages): CardViewInfo = message match {
-    case GUIMessages.SingleCard(card) => card.toViewInfo
-    case GUIMessages.Cards(card :: _) => card.toViewInfo
-    case _                            => CardViewInfo("", "", "", "")
-  }
+  def getSingleCardInfo(message: EventMessages): CardViewInfo = message match
+    case EventMessages.SingleCard(card) => card.toViewInfo
+    case EventMessages.Cards(card :: _) => card.toViewInfo
+    case _                                   => CardViewInfo("", "", "", "")
 
-  def getModelCard(index: Int): GUIMessages.SingleCard = index match {
-    case i if (i >= 0) => currentCards.length match {
-      case l if (l > i) => GUIMessages.SingleCard(currentCards(i))
-      case l            => GUIMessages.SingleCard(currentCards(l - 1))
-    }
-  }
-}
+  def getModelCard(index: Int): EventMessages.SingleCard =
+    if currentCards.isEmpty then
+      throw new IllegalStateException("Nessuna carta presente nel ViewModel.")
+    else if index >= 0 && index < currentCards.length then
+      EventMessages.SingleCard(currentCards(index))
+    else if index >= currentCards.length then
+      EventMessages.SingleCard(currentCards.last)
+    else
+      EventMessages.SingleCard(currentCards.head)

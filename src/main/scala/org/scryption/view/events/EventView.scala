@@ -3,7 +3,7 @@ package org.scryption.view.events
 import org.scryption.view.*
 import org.scryption.view.common.GUIAssets.CardViewAssets
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, StatBonus, ZOrder}
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.{GUIChannelInterface, EventMessages}
 
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
@@ -67,9 +67,12 @@ abstract class EventView(
     Future {
       while (true) {
         val msg = channel.receiveFromGame
-        Swing.onEDT {
-          renderHand(viewModel.getCardsInfo(msg))
+        msg match {
+          case msg: EventMessages => Swing.onEDT {
+            renderHand(viewModel.getCardsInfo(msg))
+          }
         }
+        
       }
     }
   }

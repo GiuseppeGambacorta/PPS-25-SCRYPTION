@@ -3,8 +3,7 @@ package org.scryption.view.fight
 import org.scryption.game.model.{Card, SacrificeAttribute}
 import org.scryption.game.model.boardModel.Board
 import org.scryption.game.model.events.TurnState
-//import org.scryption.game.model.managers.SacrificeManager
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.{GUIChannelInterface, FightMessages}
 
 import scala.swing.*
 import java.awt.{Color, Dimension}
@@ -37,7 +36,7 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
              */
             val isTargetingSacrifice = selectedSacrifices.contains((row, col))
             if hasEnoughBlood && (isSlotEmpty || isTargetingSacrifice) then
-              channel.sendToGame(GUIMessages.CardToPlayWithSacrifices(card, col, selectedSacrifices))
+              channel.sendToGame(FightMessages.CardToPlayWithSacrifices(card, col, selectedSacrifices))
               resetSelection()
             else if !isSlotEmpty then
               if isTargetingSacrifice then
@@ -53,7 +52,7 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
               println(s"FightView: not enough blood, currently: $amount.")
           case _ =>
             if isSlotEmpty then
-              channel.sendToGame(GUIMessages.CardToPlay(card, col))
+              channel.sendToGame(FightMessages.CardToPlay(card, col))
               resetSelection()
 
   private def resetSelection(): Unit =
@@ -85,7 +84,7 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
       while (true) {
         val msg = channel.receiveFromGame
         msg match {
-          case GUIMessages.FightState(fightState, turn) =>
+          case FightMessages.State(fightState, turn) =>
             Swing.onEDT {
               val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
               boardView.interactable = isPlayerActive

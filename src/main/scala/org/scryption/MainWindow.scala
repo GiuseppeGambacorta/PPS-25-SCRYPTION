@@ -5,7 +5,7 @@ import org.scryption.view.StartScreenView
 import java.awt.{Dimension, Toolkit}
 import scala.swing.*
 
-object MainWindows extends SimpleSwingApplication:
+object MainWindow extends SimpleSwingApplication:
 
 
   private val screenSize: Dimension = Toolkit.getDefaultToolkit.getScreenSize
