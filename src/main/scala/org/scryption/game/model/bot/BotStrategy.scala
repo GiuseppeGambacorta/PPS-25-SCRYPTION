@@ -20,7 +20,7 @@ object RandomBotStrategy extends BotStrategy:
     var currentBoard = fightState.board
     val possibleCards = CardLibrary.getADeckWithAllTheLibrary.toList
     for col <- 0 until ColsCount do
-      if random.nextBoolean() then
+      if currentBoard(IndexOfBotPrepRow)(col).isEmpty && random.nextBoolean() then
         val randomCard = possibleCards(random.nextInt(possibleCards.length))
         currentBoard = currentBoard.updatedSlot((IndexOfBotPrepRow, col), Some(randomCard))
     fightState.copy(board = currentBoard)
