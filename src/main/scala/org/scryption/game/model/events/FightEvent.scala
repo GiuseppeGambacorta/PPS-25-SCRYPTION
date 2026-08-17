@@ -69,7 +69,7 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
     case TurnState.botTurn =>
       if fightState.scalePoints >= PlayerWinningPoints then PlayerWon
       else
-        val bot: BotStrategy = RandomBotStrategy
+        val bot: BotStrategy = RandomBotStrategy()
         val fightStateAfterBotPlays = bot.playTurn(fightState)
         loop(TurnState.botFight, fightStateAfterBotPlays, ch)
 

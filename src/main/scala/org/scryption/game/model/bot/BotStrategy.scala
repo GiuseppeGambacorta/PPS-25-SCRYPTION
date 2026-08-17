@@ -14,13 +14,16 @@ trait BotStrategy:
    */
   def playTurn(fightState: FightState): FightState
 
-object RandomBotStrategy extends BotStrategy:
+case class RandomBotStrategy(val maxCardsPerTurn: Int = 1) extends BotStrategy:
+
   override def playTurn(fightState: FightState): FightState =
     val random = new Random()
-    var currentBoard = fightState.board
     val possibleCards = CardLibrary.getADeckWithAllTheLibrary.toList
-    for col <- 0 until ColsCount do
-      if currentBoard(IndexOfBotPrepRow)(col).isEmpty && random.nextBoolean() then
-        val randomCard = possibleCards(random.nextInt(possibleCards.length))
-        currentBoard = currentBoard.updatedSlot((IndexOfBotPrepRow, col), Some(randomCard))
-    fightState.copy(board = currentBoard)
+    val emptyCols = (0 until ColsCount).filter: col =>
+      fightState.board(IndexOfBotPrepRow)(col).isEmpty
+    .toList
+    val colsToFill = random.shuffle(emptyCols).take(maxCardsPerTurn)
+    val finalBoard = colsToFill.foldLeft(fightState.board): (board, col) =>
+      val randomCard = possibleCards(random.nextInt(possibleCards.length))
+      board.updatedSlot((IndexOfBotPrepRow, col), Some(randomCard))
+    fightState.copy(board = finalBoard)

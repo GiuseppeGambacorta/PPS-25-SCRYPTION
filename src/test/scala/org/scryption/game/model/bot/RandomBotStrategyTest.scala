@@ -14,7 +14,7 @@ class RandomBotStrategyTest extends AnyFeatureSpec with GivenWhenThen with Match
     FightState(0, 0, Deck.empty, PlayerHand.empty, board)
 
   Feature("Random Bot Strategy"):
-    val botStrategy = RandomBotStrategy
+    val botStrategy = RandomBotStrategy()
 
     Scenario("The bot plays cards only in the preparation row (row 0)"):
       Given("A completely empty board")
