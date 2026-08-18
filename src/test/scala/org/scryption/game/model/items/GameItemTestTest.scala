@@ -4,8 +4,8 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scryption.game.model.{Deck, PlayerHand}
-import org.scryption.game.model.boardModel.Board
+import org.scryption.game.model.{CardLibrary, Deck, PlayerHand}
+import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.events.FightState
 
 class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
@@ -59,7 +59,26 @@ class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers w
       When("the player uses the Pliers")
       val newState = pliers.use(initialState)
 
-      Then("the scale points MUST increase by 1")
+      Then("the scale points increases by 1")
       newState.scalePoints shouldBe 1
-      And("the Pliers MUST be removed from the inventory")
+      And("the Pliers is removed from the inventory")
+      newState.inventory shouldBe empty
+
+    Scenario("Scissors destroys the targeted card and is removed from inventory"):
+
+      Given("A FightState with an enemy card and Scissors in inventory")
+      val scissors = Scissors()
+      val initialState = createInitialState(scissors)
+      val enemyRow: BoardRow = Some(CardLibrary.wolf) | x | x | x
+      val boardWithEnemy = initialState.board.updateRow(IndexOfBotRow, enemyRow)
+      val stateWithEnemy = initialState.copy(board = boardWithEnemy)
+
+      When("the player uses the Scissors on the enemy's coordinates")
+      val targetPos = (IndexOfBotRow, 0)
+      val newState = scissors.use(stateWithEnemy, Some(targetPos))
+
+      Then("the enemy card is destroyed (slot becomes None)")
+      newState.board(targetPos._1)(targetPos._2) shouldBe None
+
+      And("the Scissors are removed from the inventory")
       newState.inventory shouldBe empty
