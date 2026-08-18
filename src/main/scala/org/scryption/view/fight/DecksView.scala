@@ -1,6 +1,7 @@
 package org.scryption.view.fight
 
 import org.scryption.game.model.Deck.Deck
+import org.scryption.game.model.items.GameItem
 import org.scryption.view.ViewModelFight
 import org.scryption.view.common.ResourceLoader
 import org.scryption.{FightMessages, GUIChannelInterface}
@@ -9,10 +10,11 @@ import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked}
 import java.awt.{Color, Cursor, Dimension, Font}
 
-class DecksView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertical):
+class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) extends BoxPanel(Orientation.Vertical):
 
   var interactable = true
   private var isMainDeckEmpty = false
+  private val fontPath = "heavyweight-cufonfonts/HEAVYWEI.TTF"
   opaque = true
   background = new Color(25, 25, 30)
   preferredSize = new Dimension(220, 0)
@@ -28,20 +30,28 @@ class DecksView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
       case None =>
         new javax.swing.ImageIcon()
 
-  val mainDeckLabel = new Label:
+  private val mainDeckLabel = new Label:
     icon = loadDeckIcon("cardtemplates/back.png")
     tooltip = "Draw from Main Deck"
     cursor = new Cursor(Cursor.HAND_CURSOR)
 
-  val squirrelDeckLabel = new Label:
+  private val squirrelDeckLabel = new Label:
     icon = loadDeckIcon("cardtemplates/squirrel_back.png")
     tooltip = "Draw a Squirrel"
     cursor = new Cursor(Cursor.HAND_CURSOR)
+
+  private val itemsContainer = new BoxPanel(Orientation.Vertical):
+    opaque = false
 
   contents += mainDeckLabel
   contents += Swing.VStrut(30)
   contents += squirrelDeckLabel
   contents += Swing.VGlue
+  contents += new Label("ITEMS"):
+    foreground = new Color(150, 150, 150)
+    font = ResourceLoader.loadFont(fontPath, 20f)
+  contents += Swing.VStrut(10)
+  contents += itemsContainer
 
   listenTo(mainDeckLabel.mouse.clicks, squirrelDeckLabel.mouse.clicks)
 
@@ -67,3 +77,27 @@ class DecksView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
       mainDeckLabel.icon = loadDeckIcon("cardtemplates/back.png")
       mainDeckLabel.tooltip = "Draw from Main Deck"
       mainDeckLabel.cursor = new Cursor(Cursor.HAND_CURSOR)
+
+  def updateItems(items: List[GameItem]): Unit =
+    itemsContainer.contents.clear()
+
+    for item <- items do
+      val itemBtn = new Button(item.name):
+        tooltip = item.description
+        cursor = new Cursor(Cursor.HAND_CURSOR)
+        background = new Color(60, 50, 50)
+        foreground = Color.WHITE
+        preferredSize = new Dimension(140, 40)
+        maximumSize = new Dimension(140, 40)
+
+      listenTo(itemBtn)
+      reactions += {
+        case ButtonClicked(`itemBtn`) =>
+          if interactable then onItemClicked(item)
+      }
+
+      itemsContainer.contents += itemBtn
+      itemsContainer.contents += Swing.VStrut(10)
+
+    revalidate()
+    repaint()

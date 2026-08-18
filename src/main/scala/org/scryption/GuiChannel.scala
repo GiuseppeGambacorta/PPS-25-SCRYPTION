@@ -1,6 +1,7 @@
 package org.scryption
 
 import org.scryption.game.model.events.{FightState, TurnState}
+import org.scryption.game.model.items.GameItem
 import org.scryption.game.model.{BoardPosition, Card}
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -18,6 +19,7 @@ enum FightMessages extends GameMessage:
   case DrawFromDeck
   case CardToPlay(card: Card[?], position: Int)
   case CardToPlayWithSacrifices(card: Card[?], position: Int, sacrificesPositions: List[BoardPosition])
+  case UseItem(item: GameItem, target: Option[BoardPosition] = None)
   case EndPlayerTurn
   case End
 

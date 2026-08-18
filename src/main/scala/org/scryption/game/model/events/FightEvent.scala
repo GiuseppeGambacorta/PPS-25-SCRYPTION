@@ -1,6 +1,6 @@
 package org.scryption.game.model.events
 
-import org.scryption.{GUIChannelInterface, FightMessages}
+import org.scryption.{FightMessages, GUIChannelInterface}
 import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.{Card, CardLibrary, DrawDecks, PlayerHand, SacrificeAttribute}
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -10,6 +10,7 @@ import org.scryption.game.model.managers.{CombatManager, MovementManager, Sacrif
 import org.scryption.game.model.managers.CombatManager.given
 import org.scryption.game.model.GameState
 import org.scryption.game.model.bot.{BotStrategy, RandomBotStrategy}
+import org.scryption.game.model.items.*
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -26,7 +27,8 @@ case class FightState(
                        bones: Int,
                        deck: Deck,
                        playerHand: PlayerHand,
-                       board: Board
+                       board: Board,
+                       inventory: List[GameItem]
                      )
 
 private val PlayerWinningPoints = 6
@@ -42,10 +44,11 @@ def fightEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
     bones = 0,
     deck = remainingDeck,
     playerHand = PlayerHand.fromList(initialCards),
-    board = generateRandomStartingBoard()
+    board = generateRandomStartingBoard(),
+    inventory = List(SquirrelBottle(), HoggyBank(), Pliers(), Scissors())
   )
 
-  GameState(gameState.deck, isGameOver = loop(TurnState.draw, initialFightState, ch))
+  GameState(gameState.deck, gameState.inventory ,isGameOver = loop(TurnState.draw, initialFightState, ch))
 
 @tailrec
 private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInterface): Boolean =
@@ -112,6 +115,13 @@ private def handlePlayerTurnPhase(fightState: FightState, ch: GUIChannelInterfac
       val updatedState = playCardWithSacrifices(fightState, card, position, sacrificesPositions)
       (TurnState.playerTurn, updatedState)
 
+    case FightMessages.UseItem(item, target) =>
+      if fightState.inventory.contains(item) then
+        val updatedState = item.use(fightState, target)
+        (TurnState.playerTurn, updatedState)
+      else
+        (TurnState.playerTurn, fightState)
+
     case FightMessages.EndPlayerTurn =>
       (TurnState.playerFight, fightState)
 
@@ -149,7 +159,8 @@ private def handleFightPhase(
     board = boardAfterQueue,
     bones = fightState.bones + result.earnedBones,
     playerHand = fightState.playerHand.addCards(result.returnedToHandCards),
-    deck = fightState.deck
+    deck = fightState.deck,
+    inventory = fightState.inventory
   )
 
   (nextTurn, newState)

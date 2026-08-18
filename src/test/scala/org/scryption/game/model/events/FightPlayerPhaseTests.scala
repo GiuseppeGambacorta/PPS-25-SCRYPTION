@@ -28,7 +28,8 @@ class FightPlayerPhaseTests extends AnyFeatureSpec with GivenWhenThen with Match
       bones = bones,
       deck = Deck.empty,
       playerHand = PlayerHand.empty,
-      board = board
+      board = board,
+      inventory = List.empty
     )
 
   Feature("Player Fight Phase - Direct Attacks and Creature Combat") {

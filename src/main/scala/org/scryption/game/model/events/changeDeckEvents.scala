@@ -24,7 +24,7 @@ def getANewCardEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
   message match {
     case EventMessages.SingleCard(card) =>
       ch.sendToGui(EventMessages.End)
-      GameState(gameState.deck.addCard(card), gameState.isGameOver)
+      GameState(gameState.deck.addCard(card), gameState.inventory, gameState.isGameOver)
     case _ =>
       ch.clear()
       getANewCardEvent(gameState, ch)
@@ -66,7 +66,7 @@ def mushRoomsExpertEvent(gameState: GameState, ch: GUIChannelInterface): GameSta
         .addCard(upgradedCard)
 
       ch.sendToGui(EventMessages.End)
-      GameState(updatedDeck, gameState.isGameOver)
+      GameState(updatedDeck, gameState.inventory, gameState.isGameOver)
 
     case _ =>
       ch.clear()
@@ -135,7 +135,7 @@ def sacrificeEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
             .addCard(updatedCard)
 
           ch.sendToGui(EventMessages.End)
-          GameState(updatedDeck, gameState.isGameOver)
+          GameState(updatedDeck, gameState.inventory, gameState.isGameOver)
 
         case _ =>
           ch.clear()
@@ -163,7 +163,7 @@ private def substituteACard(gameState: GameState, ch: GUIChannelInterface, f: Ca
     case EventMessages.SingleCard(card) =>
       ch.sendToGui(EventMessages.End)
       val updatedDeck = gameState.deck removeCard card addCard f(card)
-      GameState(updatedDeck, gameState.isGameOver)
+      GameState(updatedDeck, gameState.inventory, gameState.isGameOver)
     case _ =>
       ch.clear()
       substituteACard(gameState, ch, f)
