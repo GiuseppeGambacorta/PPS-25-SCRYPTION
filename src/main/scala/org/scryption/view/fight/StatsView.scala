@@ -1,14 +1,15 @@
 package org.scryption.view.fight
 
-import org.scryption.{GUIChannelInterface, GUIMessages}
-import org.scryption.view.ResourceLoader
+import org.scryption.{FightMessages, GUIChannelInterface, GameMessage}
 import org.scryption.game.model.events.TurnState
+import org.scryption.view.ViewModelFight
+import org.scryption.view.common.ResourceLoader
 
 import scala.swing.*
 import scala.swing.event.ButtonClicked
 import java.awt.{Color, Cursor, Dimension}
 
-class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Vertical):
+class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertical):
 
   var interactable = true
   opaque = true
@@ -99,7 +100,7 @@ class StatsView(channel: GUIChannelInterface) extends BoxPanel(Orientation.Verti
     case ButtonClicked(`endTurnButton`) =>
       if interactable then
         println("UI input: end turn")
-        channel.sendToGame(GUIMessages.EndPlayerTurn)
+        viewModel.endTurn()
   }
 
   /** Updates the bones counter.

@@ -1,6 +1,7 @@
-package org.scryption.view
+package org.scryption.view.common
 
 import org.scryption.view.events.EventView
+import org.scryption.view.common.{CardViewInfo, StatBonus}
 
 sealed trait StatBonus {
   def apply(info: CardViewInfo): CardViewInfo

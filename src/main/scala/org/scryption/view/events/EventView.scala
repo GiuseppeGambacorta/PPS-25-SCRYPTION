@@ -1,19 +1,17 @@
 package org.scryption.view.events
 
-import org.scryption.view.CardView
 import org.scryption.view.*
-import org.scryption.view.GUIAssets.CardViewAssets
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.view.common.GUIAssets.CardViewAssets
+import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, StatBonus, ZOrder}
+
 
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
 abstract class EventView(
-                          channel: GUIChannelInterface,
+                          viewModel: ViewModelEvent,
                           cardWidth: Int,
                           bonus: StatBonus,
                           slotBgImagePath: String
@@ -21,8 +19,8 @@ abstract class EventView(
 
   private val setup = CardView.forWidth(cardWidth)
   private val assets = CardViewAssets()
-
-  private val viewModel: ViewModel = new ViewModel()
+  
+  viewModel.ListenForCardsFromTheModel(renderHand)
 
   private val cardGap = 100
   private val handTopOffset = 500
@@ -39,7 +37,7 @@ abstract class EventView(
   private var slotCardIndex: Int = -1
 
   opaque = false
-  listenToChannel()
+
 
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
@@ -63,16 +61,7 @@ abstract class EventView(
     }
   }
 
-  private def listenToChannel(): Unit = {
-    Future {
-      while (true) {
-        val msg = channel.receiveFromGame
-        Swing.onEDT {
-          renderHand(viewModel.getCardsInfo(msg))
-        }
-      }
-    }
-  }
+
 
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
@@ -168,7 +157,7 @@ abstract class EventView(
     }
 
     private def sendCardToGameModel(): Unit = {
-        channel.sendToGame(viewModel.getModelCard(index))
+        viewModel.sendCardToModel(index)
     }
 
     private[EventView] def moveToSlotCoords(): Unit = {

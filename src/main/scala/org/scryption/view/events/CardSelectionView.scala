@@ -1,20 +1,18 @@
 package org.scryption.view.events
 
-import org.scryption.view.{CardView, ViewModel}
-
-import org.scryption.view.{GUIAssets, CardViewInfo, ResourceLoader, toViewInfo}
-import org.scryption.{GUIChannelInterface, GUIMessages}
-
+import org.scryption.view.common.{CardView, CardViewInfo, GUIAssets, ResourceLoader}
+import org.scryption.view.ViewModelEvent
 import java.awt.Cursor
 import java.awt.event.{MouseEvent, MouseListener}
 import javax.swing.{ImageIcon, JLabel, Timer}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+
 import scala.swing.*
 
-class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
-  val viewModel: ViewModel = new ViewModel()
+
+class CardSelectionView(viewModel: ViewModelEvent) extends FlowPanel {
+
+  viewModel.ListenForCardsFromTheModel(showCards)
 
   private val setup = CardView.forWidth(250)
   val assets: GUIAssets.CardViewAssets = setup.assets
@@ -32,27 +30,13 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
 
   opaque = false
 
-  // Avvio dell'ascolto sul canale all'istanziazione
-  listenToChannel()
 
   override protected def paintComponent(g: Graphics2D): Unit = {
     backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
     super.paintComponent(g)
   }
 
-  /** Ascolta i messaggi in arrivo dal canale in un thread separato.
-   * Quando riceve la lista delle carte, aggiorna la UI sull'EDT.
-   */
-  private def listenToChannel(): Unit = {
-    Future {
-      while (true) {
-        val msg = channel.receiveFromGame
-          Swing.onEDT {
-            showCards(viewModel.getCardsInfo(msg))
-          }
-      }
-    }
-  }
+
 
   private class CardSlot(val index: Int, info: CardViewInfo, posX: Int) {
     val frontIcon: ImageIcon =
@@ -138,7 +122,7 @@ class CardSelectionView(channel: GUIChannelInterface) extends FlowPanel {
     }
 
     private def finishSelection(): Unit = {
-      channel.sendToGame(viewModel.getModelCard(index))
+       viewModel.sendCardToModel(index)
     }
   }
 

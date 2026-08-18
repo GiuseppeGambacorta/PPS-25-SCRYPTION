@@ -1,6 +1,6 @@
 package org.scryption.game.model.events
 
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.{GUIChannelInterface, FightMessages}
 import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.{Card, CardLibrary, DrawDecks, PlayerHand, SacrificeAttribute}
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -35,7 +35,7 @@ private val NumberOfCardsAtTheStartOfTheFight = 4
 private val PlayerWon = false
 private val PlayerLost = true
 
-def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fightEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
   val initialFightState = FightState(
     scalePoints = 0,
@@ -49,7 +49,7 @@ def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
 
 @tailrec
 private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInterface): Boolean =
-  ch.sendToGui(GUIMessages.FightState(fightState, turnState))
+  ch.sendToGui(FightMessages.State(fightState, turnState))
 
   turnState match
     case TurnState.draw =>
@@ -83,11 +83,11 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
 
 private def handleDrawPhase(fightState: FightState, ch: GUIChannelInterface): (TurnState, FightState) =
   ch.receiveFromGui match
-    case GUIMessages.DrawFromSquirrel =>
+    case FightMessages.DrawFromSquirrel =>
       val updatedHand = fightState.playerHand addCard CardLibrary.squirrel
       (TurnState.playerTurn, fightState.copy(playerHand = updatedHand))
 
-    case GUIMessages.DrawFromDeck =>
+    case FightMessages.DrawFromDeck =>
       DrawDecks(fightState.deck).drawFromMain() match
         case Some((drawnCard, updatedDrawDecks)) =>
           val nextState = fightState.copy(
@@ -104,18 +104,16 @@ private def handleDrawPhase(fightState: FightState, ch: GUIChannelInterface): (T
 
 private def handlePlayerTurnPhase(fightState: FightState, ch: GUIChannelInterface): (TurnState, FightState) =
   ch.receiveFromGui match
-    case GUIMessages.CardToPlay(card, position) =>
+    case FightMessages.CardToPlay(card, position) =>
       val updatedState = playCardWithoutSacrifice(fightState, card, position)
       (TurnState.playerTurn, updatedState)
 
-    case GUIMessages.CardToPlayWithSacrifices(card, position, sacrificesPositions) =>
+    case FightMessages.CardToPlayWithSacrifices(card, position, sacrificesPositions) =>
       val updatedState = playCardWithSacrifices(fightState, card, position, sacrificesPositions)
       (TurnState.playerTurn, updatedState)
 
-    // Esempio: aggiungi qui l'evento di fine turno se la GUI invia un messaggio EndTurn
-    // case GUIMessages.EndTurn => (TurnState.playerFight, fightState)
-    case GUIMessages.EndPlayerTurn => (TurnState.playerFight, fightState)
-
+    case FightMessages.EndPlayerTurn =>
+      (TurnState.playerFight, fightState)
 
     case _ =>
       (TurnState.playerTurn, fightState)

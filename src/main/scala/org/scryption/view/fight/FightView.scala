@@ -2,20 +2,22 @@ package org.scryption.view.fight
 
 import org.scryption.game.model.{Card, SacrificeAttribute}
 import org.scryption.game.model.boardModel.Board
-import org.scryption.game.model.events.TurnState
-//import org.scryption.game.model.managers.SacrificeManager
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.game.model.events.{FightState, TurnState}
+import org.scryption.{FightMessages, GUIChannelInterface}
+import org.scryption.view.ViewModelFight
 
 import scala.swing.*
 import java.awt.{Color, Dimension}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class FightView(channel: GUIChannelInterface) extends BorderPanel:
+class FightView(viewModel : ViewModelFight) extends BorderPanel:
 
   var selectedCard: Option[Card[?]] = None
   var selectedSacrifices: List[(Int, Int)] = List.empty
   var currentBoard: Option[Board] = None
+  
+  viewModel.listenForUpdatedState(updateViews)
 
   private def onCardSelectedFromHand(cardOpt: Option[Card[?]]): Unit =
     selectedCard = cardOpt
@@ -37,7 +39,7 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
              */
             val isTargetingSacrifice = selectedSacrifices.contains((row, col))
             if hasEnoughBlood && (isSlotEmpty || isTargetingSacrifice) then
-              channel.sendToGame(GUIMessages.CardToPlayWithSacrifices(card, col, selectedSacrifices))
+              viewModel.cardToPlayWithSacrifices(card, col, selectedSacrifices)
               resetSelection()
             else if !isSlotEmpty then
               if isTargetingSacrifice then
@@ -53,7 +55,7 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
               println(s"FightView: not enough blood, currently: $amount.")
           case _ =>
             if isSlotEmpty then
-              channel.sendToGame(GUIMessages.CardToPlay(card, col))
+              viewModel.cardToPlay(card, col)
               resetSelection()
 
   private def resetSelection(): Unit =
@@ -65,45 +67,36 @@ class FightView(channel: GUIChannelInterface) extends BorderPanel:
   // To fill empty borders of board
   opaque = true
   background = new Color(20, 20, 22)
-  val boardView = new BoardView(channel, onSlotClicked)
+  val boardView = new BoardView(onSlotClicked)
 
-  val handView = new HandView(channel, onCardSelectedFromHand)
+  val handView = new HandView(onCardSelectedFromHand)
 
-  val statsView = new StatsView(channel)
+  val statsView = new StatsView(viewModel)
 
-  val decksView = new DecksView(channel)
+  val decksView = new DecksView(viewModel)
 
   layout(boardView) = BorderPanel.Position.Center
   layout(handView) = BorderPanel.Position.South
   layout(statsView) = BorderPanel.Position.West
   layout(decksView) = BorderPanel.Position.East
 
-  listenToChannel()
 
-  private def listenToChannel(): Unit = {
-    Future {
-      while (true) {
-        val msg = channel.receiveFromGame
-        msg match {
-          case GUIMessages.FightState(fightState, turn) =>
-            Swing.onEDT {
-              val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
-              boardView.interactable = isPlayerActive
-              handView.interactable = isPlayerActive
-              statsView.interactable = isPlayerActive
-              decksView.interactable = isPlayerActive
-              if !isPlayerActive then resetSelection()
-              currentBoard = Some(fightState.board)
-              boardView.updateBoard(fightState.board)
-              decksView.updateDeck(fightState.deck)
-              handView.updateHand(fightState.playerHand.toList)
-              statsView.updateScale(fightState.scalePoints)
-              statsView.updateBones(fightState.bones)
-              statsView.updateTurn(turn)
-              currentBoard = Some(fightState.board)
-            }
-          case _ =>
-        }
+
+
+
+  private def updateViews(fightState: FightState, turn: TurnState): Unit =
+      Swing.onEDT {
+        val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
+        boardView.interactable = isPlayerActive
+        handView.interactable = isPlayerActive
+        statsView.interactable = isPlayerActive
+        decksView.interactable = isPlayerActive
+        if !isPlayerActive then resetSelection()
+        currentBoard = Some(fightState.board)
+        boardView.updateBoard(fightState.board)
+        decksView.updateDeck(fightState.deck)
+        handView.updateHand(fightState.playerHand.toList)
+        statsView.updateScale(fightState.scalePoints)
+        statsView.updateBones(fightState.bones)
+        statsView.updateTurn(turn)
       }
-    }
-  }

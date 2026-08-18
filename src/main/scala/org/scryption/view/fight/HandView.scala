@@ -1,17 +1,19 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
+
 import org.scryption.game.model.Card
-import org.scryption.view.{CardView, toViewInfo}
-import org.scryption.view.GUIGeometry.CardGeometry
-import org.scryption.view.GUIAssets.CardViewAssets
+import org.scryption.view.common.toViewInfo
+import org.scryption.view.common.GUIGeometry.CardGeometry
+import org.scryption.view.common.{CardView, CardViewInfo}
+import org.scryption.view.common.ResourceLoader
+import org.scryption.view.common.GUIAssets.CardViewAssets
 
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked, MouseExited, MouseMoved}
 import java.awt.{BasicStroke, Color, Cursor, Dimension}
 import javax.swing.Timer
 
-class HandView(channel: GUIChannelInterface, onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
+class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
 
   var interactable = true
   opaque = false

@@ -1,12 +1,11 @@
 package org.scryption.game.model.events
 
+import org.scryption.EventMessages
+import org.scryption.GUIChannelInterface
 import org.scryption.game.model.*
 import org.scryption.game.model.Deck
-import org.scryption.GUIMessages
-import org.scryption.GUIChannelInterface
 
 import scala.annotation.tailrec
-
 
 type Event = (GameState, GUIChannelInterface) => GameState
 
@@ -18,17 +17,17 @@ val cardsNumberForGui = 5
  * The player picks one card to add to their deck.
  */
 @tailrec
-def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
-  ch.sendToGui(GUIMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3)._1))
+def getANewCardEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
+  ch.sendToGui(EventMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3)._1))
   val message = ch.receiveFromGui
- 
+
   message match {
-    case GUIMessages.SingleCard(card) =>
-      ch.sendToGui(GUIMessages.End)
+    case EventMessages.SingleCard(card) =>
+      ch.sendToGui(EventMessages.End)
       GameState(gameState.deck.addCard(card), gameState.isGameOver)
     case _ =>
       ch.clear()
-      getANewCard(gameState, ch)
+      getANewCardEvent(gameState, ch)
   }
 }
 
@@ -39,7 +38,7 @@ def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
  * If there are no duplicates in the deck, returns the unchanged GameState immediately.
  */
 @tailrec
-def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = {
+def mushRoomsExpertEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
   val deckList = gameState.deck.toList
 
   // Group cards to identify those occurring at least twice in the deck
@@ -50,12 +49,12 @@ def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = 
     .toList
 
   if duplicateCards.nonEmpty then
-    ch.sendToGui(GUIMessages.Cards(duplicateCards.take(cardsNumberForGui)))
+    ch.sendToGui(EventMessages.Cards(duplicateCards.take(cardsNumberForGui)))
   else
     return gameState
 
   ch.receiveFromGui match {
-    case GUIMessages.SingleCard(selectedCard) =>
+    case EventMessages.SingleCard(selectedCard) =>
       val upgradedCard = modifyCreature(selectedCard)(c =>
         c withAttack (c.attack * 2) withHealth (c.health * 2)
       )
@@ -66,12 +65,12 @@ def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = 
         .removeCard(selectedCard)
         .addCard(upgradedCard)
 
-      ch.sendToGui(GUIMessages.End)
+      ch.sendToGui(EventMessages.End)
       GameState(updatedDeck, gameState.isGameOver)
 
     case _ =>
       ch.clear()
-      mushRoomsExpert(gameState, ch)
+      mushRoomsExpertEvent(gameState, ch)
   }
 }
 
@@ -79,7 +78,7 @@ def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = 
  * Event Firecamp (Attack):
  * Allows selecting a card from the deck to increase its attack stat by +1.
  */
-def fireCamp_Attack(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fireCampEvent_Attack(gameState: GameState, ch: GUIChannelInterface): GameState =
   substituteACard(
     gameState,
     ch,
@@ -90,7 +89,7 @@ def fireCamp_Attack(gameState: GameState, ch: GUIChannelInterface): GameState =
  * Event Firecamp (Health):
  * Allows selecting a card from the deck to increase its health stat by +2.
  */
-def fireCamp_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fireCampEvent_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
   substituteACard(
     gameState,
     ch,
@@ -103,12 +102,12 @@ def fireCamp_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
  * If no cards in the deck have any seals, the event terminates and returns the original GameState.
  */
 @tailrec
-def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
+def sacrificeEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
   val cardsWithSeals = gameState.deck.toList.filter(c => c.seals.nonEmpty)
 
   if cardsWithSeals.nonEmpty then
     ch.sendToGui(
-      GUIMessages.Cards(
+      EventMessages.Cards(
         cardsWithSeals.take(cardsNumberForGui)
       )
     )
@@ -116,17 +115,17 @@ def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
     return gameState
 
   ch.receiveFromGui match {
-    case GUIMessages.SingleCard(cardToRemove) =>
+    case EventMessages.SingleCard(cardToRemove) =>
       val deckWithoutTheCard = gameState.deck.removeCard(cardToRemove)
 
       ch.sendToGui(
-        GUIMessages.Cards(
+        EventMessages.Cards(
           deckWithoutTheCard.drawRandom(Math.min(cardsNumberForGui, deckWithoutTheCard.size), 42)._1
         )
       )
 
       ch.receiveFromGui match {
-        case GUIMessages.SingleCard(cardToUpgrade) =>
+        case EventMessages.SingleCard(cardToUpgrade) =>
           val seals = cardToRemove.seals
           val updatedCard = seals.foldLeft(cardToUpgrade)((card, seal) => card.addSeal(seal))
 
@@ -135,17 +134,17 @@ def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
             .removeCard(cardToUpgrade)
             .addCard(updatedCard)
 
-          ch.sendToGui(GUIMessages.End)
+          ch.sendToGui(EventMessages.End)
           GameState(updatedDeck, gameState.isGameOver)
 
         case _ =>
           ch.clear()
-          sacrifice(gameState, ch)
+          sacrificeEvent(gameState, ch)
       }
 
     case _ =>
       ch.clear()
-      sacrifice(gameState, ch)
+      sacrificeEvent(gameState, ch)
   }
 }
 
@@ -156,13 +155,13 @@ def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
 @tailrec
 private def substituteACard(gameState: GameState, ch: GUIChannelInterface, f: Card[?] => Card[?]): GameState = {
   ch.sendToGui(
-    GUIMessages.Cards(gameState.deck.drawRandom(Math.min(cardsNumberForGui, gameState.deck.size), 42)._1)
+    EventMessages.Cards(gameState.deck.drawRandom(Math.min(cardsNumberForGui, gameState.deck.size), 42)._1)
   )
   val message = ch.receiveFromGui
 
   message match {
-    case GUIMessages.SingleCard(card) =>
-      ch.sendToGui(GUIMessages.End)
+    case EventMessages.SingleCard(card) =>
+      ch.sendToGui(EventMessages.End)
       val updatedDeck = gameState.deck removeCard card addCard f(card)
       GameState(updatedDeck, gameState.isGameOver)
     case _ =>
