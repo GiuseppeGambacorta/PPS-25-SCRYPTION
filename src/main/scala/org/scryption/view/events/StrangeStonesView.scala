@@ -13,7 +13,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
 
 class StrangeStonesView(viewModel: ViewModelEvent) extends FlowPanel {
 
-  viewModel.getCardsFromModel(renderHand)
+  viewModel.ListenForCardsFromTheModel(renderHand)
 
   private val setup = CardView.forWidth(250)
   private val assets = setup.assets

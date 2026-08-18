@@ -35,7 +35,7 @@ private val NumberOfCardsAtTheStartOfTheFight = 4
 private val PlayerWon = false
 private val PlayerLost = true
 
-def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fightEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
   val initialFightState = FightState(
     scalePoints = 0,

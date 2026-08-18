@@ -17,7 +17,7 @@ val cardsNumberForGui = 5
  * The player picks one card to add to their deck.
  */
 @tailrec
-def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
+def getANewCardEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
   ch.sendToGui(EventMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3)._1))
   val message = ch.receiveFromGui
 
@@ -27,7 +27,7 @@ def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
       GameState(gameState.deck.addCard(card), gameState.isGameOver)
     case _ =>
       ch.clear()
-      getANewCard(gameState, ch)
+      getANewCardEvent(gameState, ch)
   }
 }
 
@@ -38,7 +38,7 @@ def getANewCard(gameState: GameState, ch: GUIChannelInterface): GameState = {
  * If there are no duplicates in the deck, returns the unchanged GameState immediately.
  */
 @tailrec
-def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = {
+def mushRoomsExpertEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
   val deckList = gameState.deck.toList
 
   // Group cards to identify those occurring at least twice in the deck
@@ -70,7 +70,7 @@ def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = 
 
     case _ =>
       ch.clear()
-      mushRoomsExpert(gameState, ch)
+      mushRoomsExpertEvent(gameState, ch)
   }
 }
 
@@ -78,7 +78,7 @@ def mushRoomsExpert(gameState: GameState, ch: GUIChannelInterface): GameState = 
  * Event Firecamp (Attack):
  * Allows selecting a card from the deck to increase its attack stat by +1.
  */
-def fireCamp_Attack(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fireCampEvent_Attack(gameState: GameState, ch: GUIChannelInterface): GameState =
   substituteACard(
     gameState,
     ch,
@@ -89,7 +89,7 @@ def fireCamp_Attack(gameState: GameState, ch: GUIChannelInterface): GameState =
  * Event Firecamp (Health):
  * Allows selecting a card from the deck to increase its health stat by +2.
  */
-def fireCamp_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fireCampEvent_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
   substituteACard(
     gameState,
     ch,
@@ -102,7 +102,7 @@ def fireCamp_Health(gameState: GameState, ch: GUIChannelInterface): GameState =
  * If no cards in the deck have any seals, the event terminates and returns the original GameState.
  */
 @tailrec
-def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
+def sacrificeEvent(gameState: GameState, ch: GUIChannelInterface): GameState = {
   val cardsWithSeals = gameState.deck.toList.filter(c => c.seals.nonEmpty)
 
   if cardsWithSeals.nonEmpty then
@@ -139,12 +139,12 @@ def sacrifice(gameState: GameState, ch: GUIChannelInterface): GameState = {
 
         case _ =>
           ch.clear()
-          sacrifice(gameState, ch)
+          sacrificeEvent(gameState, ch)
       }
 
     case _ =>
       ch.clear()
-      sacrifice(gameState, ch)
+      sacrificeEvent(gameState, ch)
   }
 }
 

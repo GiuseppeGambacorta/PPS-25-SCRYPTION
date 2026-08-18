@@ -20,7 +20,7 @@ abstract class EventView(
   private val setup = CardView.forWidth(cardWidth)
   private val assets = CardViewAssets()
   
-  viewModel.getCardsFromModel(renderHand)
+  viewModel.ListenForCardsFromTheModel(renderHand)
 
   private val cardGap = 100
   private val handTopOffset = 500

@@ -16,12 +16,12 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
   private type GameEvent = (Event, GUIChannelInterface => Panel)
 
-  private val getANewCardEvent: GameEvent     = (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(ViewModelEvent(ch)))
-  private val fightEvent: GameEvent           = (fight, (ch: GUIChannelInterface) => new FightView(ch))
-  private val fireCampAttackEvent: GameEvent  = (fireCamp_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(ViewModelEvent(ch)))
-  private val fireCampHealthEvent: GameEvent  = (fireCamp_Health, (ch: GUIChannelInterface) => new FireCampHealthView(ViewModelEvent(ch)))
-  private val mycologistsEvent: GameEvent     = (mushRoomsExpert, (ch: GUIChannelInterface) => new MycologistsView(ViewModelEvent(ch)))
-  private val sacrificeEvent: GameEvent       = (sacrifice, (ch: GUIChannelInterface) => new StrangeStonesView(ViewModelEvent(ch)))
+  private val getANewCard: GameEvent     = (getANewCardEvent, (ch: GUIChannelInterface) => new CardSelectionView(ViewModelEvent(ch)))
+  private val fight: GameEvent           = (fightEvent, (ch: GUIChannelInterface) => new FightView(ch))
+  private val fireCampAttack: GameEvent  = (fireCampEvent_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(ViewModelEvent(ch)))
+  private val fireCampHealth: GameEvent  = (fireCampEvent_Health, (ch: GUIChannelInterface) => new FireCampHealthView(ViewModelEvent(ch)))
+  private val mycologists: GameEvent     = (mushRoomsExpertEvent, (ch: GUIChannelInterface) => new MycologistsView(ViewModelEvent(ch)))
+  private val sacrifice: GameEvent       = (sacrificeEvent, (ch: GUIChannelInterface) => new StrangeStonesView(ViewModelEvent(ch)))
 
   @volatile private var running = false
 
@@ -31,12 +31,12 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       val initialState = GameState.getInitialGameState
 
       val listEvents: List[GameEvent] = List(
-        getANewCardEvent,
-        fightEvent,
-        fireCampAttackEvent,
-        fireCampHealthEvent,
-        mycologistsEvent,
-        sacrificeEvent
+        getANewCard,
+        fight,
+        fireCampAttack,
+        fireCampHealth,
+        mycologists,
+        sacrifice
       )
 
       Future {

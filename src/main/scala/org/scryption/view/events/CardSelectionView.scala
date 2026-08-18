@@ -12,7 +12,7 @@ import scala.swing.*
 
 class CardSelectionView(viewModel: ViewModelEvent) extends FlowPanel {
 
-  viewModel.getCardsFromModel(showCards)
+  viewModel.ListenForCardsFromTheModel(showCards)
 
   private val setup = CardView.forWidth(250)
   val assets: GUIAssets.CardViewAssets = setup.assets

@@ -11,7 +11,7 @@ class ViewModelEvent(channel: GUIChannelInterface):
 
   private var currentCards: List[Card[?]] = Nil
 
-  def getCardsFromModel(f: List[CardViewInfo] => Unit): Unit =
+  def ListenForCardsFromTheModel(f: List[CardViewInfo] => Unit): Unit =
     Future {
       while (true) {
         val msg = channel.receiveFromGame
@@ -22,6 +22,8 @@ class ViewModelEvent(channel: GUIChannelInterface):
           case EventMessages.SingleCard(card) =>
             f(card.toViewInfo :: Nil)
           case EventMessages.End => f(Nil)
+
+          case _ =>
         }
 
       }

@@ -39,7 +39,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       ch.sendToGame(EventMessages.SingleCard(squirrel))
 
       When("Executing the GetANewCard event")
-      val updatedGameState = getANewCard(initialGameState, ch)
+      val updatedGameState = getANewCardEvent(initialGameState, ch)
 
       Then("The resulting deck should equal the initial deck with the chosen card added")
       updatedGameState.deck shouldBe (initialDeck addCard squirrel)
@@ -61,7 +61,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       )
 
       When("Executing the GetANewCard event")
-      val updatedGameState = getANewCard(initialGameState, ch)
+      val updatedGameState = getANewCardEvent(initialGameState, ch)
       guiThread.join()
 
       Then("It should recover from the invalid message, clear the channel, and apply the valid card")
@@ -80,7 +80,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       ch.sendToGame(EventMessages.SingleCard(bear))
 
       When("Executing the Firecamp Attack event")
-      val updatedGameState = fireCamp_Attack(initialGameState, ch)
+      val updatedGameState = fireCampEvent_Attack(initialGameState, ch)
 
       Then("The deck size should remain unchanged")
       updatedGameState.deck.size shouldBe initialDeck.size
@@ -113,7 +113,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       )
 
       When("Executing the Firecamp Attack event")
-      val updatedGameState = fireCamp_Attack(initialGameState, ch)
+      val updatedGameState = fireCampEvent_Attack(initialGameState, ch)
       guiThread.join()
 
       Then("The event should recover and process the valid card choice")
@@ -133,7 +133,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       ch.sendToGame(EventMessages.SingleCard(bear))
 
       When("Executing the Firecamp Health event")
-      val updatedGameState = fireCamp_Health(initialGameState, ch)
+      val updatedGameState = fireCampEvent_Health(initialGameState, ch)
 
       Then("The deck size should remain unchanged")
       updatedGameState.deck.size shouldBe initialDeck.size
@@ -157,7 +157,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val ch = GUIChannel.getNewChannel
 
       When("Executing the Mushroom Expert event")
-      val updatedGameState = mushRoomsExpert(initialGameState, ch)
+      val updatedGameState = mushRoomsExpertEvent(initialGameState, ch)
 
       Then("The returned GameState should be identical to the initial GameState")
       updatedGameState shouldBe initialGameState
@@ -173,7 +173,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       ch.sendToGame(EventMessages.SingleCard(bear))
 
       When("Executing the Mushroom Expert event")
-      val updatedGameState = mushRoomsExpert(initialGameState, ch)
+      val updatedGameState = mushRoomsExpertEvent(initialGameState, ch)
 
       Then("The deck size should decrease by 1 (2 duplicates removed, 1 fused card added)")
       updatedGameState.deck.size shouldBe (initialDeck.size - 1)
@@ -209,7 +209,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       ch.sendToGame(EventMessages.SingleCard(card2))
 
       When("Executing the Sacrifice event")
-      val updatedGameState = sacrifice(initialGameState, ch)
+      val updatedGameState = sacrificeEvent(initialGameState, ch)
 
       Then("The deck size should have been changed")
       updatedGameState.deck.size shouldBe (initialDeck.size - 1)
@@ -238,7 +238,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       )
 
       When("Executing the Sacrifice event")
-      val updatedGameState = sacrifice(initialGameState, ch)
+      val updatedGameState = sacrificeEvent(initialGameState, ch)
       guiThread.join()
 
       Then("The sacrifice event should recover after the retry and combine the seals correctly")
@@ -254,7 +254,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val ch = GUIChannel.getNewChannel
 
       When("Executing the Sacrifice event")
-      val updatedGameState = sacrifice(initialGameState, ch)
+      val updatedGameState = sacrificeEvent(initialGameState, ch)
 
       Then("The returned GameState should be identical to the initial GameState")
       updatedGameState shouldBe initialGameState
@@ -287,7 +287,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       guiThread.start()
 
       When("Executing the Sacrifice event")
-      sacrifice(initialGameState, ch)
+      sacrificeEvent(initialGameState, ch)
       guiThread.join()
     }
   }
