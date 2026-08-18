@@ -82,3 +82,40 @@ class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers w
 
       And("the Scissors are removed from the inventory")
       newState.inventory shouldBe empty
+
+    Scenario("Scissors cannot destroy a player's own card"):
+      Given("A FightState with a player card and Scissors in inventory")
+      val scissors = Scissors()
+      val initialState = createInitialState(scissors)
+      val playerRow: BoardRow = Some(CardLibrary.wolf) | x | x | x
+      val stateWithPlayerCard = initialState.copy(board = initialState.board.updateRow(IndexOfPlayerRow, playerRow))
+
+      When("the player tries to use Scissors on their own card")
+      val targetPos = (IndexOfPlayerRow, 0)
+      val newState = scissors.use(stateWithPlayerCard, Some(targetPos))
+
+      Then("the card remains on the board")
+      newState.board(targetPos._1)(targetPos._2) shouldBe Some(CardLibrary.wolf)
+
+      And("the Scissors is not consumed from the inventory")
+      newState.inventory should contain(scissors)
+
+    Scenario("Scissors cannot destroy a card in the bot's preparation row"):
+      import org.scryption.game.model.boardModel.{IndexOfBotPrepRow, BoardRow, x, |}
+
+      Given("A FightState with a card in the bot's preparation row (0) and Scissors in inventory")
+      val scissors = Scissors()
+      val initialState = createInitialState(scissors)
+
+      val prepRow: BoardRow = Some(CardLibrary.wolf) | x | x | x
+      val stateWithPrepCard = initialState.copy(board = initialState.board.updateRow(IndexOfBotPrepRow, prepRow))
+
+      When("the player tries to use Scissors on the preparation row")
+      val targetPos = (IndexOfBotPrepRow, 0)
+      val newState = scissors.use(stateWithPrepCard, Some(targetPos))
+
+      Then("the card remains on the board")
+      newState.board(targetPos._1)(targetPos._2) shouldBe Some(CardLibrary.wolf)
+
+      And("the Scissors is not consumed from the inventory")
+      newState.inventory should contain(scissors)

@@ -10,7 +10,7 @@ import org.scryption.game.model.managers.{CombatManager, MovementManager, Sacrif
 import org.scryption.game.model.managers.CombatManager.given
 import org.scryption.game.model.GameState
 import org.scryption.game.model.bot.{BotStrategy, RandomBotStrategy}
-import org.scryption.game.model.items.GameItem
+import org.scryption.game.model.items.*
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -45,7 +45,7 @@ def fightEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
     deck = remainingDeck,
     playerHand = PlayerHand.fromList(initialCards),
     board = generateRandomStartingBoard(),
-    inventory = List.empty
+    inventory = List(SquirrelBottle(), HoggyBank(), Pliers(), Scissors())
   )
 
   GameState(gameState.deck, gameState.inventory ,isGameOver = loop(TurnState.draw, initialFightState, ch))

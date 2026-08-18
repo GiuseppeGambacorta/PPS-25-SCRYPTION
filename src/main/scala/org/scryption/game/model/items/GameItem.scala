@@ -49,7 +49,9 @@ case class Scissors() extends GameItem:
 
   override def use(state: FightState, target: Option[BoardPosition] = None): FightState =
     target match
-      case Some(pos) if pos.isValid && state.board(pos._1)(pos._2).isDefined =>
+      case Some(pos) if pos._1 == boardModel.IndexOfBotRow &&
+        pos.isValid &&
+        state.board(pos._1)(pos._2).isDefined =>
         val newBoard = state.board.updatedSlot(pos, boardModel.x)
         val newInventory = state.inventory.filterNot(_ == this)
         state.copy(board = newBoard, inventory = newInventory)

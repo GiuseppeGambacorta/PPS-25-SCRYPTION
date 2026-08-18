@@ -24,10 +24,12 @@ class ViewModelFight(channel: GUIChannelInterface):
 
   def cardToPlayWithSacrifices(card: Card[?], position: Int, sacrificesPositions: List[BoardPosition]): Unit =
     channel.sendToGame(FightMessages.CardToPlayWithSacrifices(card, position, sacrificesPositions))
-    
-    
+
   def drawFromSquirrel() : Unit =
     channel.sendToGame(FightMessages.DrawFromSquirrel)
+
+  def useItem(item: org.scryption.game.model.items.GameItem, target: Option[BoardPosition] = None): Unit =
+    channel.sendToGame(FightMessages.UseItem(item, target))
     
   def drawFromDeck() : Unit =
     channel.sendToGame(FightMessages.DrawFromDeck)
