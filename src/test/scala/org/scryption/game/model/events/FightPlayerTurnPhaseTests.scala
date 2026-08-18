@@ -3,7 +3,7 @@ package org.scryption.game.model.events
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.{GUIChannel, GUIChannelInterface, CardMessage}
+import org.scryption.{GUIChannel, GUIChannelInterface, GameMessage}
 import org.scryption.game.model.*
 import org.scryption.game.model.boardModel.*
 

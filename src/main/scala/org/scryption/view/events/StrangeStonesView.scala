@@ -2,18 +2,18 @@ package org.scryption.view.events
 
 import org.scryption.view.*
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader}
-import org.scryption.{GUIChannelInterface, EventMessages}
+
 
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
-class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
+class StrangeStonesView(viewModel: ViewModelEvent) extends FlowPanel {
 
-  private val viewModel: ViewModel = new ViewModel()
+  viewModel.getCardsFromModel(renderHand)
 
   private val setup = CardView.forWidth(250)
   private val assets = setup.assets
@@ -42,7 +42,7 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
   private var confirmLabel: Option[JLabel] = None
 
   opaque = false
-  listenToChannel()
+
 
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
@@ -74,20 +74,7 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
         g.fillRoundRect(x, y, w, h, 20, 20)
     }
 
-  private def listenToChannel(): Unit = {
-    Future {
-      while (true) {
-        val msg = channel.receiveFromGame
-        msg match {
-          case msg: EventMessages =>
-            Swing.onEDT {
-              renderHand(viewModel.getCardsInfo(msg))
-            }
-        }
-        }
-      
-    }
-  }
+
 
   private sealed trait SlotKind
   private object SlotKind {
@@ -238,8 +225,8 @@ class StrangeStonesView(channel: GUIChannelInterface) extends FlowPanel {
   }
 
   private def sendResultToGameModel(sacrificeCardIndex: Int, upgradeCardIndex: Int): Unit = {
-    channel.sendToGame(viewModel.getModelCard(sacrificeCardIndex))
-    channel.sendToGame(viewModel.getModelCard(upgradeCardIndex))
+    viewModel.sendCardToModel(sacrificeCardIndex)
+    viewModel.sendCardToModel(upgradeCardIndex)
   }
 
   private def renderHand(cardsViewInfo: List[CardViewInfo]): Unit = {

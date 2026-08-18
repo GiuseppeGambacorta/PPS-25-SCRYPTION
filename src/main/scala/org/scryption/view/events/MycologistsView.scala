@@ -2,13 +2,11 @@ package org.scryption.view.events
 
 import org.scryption.view.*
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, ZOrder}
-import org.scryption.{GUIChannelInterface, EventMessages}
+
 
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
 /** Mycologists event: pick two matching cards, merge them into one boosted card.
@@ -19,9 +17,10 @@ import scala.swing.{FlowPanel, Panel, Swing}
  *  shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used
  *  to be copy-pasted here too.
  */
-class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
+class MycologistsView(viewModel: ViewModelEvent) extends FlowPanel {
 
-  private val viewModel: ViewModel = new ViewModel()
+ 
+  viewModel.getCardsFromModel(renderHand)
 
   private val setup = CardView.forWidth(250)
   private val assets = setup.assets
@@ -47,7 +46,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
   private val visualStatBonus = 2
 
   opaque = false
-  listenToChannel()
+
 
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
@@ -67,20 +66,6 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
     }
   }
 
-  private def listenToChannel(): Unit = {
-    Future {
-      while (true) {
-        val msg = channel.receiveFromGame
-        msg match {
-          case msg : EventMessages =>
-            Swing.onEDT {
-            renderHand(viewModel.getCardsInfo(msg))
-            }
-        }
-        
-      }
-    }
-  }
 
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
@@ -218,7 +203,7 @@ class MycologistsView(channel: GUIChannelInterface) extends FlowPanel {
     }
 
     private def sendCardToGameModel(): Unit = {
-      channel.sendToGame(viewModel.getModelCard(index))
+       viewModel.sendCardToModel(index)
     }
   }
 

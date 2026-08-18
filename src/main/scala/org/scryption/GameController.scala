@@ -2,6 +2,7 @@ package org.scryption
 
 import org.scryption.game.model.events.*
 import org.scryption.game.model.{Deck, GameState}
+import org.scryption.view.ViewModelEvent
 import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
 import org.scryption.{GUIChannel, GUIChannelInterface}
@@ -15,12 +16,12 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
   private type GameEvent = (Event, GUIChannelInterface => Panel)
 
-  private val getANewCardEvent: GameEvent     = (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(channel = ch))
-  private val fightEvent: GameEvent           = (fight, (ch: GUIChannelInterface) => new FightView(channel = ch))
-  private val fireCampAttackEvent: GameEvent  = (fireCamp_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(channel = ch))
-  private val fireCampHealthEvent: GameEvent  = (fireCamp_Health, (ch: GUIChannelInterface) => new FireCampHealthView(channel = ch))
-  private val mycologistsEvent: GameEvent     = (mushRoomsExpert, (ch: GUIChannelInterface) => new MycologistsView(channel = ch))
-  private val sacrificeEvent: GameEvent       = (sacrifice, (ch: GUIChannelInterface) => new StrangeStonesView(channel = ch))
+  private val getANewCardEvent: GameEvent     = (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(ViewModelEvent(ch)))
+  private val fightEvent: GameEvent           = (fight, (ch: GUIChannelInterface) => new FightView(ch))
+  private val fireCampAttackEvent: GameEvent  = (fireCamp_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(ViewModelEvent(ch)))
+  private val fireCampHealthEvent: GameEvent  = (fireCamp_Health, (ch: GUIChannelInterface) => new FireCampHealthView(ViewModelEvent(ch)))
+  private val mycologistsEvent: GameEvent     = (mushRoomsExpert, (ch: GUIChannelInterface) => new MycologistsView(ViewModelEvent(ch)))
+  private val sacrificeEvent: GameEvent       = (sacrifice, (ch: GUIChannelInterface) => new StrangeStonesView(ViewModelEvent(ch)))
 
   @volatile private var running = false
 

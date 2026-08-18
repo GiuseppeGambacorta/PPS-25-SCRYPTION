@@ -1,18 +1,18 @@
 package org.scryption
 
 import org.scryption.game.model.events.{FightState, TurnState}
-import org.scryption.game.model.{BoardPosition, Card, events}
+import org.scryption.game.model.{BoardPosition, Card}
 
 import java.util.concurrent.LinkedBlockingQueue
 
-sealed trait CardMessage
+sealed trait GameMessage
 
-enum EventMessages extends CardMessage:
+enum EventMessages extends GameMessage:
   case Cards(cards: List[Card[?]])
   case SingleCard(card: Card[?])
   case End
 
-enum FightMessages extends CardMessage:
+enum FightMessages extends GameMessage:
   case State(fightState: FightState, turn: TurnState)
   case DrawFromSquirrel
   case DrawFromDeck
@@ -22,30 +22,30 @@ enum FightMessages extends CardMessage:
   case End
 
 trait GUIChannelInterface:
-  def sendToGui(message: CardMessage): Unit
-  def receiveFromGui: CardMessage
-  def receiveFromGame: CardMessage
-  def sendToGame(message: CardMessage): Unit
+  def sendToGui(message: GameMessage): Unit
+  def receiveFromGui: GameMessage
+  def receiveFromGame: GameMessage
+  def sendToGame(message: GameMessage): Unit
   def clear(): Unit
 
 
 class GUIChannel private (
-                           private val toGui: LinkedBlockingQueue[CardMessage],
-                           private val toGame: LinkedBlockingQueue[CardMessage]
+                           private val toGui: LinkedBlockingQueue[GameMessage],
+                           private val toGame: LinkedBlockingQueue[GameMessage]
                          ) extends GUIChannelInterface:
 
   private val lock = new Object
 
-  override def sendToGui(message: CardMessage): Unit = lock.synchronized {
+  override def sendToGui(message: GameMessage): Unit = lock.synchronized {
     toGui.put(message)
   }
 
-  override def sendToGame(message: CardMessage): Unit = lock.synchronized {
+  override def sendToGame(message: GameMessage): Unit = lock.synchronized {
     toGame.put(message)
   }
 
-  override def receiveFromGui: CardMessage = toGame.take()
-  override def receiveFromGame: CardMessage = toGui.take()
+  override def receiveFromGui: GameMessage = toGame.take()
+  override def receiveFromGame: GameMessage = toGui.take()
 
 
   override def clear(): Unit = lock.synchronized {
@@ -56,6 +56,6 @@ class GUIChannel private (
 object GUIChannel:
   def getNewChannel: GUIChannelInterface =
     new GUIChannel(
-      new LinkedBlockingQueue[CardMessage](),
-      new LinkedBlockingQueue[CardMessage]()
+      new LinkedBlockingQueue[GameMessage](),
+      new LinkedBlockingQueue[GameMessage]()
     )
