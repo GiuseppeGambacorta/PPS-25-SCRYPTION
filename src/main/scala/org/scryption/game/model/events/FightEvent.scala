@@ -115,6 +115,13 @@ private def handlePlayerTurnPhase(fightState: FightState, ch: GUIChannelInterfac
       val updatedState = playCardWithSacrifices(fightState, card, position, sacrificesPositions)
       (TurnState.playerTurn, updatedState)
 
+    case FightMessages.UseItem(item, target) =>
+      if fightState.inventory.contains(item) then
+        val updatedState = item.use(fightState, target)
+        (TurnState.playerTurn, updatedState)
+      else
+        (TurnState.playerTurn, fightState)
+
     case FightMessages.EndPlayerTurn =>
       (TurnState.playerFight, fightState)
 
