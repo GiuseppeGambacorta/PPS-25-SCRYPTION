@@ -1,6 +1,6 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
+
 import org.scryption.game.model.Card
 import org.scryption.view.common.toViewInfo
 import org.scryption.view.common.GUIGeometry.CardGeometry
@@ -13,7 +13,7 @@ import scala.swing.event.{ButtonClicked, MouseClicked, MouseExited, MouseMoved}
 import java.awt.{BasicStroke, Color, Cursor, Dimension}
 import javax.swing.Timer
 
-class HandView(channel: GUIChannelInterface, onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
+class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
 
   var interactable = true
   opaque = false

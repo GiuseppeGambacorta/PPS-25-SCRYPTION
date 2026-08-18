@@ -1,6 +1,5 @@
 package org.scryption.view.fight
 
-import org.scryption.GUIChannelInterface
 import org.scryption.game.model.boardModel.*
 import org.scryption.view.common.GUIGeometry.CardGeometry
 import org.scryption.view.common.GUIAssets.CardViewAssets
@@ -11,7 +10,7 @@ import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
 import java.awt.{BasicStroke, Color, Cursor, Graphics2D}
 import java.awt.image.BufferedImage
 
-class BoardView(channel: GUIChannelInterface, onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
+class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
 
   opaque = false
   private val backgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage("table.png")

@@ -1,8 +1,8 @@
 package org.scryption
 
 import org.scryption.game.model.events.*
-import org.scryption.game.model.{Deck, GameState}
-import org.scryption.view.ViewModelEvent
+import org.scryption.game.model.GameState
+import org.scryption.view.{ViewModelEvent, ViewModelFight}
 import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
 import org.scryption.{GUIChannel, GUIChannelInterface}
@@ -17,7 +17,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
   private type GameEvent = (Event, GUIChannelInterface => Panel)
 
   private val getANewCard: GameEvent     = (getANewCardEvent, (ch: GUIChannelInterface) => new CardSelectionView(ViewModelEvent(ch)))
-  private val fight: GameEvent           = (fightEvent, (ch: GUIChannelInterface) => new FightView(ch))
+  private val fight: GameEvent           = (fightEvent, (ch: GUIChannelInterface) => new FightView(ViewModelFight(ch)))
   private val fireCampAttack: GameEvent  = (fireCampEvent_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(ViewModelEvent(ch)))
   private val fireCampHealth: GameEvent  = (fireCampEvent_Health, (ch: GUIChannelInterface) => new FireCampHealthView(ViewModelEvent(ch)))
   private val mycologists: GameEvent     = (mushRoomsExpertEvent, (ch: GUIChannelInterface) => new MycologistsView(ViewModelEvent(ch)))
