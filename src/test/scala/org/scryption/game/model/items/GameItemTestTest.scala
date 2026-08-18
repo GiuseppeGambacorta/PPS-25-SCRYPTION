@@ -50,3 +50,16 @@ class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers w
 
       And("the Hoggy Bank is removed from the inventory")
       newState.inventory shouldBe empty
+
+    Scenario("Pliers adds 1 point to the scale and is removed from inventory"):
+      Given("A FightState with 0 scale points and Pliers in inventory")
+      val pliers = Pliers()
+      val initialState = createInitialState(pliers)
+
+      When("the player uses the Pliers")
+      val newState = pliers.use(initialState)
+
+      Then("the scale points MUST increase by 1")
+      newState.scalePoints shouldBe 1
+      And("the Pliers MUST be removed from the inventory")
+      newState.inventory shouldBe empty

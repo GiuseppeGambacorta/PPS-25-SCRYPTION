@@ -32,3 +32,12 @@ case class HoggyBank() extends GameItem:
     val newBones = state.bones + 4
     val newInventory = state.inventory.filterNot(_ == this)
     state.copy(bones = newBones, inventory = newInventory)
+
+case class Pliers() extends GameItem:
+  override def name: String = "Pliers"
+  override def description: String = "Yank a tooth out. It is placed on your side of the scales."
+
+  override def use(state: FightState): FightState =
+    val newScale = state.scalePoints + 1
+    val newInventory = state.inventory.filterNot(_ == this)
+    state.copy(scalePoints = newScale, inventory = newInventory)
