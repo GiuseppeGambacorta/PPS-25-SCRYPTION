@@ -101,8 +101,6 @@ class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers w
       newState.inventory should contain(scissors)
 
     Scenario("Scissors cannot destroy a card in the bot's preparation row"):
-      import org.scryption.game.model.boardModel.{IndexOfBotPrepRow, BoardRow, x, |}
-
       Given("A FightState with a card in the bot's preparation row (0) and Scissors in inventory")
       val scissors = Scissors()
       val initialState = createInitialState(scissors)
