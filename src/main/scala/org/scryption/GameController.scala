@@ -50,7 +50,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
   @tailrec
   private def gameLoop(gameState: GameState, events: List[GameEvent]): Unit =
     (gameState, events) match
-      case (_, Nil) | (GameState(_, true), _) =>
+      case (_, Nil) | (GameState(_, _, true), _) =>
         println(s"=== PARTITA TERMINATA ===")
         println(s"Mazzo Finale: ${gameState.deck}")
       case (_, (event, createView) :: remainingEvents) =>

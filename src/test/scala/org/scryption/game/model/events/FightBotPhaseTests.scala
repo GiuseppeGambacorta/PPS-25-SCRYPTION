@@ -28,7 +28,8 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
       bones = bones,
       deck = Deck.empty,
       playerHand = PlayerHand.empty,
-      board = board
+      board = board,
+      inventory = List.empty
     )
 
   Feature("Bot Fight Phase - Attacks From Central Row Against Player Row") {

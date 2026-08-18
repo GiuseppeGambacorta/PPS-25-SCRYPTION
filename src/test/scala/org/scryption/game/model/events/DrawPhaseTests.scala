@@ -18,7 +18,8 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       bones = 0,
       deck = Deck.fromList(List(wolf, wolf, wolf, wolf)),
       playerHand = PlayerHand.empty,
-      board = Board.empty
+      board = Board.empty,
+      inventory = List.empty
     )
 
   Feature("Draw Phase Handling") {

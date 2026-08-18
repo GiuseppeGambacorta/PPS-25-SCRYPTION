@@ -1,0 +1,25 @@
+package org.scryption.game.model.items
+
+import org.scryption.game.model.CardLibrary
+import org.scryption.game.model.events.FightState
+
+trait GameItem:
+  def name: String
+  def description: String
+
+  /** Applies the items effect to the current fight state.
+   *
+   * @param state The current fight state.
+   * @return the updated FightState.
+   */
+  def use(state: FightState): FightState
+
+
+case class SquirrelBottle() extends GameItem:
+  override def name: String = "Squirrel in a Bottle"
+  override def description: String = "Break in case of emergency. Adds a Squirrel to your hand."
+
+  override def use(state: FightState): FightState =
+    val newHand = state.playerHand.addCard(CardLibrary.squirrel)
+    val newInventory = state.inventory.filterNot(_ == this)
+    state.copy(playerHand = newHand, inventory = newInventory)
