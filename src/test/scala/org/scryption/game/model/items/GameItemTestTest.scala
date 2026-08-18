@@ -10,7 +10,7 @@ import org.scryption.game.model.events.FightState
 
 class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
 
-  private def createInitialState(bottle: SquirrelBottle) =
+  private def createInitialState(bottle: GameItem) =
     FightState(
       scalePoints = 0,
       bones = 0,
@@ -20,9 +20,9 @@ class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers w
       inventory = List(bottle)
     )
 
-  Feature("Squirrel in a Bottle"):
+  Feature("Game Items"):
 
-    Scenario("Using the bottle adds a Squirrel to the hand and removes the item from inventory"):
+    Scenario("Using the Squirrel Bottle adds a Squirrel to the hand and removes the item from inventory"):
       Given("A FightState with 0 cards in hand and the bottle in inventory")
       val bottle = SquirrelBottle()
       val initialState: FightState = createInitialState(bottle)
@@ -35,4 +35,18 @@ class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers w
       newState.playerHand.toList.head.name shouldBe "Squirrel"
 
       And("the bottle is removed from the inventory")
+      newState.inventory shouldBe empty
+
+    Scenario("Hoggy Bank adds 4 bones and is removed from inventory"):
+      Given("A FightState with 0 bones and the Hoggy Bank in inventory")
+      val hoggyBank = HoggyBank()
+      val initialState = createInitialState(hoggyBank)
+
+      When("the player uses the Hoggy Bank")
+      val newState = hoggyBank.use(initialState)
+
+      Then("the player has exactly 4 bones")
+      newState.bones shouldBe 4
+
+      And("the Hoggy Bank is removed from the inventory")
       newState.inventory shouldBe empty

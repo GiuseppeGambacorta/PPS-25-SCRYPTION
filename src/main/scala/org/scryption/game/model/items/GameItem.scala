@@ -23,3 +23,12 @@ case class SquirrelBottle() extends GameItem:
     val newHand = state.playerHand.addCard(CardLibrary.squirrel)
     val newInventory = state.inventory.filterNot(_ == this)
     state.copy(playerHand = newHand, inventory = newInventory)
+
+case class HoggyBank() extends GameItem:
+  override def name: String = "Hoggy Bank"
+  override def description: String = "A small ceramic pig. Break it to gain 4 Bones."
+
+  override def use(state: FightState): FightState =
+    val newBones = state.bones + 4
+    val newInventory = state.inventory.filterNot(_ == this)
+    state.copy(bones = newBones, inventory = newInventory)
