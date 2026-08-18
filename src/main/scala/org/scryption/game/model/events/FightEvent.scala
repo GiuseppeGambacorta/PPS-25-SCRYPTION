@@ -8,8 +8,8 @@ import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.SacrificeAttribute.{Blood, Bones}
 import org.scryption.game.model.managers.{CombatManager, MovementManager, SacrificeManager}
 import org.scryption.game.model.managers.CombatManager.given
-
 import org.scryption.game.model.GameState
+import org.scryption.game.model.bot.{BotStrategy, RandomBotStrategy}
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -69,8 +69,9 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
     case TurnState.botTurn =>
       if fightState.scalePoints >= PlayerWinningPoints then PlayerWon
       else
-        // TODO: IA / Bot sceglie ed esegue le sue mosse
-        loop(TurnState.botFight, fightState, ch)
+        val bot: BotStrategy = RandomBotStrategy()
+        val fightStateAfterBotPlays = bot.playTurn(fightState)
+        loop(TurnState.botFight, fightStateAfterBotPlays, ch)
 
     case TurnState.botFight =>
       val (nextTurn, nextState) = handleFightPhase(fightState, ch, isPlayerAttacking = false)
