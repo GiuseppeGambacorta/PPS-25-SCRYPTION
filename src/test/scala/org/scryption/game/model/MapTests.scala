@@ -3,44 +3,147 @@ package org.scryption.game.model
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.{GUIChannel, GUIChannelInterface}
-import org.scryption.game.model.Maps
+import org.scryption.game.model.MapBranch.*
 import org.scryption.game.model.Maps.Path
-import org.scryption.game.model.Maps.Path.*
 import org.scryption.game.model.events.*
-import org.scryption.view.events.CardSelectionView
 
 class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
-  private val gameState = GameState(deck = Deck.getStandardDeck, isGameOver = false)
-  private val ch = GUIChannel.getNewChannel
-  //private val newCard1: Event = (getANewCard, (ch: GUIChannelInterface) => new CardSelectionView(channel = ch))
+  Feature("Creation of a MapScript") {
 
-  Feature("Creation of a new Map from a List of Events") {
+    Scenario("The MapScript must be empty if there's no levels") {
+      Given("an empty MapLevel List")
+      val levels: List[MapLevel[Event]] = List.empty
 
-    Scenario("The Map must be End") {
-      Given("an empty Event List")
-      val events: List[Event] = List.empty
+      When("creating a new MapScript")
+      val script: MapScript[Event] = MapScript[Event](levels)
 
-      When("creating a new Map")
-      val map: Path[Event] = createFromList(events)
-
-      Then("The resulting should be End")
-      map.shouldBe(End())
+      Then("The result should be empty")
+      script.isEmpty.shouldBe(true)
     }
 
-    Scenario("The Map must be Node") {
-      Given("a List with one Event")
-      val events: List[Event] = List(
-        (gameState, ch) => getANewCard(gameState, ch)
+    Scenario("The MapScript must be empty if there's no steps") {
+      Given("a MapLevel List with an empty MapStep List")
+      val levels: List[MapLevel[Event]] = List(MapLevel(List.empty))
+
+      When("creating a new MapScript")
+      val script: MapScript[Event] = MapScript[Event](levels)
+
+      Then("The result should be empty")
+      script.isEmpty.shouldBe(true)
+    }
+
+    Scenario("The MapScript must not be empty") {
+      Given("a MapLevel List with a MapStep List with an Event")
+      val levels: List[MapLevel[Event]] = List(MapLevel(List(Node((gameState, ch) => getANewCard(gameState, ch)))))
+
+      When("creating a new MapScript")
+      val script: MapScript[Event] = MapScript[Event](levels)
+
+      Then("The result should be a Node")
+      script.isEmpty.shouldBe(false)
+    }
+  }
+
+  Feature("Creation of a Path from a MapScript") {
+
+    Scenario("The Path must be End") {
+
+      Given("an empty MapScript")
+      val script: MapScript[Event] = MapScript(List.empty)
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result must be End")
+      gameMap.shouldBe(Path.End())
+    }
+
+    Scenario("The Path must be a Node") {
+
+      Given("a MapScript with an event")
+      val event = (gameState, ch) => getANewCard(gameState, ch)
+
+      val script: MapScript[Event] = MapScript(List(MapLevel(List(Node(event)))))
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result must be a Node")
+      gameMap.shouldBe(Path.Node(event, Path.End()))
+    }
+
+    Scenario("The Path must be a sequence of Nodes") {
+
+      Given("a MapScript with a few linear events")
+      val event1 = (gameState, ch) => sacrifice(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+
+      val script: MapScript[Event] = MapScript(List (
+        MapLevel(List (
+          Node(event1)
+        )),
+        MapLevel(List (
+          Node(event2)
+        )),
+        MapLevel(List (
+          Node(event3)
+        ))
+      ))
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result must be a sequence of Node")
+      gameMap.shouldBe(Path.Node(event1, Path.Node(event2, Path.Node(event3, Path.End()))))
+    }
+
+    Scenario("The Path must have expected structure") {
+
+      Given("some events and a MapScript")
+      val event1 = (gameState, ch) => getANewCard(gameState, ch)
+      val event2 = (gameState, ch) => fireCamp_Attack(gameState, ch)
+      val event3 = (gameState, ch) => fireCamp_Health(gameState, ch)
+      val event4 = (gameState, ch) => getANewCard(gameState, ch)
+      val event5 = (gameState, ch) => fireCamp_Attack(gameState, ch)
+      val event6 = (gameState, ch) => fireCamp_Health(gameState, ch)
+      val event7 = (gameState, ch) => sacrifice(gameState, ch)
+      val event8 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event9 = (gameState, ch) => getANewCard(gameState, ch)
+
+      val script: MapScript[Event] = MapScript(List(
+        MapLevel(List (
+          Node(event1)
+        )),
+        MapLevel(List (
+          Fork(event2, event3)
+        )),
+        MapLevel(List (
+          Node(event4),
+          Fork(event5, event6)
+        )),
+        MapLevel(List (
+          Node(event7),
+          Node(event8)
+        )),
+        MapLevel(List (
+          Node(event9)
+        ))
+      ))
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result should be equal")
+      gameMap.shouldBe(
+        Path.Node(event1, Path.Fork(
+          Path.Node(event2, Path.Node(event4, Path.Node(event7, Path.Node(event9, Path.End())))),
+          Path.Node(event3, Path.Fork(
+            Path.Node(event5, Path.Node(event8, Path.Node(event9, Path.End()))),
+            Path.Node(event6, Path.Node(event8, Path.Node(event9, Path.End())))
+          ))
+        ))
       )
-
-      When("creating a new Map")
-      val map: Path[Event] = createFromList(events)
-
-      Then("The result should be Node")
-      map.shouldBe(Node)
     }
-    
-    
   }
