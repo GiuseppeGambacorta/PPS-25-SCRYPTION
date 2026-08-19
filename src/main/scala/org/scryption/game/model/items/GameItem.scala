@@ -27,7 +27,7 @@ case class SquirrelBottle() extends GameItem:
 
   override def use(state: FightState, target: Option[BoardPosition] = None): FightState =
     val newHand = state.playerHand.addCard(CardLibrary.squirrel)
-    val newInventory = state.inventory.filterNot(_ == this)
+    val newInventory = state.inventory.diff(List(this))
     state.copy(playerHand = newHand, inventory = newInventory)
 
 case class HoggyBank() extends GameItem:
@@ -36,7 +36,7 @@ case class HoggyBank() extends GameItem:
 
   override def use(state: FightState, target: Option[BoardPosition] = None): FightState =
     val newBones = state.bones + 4
-    val newInventory = state.inventory.filterNot(_ == this)
+    val newInventory = state.inventory.diff(List(this))
     state.copy(bones = newBones, inventory = newInventory)
 
 case class Pliers() extends GameItem:
@@ -45,7 +45,7 @@ case class Pliers() extends GameItem:
 
   override def use(state: FightState, target: Option[BoardPosition] = None): FightState =
     val newScale = state.scalePoints + 1
-    val newInventory = state.inventory.filterNot(_ == this)
+    val newInventory = state.inventory.diff(List(this))
     state.copy(scalePoints = newScale, inventory = newInventory)
 
 case class Scissors() extends GameItem:
@@ -58,6 +58,6 @@ case class Scissors() extends GameItem:
         pos.isValid &&
         state.board(pos._1)(pos._2).isDefined =>
         val newBoard = state.board.updatedSlot(pos, boardModel.x)
-        val newInventory = state.inventory.filterNot(_ == this)
+        val newInventory = state.inventory.diff(List(this))
         state.copy(board = newBoard, inventory = newInventory)
       case _ => state

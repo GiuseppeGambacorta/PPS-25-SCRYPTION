@@ -4,10 +4,9 @@ import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.items.GameItem
 import org.scryption.view.ViewModelFight
 import org.scryption.view.common.ResourceLoader
-import org.scryption.{FightMessages, GameMessagesInterface}
 
 import scala.swing.*
-import scala.swing.event.{ButtonClicked, MouseClicked}
+import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
 import java.awt.{Color, Cursor, Dimension, Font}
 
 class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) extends BoxPanel(Orientation.Vertical):
@@ -29,6 +28,43 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
         new javax.swing.ImageIcon(scaled)
       case None =>
         new javax.swing.ImageIcon()
+
+  private def loadItemIcon(path: String): javax.swing.ImageIcon =
+    ResourceLoader.loadTemplateImage(path) match
+      case Some(img) =>
+        val size = 80
+        val scaled = img.getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH)
+        new javax.swing.ImageIcon(scaled)
+      case None =>
+        new javax.swing.ImageIcon()
+
+  private class ItemLabel(val item: GameItem, imagePath: String) extends Label:
+    icon = loadItemIcon(imagePath)
+    tooltip = item.description
+    cursor = new Cursor(Cursor.HAND_CURSOR)
+    if icon.getIconWidth == -1 then text = item.name
+    private var isHovered = false
+    listenTo(mouse.clicks, mouse.moves)
+    reactions += {
+      case _: MouseMoved =>
+        if interactable && !isHovered then
+          isHovered = true
+          repaint()
+      case _: MouseExited =>
+        isHovered = false
+        repaint()
+      case _: MouseClicked =>
+        if interactable then onItemClicked(item)
+    }
+
+    override protected def paintComponent(g: Graphics2D): Unit =
+      g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+      if isHovered then
+        g.setColor(new Color(120, 120, 120, 150))
+      else
+        g.setColor(new Color(60, 60, 65, 100))
+      g.fillRoundRect(5, 5, size.width - 10, size.height - 10, 20, 20)
+      super.paintComponent(g)
 
   private val mainDeckLabel = new Label:
     icon = loadDeckIcon("cardtemplates/back.png")
@@ -80,24 +116,16 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
 
   def updateItems(items: List[GameItem]): Unit =
     itemsContainer.contents.clear()
-
     for item <- items do
-      val itemBtn = new Button(item.name):
-        tooltip = item.description
-        cursor = new Cursor(Cursor.HAND_CURSOR)
-        background = new Color(60, 50, 50)
-        foreground = Color.WHITE
-        preferredSize = new Dimension(140, 40)
-        maximumSize = new Dimension(140, 40)
-
-      listenTo(itemBtn)
-      reactions += {
-        case ButtonClicked(`itemBtn`) =>
-          if interactable then onItemClicked(item)
-      }
-
-      itemsContainer.contents += itemBtn
-      itemsContainer.contents += Swing.VStrut(10)
+      val imagePath = item.name match
+        case "Squirrel in a Bottle" => "items/squirrel_bottle.png"
+        case "Hoggy Bank"           => "items/hoggy_bank.png"
+        case "Pliers"               => "items/pliers.png"
+        case "Scissors"             => "items/scissors.png"
+        case default                => s"items/${default.toLowerCase.replace(" ", "_")}.png"
+      val itemLabel = new ItemLabel(item, imagePath)
+      itemsContainer.contents += itemLabel
+      itemsContainer.contents += Swing.VStrut(15)
 
     revalidate()
     repaint()

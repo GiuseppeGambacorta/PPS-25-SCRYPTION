@@ -45,7 +45,7 @@ def fightEvent(gameState: GameState, ch: GameMessagesInterface): GameState =
     deck = remainingDeck,
     playerHand = PlayerHand.fromList(initialCards),
     board = generateRandomStartingBoard(),
-    inventory = List(SquirrelBottle(), HoggyBank(), Pliers(), Scissors())
+    inventory = gameState.inventory
   )
 
   GameState(gameState.deck, gameState.inventory ,isGameOver = loop(TurnState.draw, initialFightState, ch))
