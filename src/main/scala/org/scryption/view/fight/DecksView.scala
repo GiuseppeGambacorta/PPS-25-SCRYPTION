@@ -9,7 +9,7 @@ import scala.swing.*
 import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
 import java.awt.{Color, Cursor, Dimension, Font}
 
-class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) extends BoxPanel(Orientation.Vertical):
+class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) extends BorderPanel:
 
   var interactable = true
   private var isMainDeckEmpty = false
@@ -79,15 +79,26 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
   private val itemsContainer = new BoxPanel(Orientation.Vertical):
     opaque = false
 
-  contents += mainDeckLabel
-  contents += Swing.VStrut(30)
-  contents += squirrelDeckLabel
-  contents += Swing.VGlue
-  contents += new Label("ITEMS"):
-    foreground = new Color(150, 150, 150)
-    font = ResourceLoader.loadFont(fontPath, 20f)
-  contents += Swing.VStrut(10)
-  contents += itemsContainer
+  private val topPanel = new BoxPanel(Orientation.Vertical):
+    opaque = false
+    contents += mainDeckLabel
+    contents += Swing.VStrut(30)
+    contents += squirrelDeckLabel
+    contents += Swing.VStrut(30)
+    contents += new Label("ITEMS"):
+      foreground = new Color(150, 150, 150)
+      font = ResourceLoader.loadFont(fontPath, 20f)
+    contents += Swing.VStrut(10)
+
+  private val scrollItems = new ScrollPane(itemsContainer):
+    opaque = false
+    peer.getViewport.setOpaque(false)
+    border = Swing.EmptyBorder(0)
+    horizontalScrollBarPolicy = ScrollPane.BarPolicy.Never
+    verticalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
+
+  layout(topPanel) = BorderPanel.Position.North
+  layout(scrollItems) = BorderPanel.Position.Center
 
   listenTo(mainDeckLabel.mouse.clicks, squirrelDeckLabel.mouse.clicks)
 
