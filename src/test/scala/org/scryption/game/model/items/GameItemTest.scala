@@ -8,7 +8,7 @@ import org.scryption.game.model.{CardLibrary, Deck, PlayerHand}
 import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.events.FightState
 
-class GameItemTestTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
+class GameItemTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
 
   private def createInitialState(bottle: GameItem) =
     FightState(

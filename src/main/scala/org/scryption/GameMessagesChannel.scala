@@ -11,6 +11,8 @@ sealed trait GameMessage
 enum EventMessages extends GameMessage:
   case Cards(cards: List[Card[?]])
   case SingleCard(card: Card[?])
+  case Items(items: List[GameItem])
+  case SingleItem(item:GameItem)
   case End
 
 enum FightMessages extends GameMessage:
@@ -23,7 +25,7 @@ enum FightMessages extends GameMessage:
   case EndPlayerTurn
   case End
 
-trait GUIChannelInterface:
+trait GameMessagesInterface:
   def sendToGui(message: GameMessage): Unit
   def receiveFromGui: GameMessage
   def receiveFromGame: GameMessage
@@ -31,10 +33,10 @@ trait GUIChannelInterface:
   def clear(): Unit
 
 
-class GUIChannel private (
+class GameMessagesChannel private(
                            private val toGui: LinkedBlockingQueue[GameMessage],
                            private val toGame: LinkedBlockingQueue[GameMessage]
-                         ) extends GUIChannelInterface:
+                         ) extends GameMessagesInterface:
 
   private val lock = new Object
 
@@ -55,9 +57,9 @@ class GUIChannel private (
     toGame.clear()
   }
 
-object GUIChannel:
-  def getNewChannel: GUIChannelInterface =
-    new GUIChannel(
+object GameMessagesChannel:
+  def apply(): GameMessagesInterface =
+    new GameMessagesChannel(
       new LinkedBlockingQueue[GameMessage](),
       new LinkedBlockingQueue[GameMessage]()
     )

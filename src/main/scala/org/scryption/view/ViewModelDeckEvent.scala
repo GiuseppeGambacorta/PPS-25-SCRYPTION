@@ -1,13 +1,13 @@
 package org.scryption.view
 
-import org.scryption.{EventMessages, GUIChannelInterface}
+import org.scryption.{EventMessages, GameMessagesInterface}
 import org.scryption.game.model.Card
-import org.scryption.view.common.{CardViewInfo, toViewInfo}
+import org.scryption.view.common.{CardViewInfo, cardToViewInfo}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ViewModelEvent(channel: GUIChannelInterface):
+class ViewModelDeckEvent(channel: GameMessagesInterface):
 
   private var currentCards: List[Card[?]] = Nil
 
@@ -18,9 +18,9 @@ class ViewModelEvent(channel: GUIChannelInterface):
         msg match {
           case EventMessages.Cards(cards) =>
             currentCards = cards
-            f(cards.map(_.toViewInfo))
+            f(cards.map(_.cardToViewInfo))
           case EventMessages.SingleCard(card) =>
-            f(card.toViewInfo :: Nil)
+            f(card.cardToViewInfo :: Nil)
           case EventMessages.End => f(Nil)
 
           case _ =>
@@ -33,8 +33,8 @@ class ViewModelEvent(channel: GUIChannelInterface):
 
 
   def getSingleCardInfo(message: EventMessages): CardViewInfo = message match
-    case EventMessages.SingleCard(card) => card.toViewInfo
-    case EventMessages.Cards(card :: _) => card.toViewInfo
+    case EventMessages.SingleCard(card) => card.cardToViewInfo
+    case EventMessages.Cards(card :: _) => card.cardToViewInfo
     case _                                   => CardViewInfo("", "", "", "")
 
   def sendCardToModel(index: Int): Unit =

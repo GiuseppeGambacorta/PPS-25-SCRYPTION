@@ -4,7 +4,7 @@ import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.items.GameItem
 import org.scryption.view.ViewModelFight
 import org.scryption.view.common.ResourceLoader
-import org.scryption.{FightMessages, GUIChannelInterface}
+import org.scryption.{FightMessages, GameMessagesInterface}
 
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, MouseClicked}

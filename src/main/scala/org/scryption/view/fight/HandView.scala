@@ -2,7 +2,7 @@ package org.scryption.view.fight
 
 
 import org.scryption.game.model.Card
-import org.scryption.view.common.toViewInfo
+import org.scryption.view.common.cardToViewInfo
 import org.scryption.view.common.GUIGeometry.CardGeometry
 import org.scryption.view.common.{CardView, CardViewInfo}
 import org.scryption.view.common.ResourceLoader
@@ -120,7 +120,7 @@ class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
     cardsContainer.contents.clear()
     selectedPanel = None
     for card <- cards do
-      val viewInfo = card.toViewInfo
+      val viewInfo = card.cardToViewInfo
       val template = renderer.assets.frontTemplatePath(viewInfo.cardType)
       renderer.render(viewInfo, template) match
         case Some(cardIcon) =>

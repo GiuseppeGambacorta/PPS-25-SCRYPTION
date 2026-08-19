@@ -134,7 +134,7 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
         val slotIndex = row * ColsCount + col
         board(row)(col) match
           case Some(card) =>
-            val viewInfo = card.toViewInfo
+            val viewInfo = card.cardToViewInfo
             val template = renderer.assets.frontTemplatePath(viewInfo.cardType)
             renderer.render(viewInfo, template) match
               case Some(cardIcon) =>

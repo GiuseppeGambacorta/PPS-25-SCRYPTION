@@ -3,13 +3,12 @@ package org.scryption.view
 import org.scryption.game.model.Card
 import org.scryption.game.model.BoardPosition
 import org.scryption.game.model.events.{FightState, TurnState}
-import org.scryption.view.common.{CardViewInfo, toViewInfo}
-import org.scryption.{FightMessages, GUIChannelInterface}
+import org.scryption.{FightMessages, GameMessagesInterface}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ViewModelFight(channel: GUIChannelInterface):
+class ViewModelFight(channel: GameMessagesInterface):
 
   def listenForUpdatedState(onUpdate: (FightState, TurnState) => Unit): Unit =
     Future {
