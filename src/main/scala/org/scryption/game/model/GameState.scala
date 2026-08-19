@@ -1,9 +1,11 @@
 package org.scryption.game.model
 
-case class GameState(deck: Deck.Deck, isGameOver: Boolean)
+import org.scryption.game.model.items.GameItem
+
+case class GameState(deck: Deck.Deck, inventory: List[GameItem], isGameOver: Boolean)
 
 
 object GameState:
 
-  def apply() : GameState = GameState(deck = Deck.getStandardDeck, isGameOver = false)
-  def apply(deck: Deck.Deck) : GameState = GameState(deck = deck, isGameOver = false)
+  def getInitialGameState: GameState = GameState(deck = Deck.getStandardDeck, List.empty, isGameOver = false)
+  def getInitialGameState(deck: Deck.Deck) : GameState = GameState(deck = deck, List.empty, isGameOver = false)

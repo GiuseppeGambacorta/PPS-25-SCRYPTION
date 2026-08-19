@@ -1,6 +1,6 @@
 package org.scryption.view.fight
 
-import org.scryption.{FightMessages, GUIChannelInterface, GameMessage}
+import org.scryption.{FightMessages, GameMessagesInterface, GameMessage}
 import org.scryption.game.model.events.TurnState
 import org.scryption.view.ViewModelFight
 import org.scryption.view.common.ResourceLoader

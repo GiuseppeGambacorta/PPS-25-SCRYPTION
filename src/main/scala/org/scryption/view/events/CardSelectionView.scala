@@ -1,7 +1,7 @@
 package org.scryption.view.events
 
 import org.scryption.view.common.{CardView, CardViewInfo, GUIAssets, ResourceLoader}
-import org.scryption.view.ViewModelEvent
+import org.scryption.view.ViewModelDeckEvent
 import java.awt.Cursor
 import java.awt.event.{MouseEvent, MouseListener}
 import javax.swing.{ImageIcon, JLabel, Timer}
@@ -10,7 +10,7 @@ import scala.swing.*
 
 
 
-class CardSelectionView(viewModel: ViewModelEvent) extends FlowPanel {
+class CardSelectionView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   viewModel.ListenForCardsFromTheModel(showCards)
 

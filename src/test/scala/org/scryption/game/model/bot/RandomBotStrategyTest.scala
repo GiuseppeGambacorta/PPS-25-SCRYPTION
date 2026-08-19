@@ -11,7 +11,7 @@ import org.scryption.game.model.{CardLibrary, Deck, PlayerHand}
 class RandomBotStrategyTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
 
   private def createDummyState(board: Board): FightState =
-    FightState(0, 0, Deck.empty, PlayerHand.empty, board)
+    FightState(0, 0, Deck.empty, PlayerHand.empty, board, List.empty)
 
   Feature("Random Bot Strategy"):
     val botStrategy = RandomBotStrategy()

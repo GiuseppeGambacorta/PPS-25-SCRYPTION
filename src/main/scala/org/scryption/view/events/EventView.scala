@@ -11,7 +11,7 @@ import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.swing.{FlowPanel, Panel, Swing}
 
 abstract class EventView(
-                          viewModel: ViewModelEvent,
+                          viewModel: ViewModelDeckEvent,
                           cardWidth: Int,
                           bonus: StatBonus,
                           slotBgImagePath: String
