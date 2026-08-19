@@ -2,7 +2,7 @@ package org.scryption
 
 import org.scryption.game.model.events.*
 import org.scryption.game.model.GameState
-import org.scryption.view.{ViewModelEvent, ViewModelFight}
+import org.scryption.view.{MapView, ViewModelEvent, ViewModelFight, ViewModelMap}
 import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
 import org.scryption.{GUIChannel, GUIChannelInterface}
@@ -12,9 +12,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.Panel
 
+
+type GameEvent = (Event, GUIChannelInterface => Panel)
+
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
-  private type GameEvent = (Event, GUIChannelInterface => Panel)
+
+
+  //private val map : GameEvent = (MapEvent, (ch: GUIChannelInterface) => new MapView(ViewModelMap(ch)))
 
   private val getANewCard: GameEvent     = (getANewCardEvent, (ch: GUIChannelInterface) => new CardSelectionView(ViewModelEvent(ch)))
   private val fight: GameEvent           = (fightEvent, (ch: GUIChannelInterface) => new FightView(ViewModelFight(ch)))
@@ -28,7 +33,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
   def startNewGame(): Unit =
     if !running then
       running = true
-      val initialState = GameState.getInitialGameState
+      val initialState = GameState()
 
       val listEvents: List[GameEvent] = List(
         getANewCard,
@@ -39,22 +44,40 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
         sacrifice
       )
 
+
+      val end : Path = getANewCard :: fight :: Path.Nil
+      val bifork
+
+      val begin : Path =  fight :: getANewCard :: Path.Nil
+
+
+
+
       Future {
         try
-          gameLoop(initialState, listEvents)
+          gameLoop(initialState, path)
         finally
           running = false
           onGameOver()
       }
 
   @tailrec
-  private def gameLoop(gameState: GameState, events: List[GameEvent]): Unit =
-    (gameState, events) match
-      case (_, Nil) | (GameState(_, true), _) =>
+  private def gameLoop(gameState: GameState, map : Path): Unit =
+    (gameState, map) match
+      case (_, Path.Nil) | (GameState(_, true), _) =>
         println(s"=== PARTITA TERMINATA ===")
         println(s"Mazzo Finale: ${gameState.deck}")
-      case (_, (event, createView) :: remainingEvents) =>
-        val ch = GUIChannel.getNewChannel
-        onViewChange(createView(ch))
+      case (_, Path.Node( (event,view), nextEvent)) =>
+
+
+
+
+        val ch = GUIChannel()
+        onViewChange(view(ch))
         val nextState = event(gameState, ch)
-        gameLoop(nextState, remainingEvents)
+
+
+        onViewChange(new MapView(ViewModelMap(ch)))
+        val newMap = MapEvent(nextEvent, ch)
+
+        gameLoop(nextState, newMap)

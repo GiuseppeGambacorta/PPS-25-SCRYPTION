@@ -7,6 +7,11 @@ import java.util.concurrent.LinkedBlockingQueue
 
 sealed trait GameMessage
 
+
+enum MapMessages extends GameMessage:
+  case SaveGame
+  case EndGame
+
 enum EventMessages extends GameMessage:
   case Cards(cards: List[Card[?]])
   case SingleCard(card: Card[?])
@@ -54,7 +59,7 @@ class GUIChannel private (
   }
 
 object GUIChannel:
-  def getNewChannel: GUIChannelInterface =
+  def apply(): GUIChannelInterface =
     new GUIChannel(
       new LinkedBlockingQueue[GameMessage](),
       new LinkedBlockingQueue[GameMessage]()

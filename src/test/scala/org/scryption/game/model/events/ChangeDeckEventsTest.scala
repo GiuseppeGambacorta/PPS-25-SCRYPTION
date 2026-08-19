@@ -35,7 +35,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
       ch.sendToGame(EventMessages.SingleCard(squirrel))
 
       When("Executing the GetANewCard event")
@@ -53,7 +53,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("A mock GUI thread that sends Cards first, and SingleCard after retry")
       val initialDeck = fromList(squirrel :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       val guiThread = runMockGuiWithRetry(ch)(
         wrongResponses = List(EventMessages.Cards(List(fox))),
@@ -76,7 +76,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
       ch.sendToGame(EventMessages.SingleCard(bear))
 
       When("Executing the Firecamp Attack event")
@@ -105,7 +105,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("A mock GUI thread that sends End first, and SingleCard after retry")
       val initialDeck = fromList(bear :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       val guiThread = runMockGuiWithRetry(ch)(
         wrongResponses = List(EventMessages.End),
@@ -129,7 +129,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(squirrel :: bear :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
       ch.sendToGame(EventMessages.SingleCard(bear))
 
       When("Executing the Firecamp Health event")
@@ -154,7 +154,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState with a deck containing no duplicates")
       val initialDeck = fromList(squirrel :: bear :: fox :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       When("Executing the Mushroom Expert event")
       val updatedGameState = mushRoomsExpertEvent(initialGameState, ch)
@@ -167,7 +167,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState with a deck containing duplicates")
       val initialDeck = fromList(bear :: bear :: squirrel :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       // Simula la risposta della GUI selezionando la carta duplicata (bear)
       ch.sendToGame(EventMessages.SingleCard(bear))
@@ -203,7 +203,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState with 2 cards and a GUIChannel")
       val initialDeck = fromList(card1 :: card2 :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       ch.sendToGame(EventMessages.SingleCard(card1))
       ch.sendToGame(EventMessages.SingleCard(card2))
@@ -230,7 +230,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("A mock GUI thread that sends SingleCard+Cards first, and two SingleCards after retry")
       val initialDeck = fromList(card1 :: card2 :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       val guiThread = runMockGuiWithRetry(ch)(
         wrongResponses = List(EventMessages.SingleCard(card1), EventMessages.Cards(List(squirrel))),
@@ -251,7 +251,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("An initial GameState where no card has seals")
       val initialDeck = fromList(squirrel :: bear :: card2 :: Nil)
       val initialGameState = GameState.getInitialGameState(initialDeck)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       When("Executing the Sacrifice event")
       val updatedGameState = sacrificeEvent(initialGameState, ch)
@@ -264,7 +264,7 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       Given("A deck containing cards with and without seals")
       val deckWithMixedCards = fromList(squirrel :: bear :: card1 :: Nil)
       val initialGameState = GameState.getInitialGameState(deckWithMixedCards)
-      val ch = GUIChannel.getNewChannel
+      val ch = GUIChannel.apply
 
       val guiThread = new Thread(() => {
         val receivedMsg = ch.receiveFromGame

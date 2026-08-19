@@ -39,7 +39,7 @@ class FightPlayerFightPhaseTests extends AnyFeatureSpec with GivenWhenThen with 
 
     Scenario("Player creature with NO opponent in the central row attacks the opponent directly") {
       Given("a player Wolf (3 ATK) in player row (index 2) and empty central row (index 1)")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GUIChannelInterface = GUIChannel.apply
 
       val initialBoard = (x          | x | x | x) || // Index 0: Bot row
         (x          | x | x | x) || // Index 1: Central row (Empty)
@@ -59,7 +59,7 @@ class FightPlayerFightPhaseTests extends AnyFeatureSpec with GivenWhenThen with 
 
     Scenario("Player creature fights directly with the opponent creature placed in the central row") {
       Given("a player Wolf (3 ATK) in index 2 and a Bullfrog (3 HP) in the central row (index 1)")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GUIChannelInterface = GUIChannel.apply
 
       val initialBoard = (x              | x | x | x) || // Index 0: Bot row
         (Some(bullfrog) | x | x | x) || // Index 1: Central row
@@ -82,7 +82,7 @@ class FightPlayerFightPhaseTests extends AnyFeatureSpec with GivenWhenThen with 
 
     Scenario("Player creature attacks opponent in central row, but does not destroy it if HP > ATK") {
       Given("a player Squirrel (1 ATK) in index 2 facing an Adder (2 HP) in the central row (index 1)")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GUIChannelInterface = GUIChannel.apply
 
       val initialBoard = (x              | x | x | x) || // Index 0: Bot row
         (Some(adder)    | x | x | x) || // Index 1: Central row
@@ -104,7 +104,7 @@ class FightPlayerFightPhaseTests extends AnyFeatureSpec with GivenWhenThen with 
 
     Scenario("Mixed Board: Column 0 fights central row creature, Column 1 attacks directly") {
       Given("Wolf (col 0) facing Bullfrog in central row, and Bear (col 1) facing empty central row slot")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GUIChannelInterface = GUIChannel.apply
 
       val initialBoard = (x              | x          | x | x) || // Index 0: Bot row
         (Some(bullfrog) | x          | x | x) || // Index 1: Central row
@@ -131,7 +131,7 @@ class FightPlayerFightPhaseTests extends AnyFeatureSpec with GivenWhenThen with 
 
     Scenario("Player Airborne creature flies over central row creature and damages scale points directly") {
       Given("a player Sparrow (1 ATK, Airborne) in index 2 facing a Bullfrog in central row (index 1)")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GUIChannelInterface = GUIChannel.apply
 
       val initialBoard = (x              | x | x | x) || // Index 0: Bot row
         (Some(bullfrog) | x | x | x) || // Index 1: Central row
@@ -151,7 +151,7 @@ class FightPlayerFightPhaseTests extends AnyFeatureSpec with GivenWhenThen with 
 
     Scenario("Player Airborne creature is blocked when facing a central row card with MightyLeap") {
       Given("a player Sparrow (Airborne) in index 2 facing a Boulder with MightyLeap in central row")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GUIChannelInterface = GUIChannel.apply
 
       val initialBoard = (x             | x | x | x) || // Index 0: Bot row
         (Some(boulder) | x | x | x) || // Index 1: Central row (MightyLeap)
