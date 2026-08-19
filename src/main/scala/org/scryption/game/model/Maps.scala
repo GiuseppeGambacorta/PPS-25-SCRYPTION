@@ -14,11 +14,21 @@ object Maps:
       case levels => levels.head match {
         case level: MapLevel[E] => level.head match {
           case branch: MapBranch[E] => branch match {
-            case MapBranch.Node(event) => levels.tail match {
+            case MapBranch.Node(event)       => levels.tail match {
               case nextLevels if !nextLevels.isEmpty => Node(event, fromScript(nextLevels))
-              case _ => Node(event, End())
+              case _                                 => Node(event, End())
+            }
+            case MapBranch.Fork(left, right) => levels.tail match {
+              case nextLevels if !nextLevels.isEmpty => nextLevels.head
+                Fork(Node(left, fromScript(nextLevels)), Node(right, fromScript(nextLevels)))
+              case _                                 => Fork(Node(left, End()), Node(right, End()))
+            }
+            case MapBranch.Join(event)       => levels.tail match {
+              case nextLevels if !nextLevels.isEmpty => Node(event, fromScript(nextLevels))
+              case _                                 => Node(event, End())
             }
           }
+          // TO-DO: next branches
         }
       }
     }

@@ -7,6 +7,7 @@ sealed trait MapBranch[+E]
 object MapBranch:
   case class Node[E](event: E) extends MapBranch[E]
   case class Fork[E](leftEvent: E, rightEvent: E) extends MapBranch[E]
+  case class Join[E](event: E) extends MapBranch[E]
 
 class MapLevel[E](val branches: List[MapBranch[E]]):
   def :+(branch: MapBranch[E]): MapLevel[E] = new MapLevel(branches :+ branch)

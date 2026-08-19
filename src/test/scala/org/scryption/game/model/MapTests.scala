@@ -99,6 +99,109 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       gameMap.shouldBe(Path.Node(event1, Path.Node(event2, Path.Node(event3, Path.End()))))
     }
 
+    Scenario("The Path must have a two branches") {
+
+      Given("a MapScript with a few events")
+      val event1 = (gameState, ch) => sacrifice(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+
+      val script: MapScript[Event] = MapScript(List(
+        MapLevel(List(
+          Node(event1)
+        )),
+        MapLevel(List(
+          Fork(event2, event3)
+        ))
+      ))
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result must have two branches")
+      gameMap.shouldBe(Path.Node(event1, Path.Fork(Path.Node(event2, Path.End()), Path.Node(event3, Path.End()))))
+    }
+
+    Scenario("The Path must have a two branches that join back") {
+
+      Given("a MapScript with a few events")
+      val event1 = (gameState, ch) => sacrifice(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
+
+      val script: MapScript[Event] = MapScript(List(
+        MapLevel(List(
+          Node(event1)
+        )),
+        MapLevel(List(
+          Fork(event2, event3)
+        )),
+        MapLevel(List (
+          Join(event4)
+        ))
+      ))
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result must have two branches")
+      gameMap.shouldBe(Path.Node(event1, Path.Fork(
+        Path.Node(event2, Path.Node(event4, Path.End())),
+        Path.Node(event3, Path.Node(event4, Path.End()))
+      )))
+    }
+
+    Scenario("The Path must have a four branches that join back") {
+
+      Given("a MapScript with some events")
+      val event1 = (gameState, ch) => sacrifice(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
+      val event5 = (gameState, ch) => fireCamp_Health(gameState, ch)
+      val event6 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event7 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event8 = (gameState, ch) => getANewCard(gameState, ch)
+      val event9 = (gameState, ch) => sacrifice(gameState, ch)
+      val event10 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+
+      val script: MapScript[Event] = MapScript(List(
+        MapLevel(List(
+          Node(event1)
+        )),
+        MapLevel(List(
+          Fork(event2, event3)
+        )),
+        MapLevel(List(
+          Fork(event4, event5),
+          Fork(event6, event7)
+        )),
+        MapLevel(List (
+          Join(event8),
+          Join(event9)
+        )),
+        MapLevel(List (
+          Join(event10)
+        ))
+      ))
+
+      When("creating a new Path")
+      val gameMap: Path[Event] = Path.fromScript(script)
+
+      Then("The result must have four branches")
+      gameMap.shouldBe(Path.Node(event1, Path.Fork(
+        Path.Node(event2, Path.Fork(
+          Path.Node(event4, Path.Node(event8, Path.Node(event10, Path.End()))),
+          Path.Node(event5, Path.Node(event8, Path.Node(event10, Path.End())))
+        )),
+        Path.Node(event3, Path.Fork(
+          Path.Node(event6, Path.Node(event9, Path.Node(event10, Path.End()))),
+          Path.Node(event7, Path.Node(event9, Path.Node(event10, Path.End())))
+        ))
+      )))
+    }
+
     Scenario("The Path must have expected structure") {
 
       Given("some events and a MapScript")
@@ -125,10 +228,10 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
         )),
         MapLevel(List (
           Node(event7),
-          Node(event8)
+          Join(event8)
         )),
         MapLevel(List (
-          Node(event9)
+          Join(event9)
         ))
       ))
 
