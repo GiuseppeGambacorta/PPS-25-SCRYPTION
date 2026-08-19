@@ -17,7 +17,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
  *  shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used
  *  to be copy-pasted here too.
  */
-class MycologistsView(viewModel: ViewModelEvent) extends FlowPanel {
+class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
  
   viewModel.ListenForCardsFromTheModel(renderHand)

@@ -11,7 +11,7 @@ import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.concurrent.Future
 import scala.swing.{FlowPanel, Panel, Swing}
 
-class StrangeStonesView(viewModel: ViewModelEvent) extends FlowPanel {
+class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   viewModel.ListenForCardsFromTheModel(renderHand)
 

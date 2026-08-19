@@ -1,10 +1,10 @@
 package org.scryption.view.events
 
-import org.scryption.GUIChannelInterface
-import org.scryption.view.ViewModelEvent
+import org.scryption.GameMessagesInterface
+import org.scryption.view.ViewModelDeckEvent
 import org.scryption.view.common.StatBonus
 
-class FireCampAttackView(viewModel : ViewModelEvent)
+class FireCampAttackView(viewModel : ViewModelDeckEvent)
   extends EventView(
     viewModel = viewModel,
     cardWidth = 250,

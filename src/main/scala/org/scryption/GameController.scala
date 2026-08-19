@@ -2,10 +2,10 @@ package org.scryption
 
 import org.scryption.game.model.events.*
 import org.scryption.game.model.GameState
-import org.scryption.view.{ViewModelEvent, ViewModelFight}
+import org.scryption.view.{ViewModelDeckEvent, ViewModelFight, ViewModelItemEvent}
 import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
-import org.scryption.{GUIChannel, GUIChannelInterface}
+import org.scryption.{GameMessagesChannel, GameMessagesInterface}
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,14 +14,15 @@ import scala.swing.Panel
 
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
-  private type GameEvent = (Event, GUIChannelInterface => Panel)
+  private type GameEvent = (Event, GameMessagesInterface => Panel)
 
-  private val getANewCard: GameEvent     = (getANewCardEvent, (ch: GUIChannelInterface) => new CardSelectionView(ViewModelEvent(ch)))
-  private val fight: GameEvent           = (fightEvent, (ch: GUIChannelInterface) => new FightView(ViewModelFight(ch)))
-  private val fireCampAttack: GameEvent  = (fireCampEvent_Attack, (ch: GUIChannelInterface) => new FireCampAttackView(ViewModelEvent(ch)))
-  private val fireCampHealth: GameEvent  = (fireCampEvent_Health, (ch: GUIChannelInterface) => new FireCampHealthView(ViewModelEvent(ch)))
-  private val mycologists: GameEvent     = (mushRoomsExpertEvent, (ch: GUIChannelInterface) => new MycologistsView(ViewModelEvent(ch)))
-  private val sacrifice: GameEvent       = (sacrificeEvent, (ch: GUIChannelInterface) => new StrangeStonesView(ViewModelEvent(ch)))
+  private val getANewCard: GameEvent     = (getANewCardEvent, (ch: GameMessagesInterface) => new CardSelectionView(ViewModelDeckEvent(ch)))
+  private val fight: GameEvent           = (fightEvent, (ch: GameMessagesInterface) => new FightView(ViewModelFight(ch)))
+  private val fireCampAttack: GameEvent  = (fireCampEvent_Attack, (ch: GameMessagesInterface) => new FireCampAttackView(ViewModelDeckEvent(ch)))
+  private val fireCampHealth: GameEvent  = (fireCampEvent_Health, (ch: GameMessagesInterface) => new FireCampHealthView(ViewModelDeckEvent(ch)))
+  private val mycologists: GameEvent     = (mushRoomsExpertEvent, (ch: GameMessagesInterface) => new MycologistsView(ViewModelDeckEvent(ch)))
+  private val sacrifice: GameEvent       = (sacrificeEvent, (ch: GameMessagesInterface) => new StrangeStonesView(ViewModelDeckEvent(ch)))
+  private val getANewItem: GameEvent     = (getANewItemEvent, (ch: GameMessagesInterface) => new ItemSelectionView(ViewModelItemEvent(ch)))
 
   @volatile private var running = false
 
@@ -31,6 +32,11 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       val initialState = GameState.getInitialGameState
 
       val listEvents: List[GameEvent] = List(
+        getANewItem,
+        getANewItem,
+        getANewItem,
+        getANewItem,
+        getANewItem,
         getANewCard,
         fight,
         fireCampAttack,
@@ -53,8 +59,9 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       case (_, Nil) | (GameState(_, _, true), _) =>
         println(s"=== PARTITA TERMINATA ===")
         println(s"Mazzo Finale: ${gameState.deck}")
+
       case (_, (event, createView) :: remainingEvents) =>
-        val ch = GUIChannel.getNewChannel
+        val ch = GameMessagesChannel()
         onViewChange(createView(ch))
         val nextState = event(gameState, ch)
         gameLoop(nextState, remainingEvents)

@@ -4,6 +4,11 @@ import org.scryption.game.model.boardModel.isValid
 import org.scryption.game.model.{BoardPosition, CardLibrary, boardModel}
 import org.scryption.game.model.events.FightState
 
+
+
+val allItems = List(SquirrelBottle(), HoggyBank(), Pliers(), Scissors())
+
+
 trait GameItem:
   def name: String
   def description: String

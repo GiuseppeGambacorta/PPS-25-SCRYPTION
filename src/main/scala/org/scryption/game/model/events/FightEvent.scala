@@ -1,6 +1,6 @@
 package org.scryption.game.model.events
 
-import org.scryption.{FightMessages, GUIChannelInterface}
+import org.scryption.{FightMessages, GameMessagesInterface}
 import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.{Card, CardLibrary, DrawDecks, PlayerHand, SacrificeAttribute}
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -37,7 +37,7 @@ private val NumberOfCardsAtTheStartOfTheFight = 4
 private val PlayerWon = false
 private val PlayerLost = true
 
-def fightEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fightEvent(gameState: GameState, ch: GameMessagesInterface): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
   val initialFightState = FightState(
     scalePoints = 0,
@@ -51,7 +51,7 @@ def fightEvent(gameState: GameState, ch: GUIChannelInterface): GameState =
   GameState(gameState.deck, gameState.inventory ,isGameOver = loop(TurnState.draw, initialFightState, ch))
 
 @tailrec
-private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInterface): Boolean =
+private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesInterface): Boolean =
   ch.sendToGui(FightMessages.State(fightState, turnState))
 
   turnState match
@@ -66,7 +66,7 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
       loop(nextTurn, nextState, ch)
 
     case TurnState.playerFight =>
-      val (nextTurn, nextState) = handleFightPhase(fightState, ch, isPlayerAttacking = true)
+      val (nextTurn, nextState) = handleFightPhase(fightState, isPlayerAttacking = true)
       loop(nextTurn, nextState, ch)
 
     case TurnState.botTurn =>
@@ -77,14 +77,14 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
         loop(TurnState.botFight, fightStateAfterBotPlays, ch)
 
     case TurnState.botFight =>
-      val (nextTurn, nextState) = handleFightPhase(fightState, ch, isPlayerAttacking = false)
+      val (nextTurn, nextState) = handleFightPhase(fightState, isPlayerAttacking = false)
       loop(nextTurn, nextState, ch)
 
 // ============================================================================
 // Phase Handlers (Restituiscono la tupla (TurnState, FightState))
 // ============================================================================
 
-private def handleDrawPhase(fightState: FightState, ch: GUIChannelInterface): (TurnState, FightState) =
+private def handleDrawPhase(fightState: FightState, ch: GameMessagesInterface): (TurnState, FightState) =
   ch.receiveFromGui match
     case FightMessages.DrawFromSquirrel =>
       val updatedHand = fightState.playerHand addCard CardLibrary.squirrel
@@ -105,7 +105,7 @@ private def handleDrawPhase(fightState: FightState, ch: GUIChannelInterface): (T
       ch.clear()
       (TurnState.draw, fightState)
 
-private def handlePlayerTurnPhase(fightState: FightState, ch: GUIChannelInterface): (TurnState, FightState) =
+private def handlePlayerTurnPhase(fightState: FightState, ch: GameMessagesInterface): (TurnState, FightState) =
   ch.receiveFromGui match
     case FightMessages.CardToPlay(card, position) =>
       val updatedState = playCardWithoutSacrifice(fightState, card, position)
@@ -130,7 +130,6 @@ private def handlePlayerTurnPhase(fightState: FightState, ch: GUIChannelInterfac
 
 private def handleFightPhase(
                               fightState: FightState,
-                              ch: GUIChannelInterface,
                               isPlayerAttacking: Boolean
                             ): (TurnState, FightState) =
   val (attackerRowIdx, defenderRowIdx) =
