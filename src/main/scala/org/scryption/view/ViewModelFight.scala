@@ -4,8 +4,7 @@ import org.scryption.game.model.Card
 import org.scryption.game.model.BoardPosition
 import org.scryption.game.model.boardModel.Board
 import org.scryption.game.model.events.{FightState, TurnState}
-import org.scryption.game.model.managers.SacrificeManager
-import org.scryption.{FightMessages, GameMessagesInterface}
+import org.scryption.{FightMessages, GameMessagesChannel}
 
 import javax.swing.Timer
 import scala.collection.mutable
@@ -13,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.Swing
 
-class ViewModelFight(channel: GameMessagesInterface):
+class ViewModelFight(channel: GameMessagesChannel):
 
   private val eventQueue = mutable.Queue.empty[(FightState, TurnState)]
   private var isPlayingBack = false

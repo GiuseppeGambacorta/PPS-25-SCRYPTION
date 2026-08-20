@@ -1,6 +1,6 @@
 package org.scryption.game.model.events
 
-import org.scryption.{FightMessages, GameMessagesInterface}
+import org.scryption.{FightMessages, GameMessagesChannel}
 import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.{Card, CardLibrary, DrawDecks, PlayerHand, SacrificeAttribute}
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -37,7 +37,7 @@ private val NumberOfCardsAtTheStartOfTheFight = 4
 private val PlayerWon = false
 private val PlayerLost = true
 
-def fightEvent(gameState: GameState, ch: GameMessagesInterface): GameState =
+def fightEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
   val initialFightState = FightState(
     scalePoints = 0,
@@ -51,7 +51,7 @@ def fightEvent(gameState: GameState, ch: GameMessagesInterface): GameState =
   GameState(gameState.deck, gameState.inventory ,isGameOver = loop(TurnState.draw, initialFightState, ch))
 
 @tailrec
-private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesInterface): Boolean =
+private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesChannel): Boolean =
   ch.sendToGui(FightMessages.State(fightState, turnState))
 
   turnState match
@@ -84,7 +84,7 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesI
 // Phase Handlers (Restituiscono la tupla (TurnState, FightState))
 // ============================================================================
 
-private def handleDrawPhase(fightState: FightState, ch: GameMessagesInterface): (TurnState, FightState) =
+private def handleDrawPhase(fightState: FightState, ch: GameMessagesChannel): (TurnState, FightState) =
   ch.receiveFromGui match
     case FightMessages.DrawFromSquirrel =>
       val updatedHand = fightState.playerHand addCard CardLibrary.squirrel
@@ -105,7 +105,7 @@ private def handleDrawPhase(fightState: FightState, ch: GameMessagesInterface): 
       ch.clear()
       (TurnState.draw, fightState)
 
-private def handlePlayerTurnPhase(fightState: FightState, ch: GameMessagesInterface): (TurnState, FightState) =
+private def handlePlayerTurnPhase(fightState: FightState, ch: GameMessagesChannel): (TurnState, FightState) =
   ch.receiveFromGui match
     case FightMessages.CardToPlay(card, position) =>
       val updatedState = playCardWithoutSacrifice(fightState, card, position)

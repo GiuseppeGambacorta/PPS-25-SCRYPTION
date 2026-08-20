@@ -25,7 +25,13 @@ enum FightMessages extends GameMessage:
   case EndPlayerTurn
   case End
 
-trait GameMessagesInterface:
+
+enum MapMessages extends GameMessage:
+  case left
+  case right
+  case forward
+
+trait GameMessagesChannel:
   def sendToGui(message: GameMessage): Unit
   def receiveFromGui: GameMessage
   def receiveFromGame: GameMessage
@@ -33,10 +39,10 @@ trait GameMessagesInterface:
   def clear(): Unit
 
 
-class GameMessagesChannel private(
+class GameMessagesChannelImpl (
                            private val toGui: LinkedBlockingQueue[GameMessage],
                            private val toGame: LinkedBlockingQueue[GameMessage]
-                         ) extends GameMessagesInterface:
+                         ) extends GameMessagesChannel:
 
   private val lock = new Object
 
@@ -58,8 +64,8 @@ class GameMessagesChannel private(
   }
 
 object GameMessagesChannel:
-  def apply(): GameMessagesInterface =
-    new GameMessagesChannel(
+  def apply(): GameMessagesChannel =
+    new GameMessagesChannelImpl(
       new LinkedBlockingQueue[GameMessage](),
       new LinkedBlockingQueue[GameMessage]()
     )

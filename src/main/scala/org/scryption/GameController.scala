@@ -2,27 +2,36 @@ package org.scryption
 
 import org.scryption.game.model.events.*
 import org.scryption.game.model.GameState
-import org.scryption.view.{ViewModelDeckEvent, ViewModelFight, ViewModelItemEvent}
+import org.scryption.view.{ViewModelDeckEvent, ViewModelFight, ViewModelItemEvent, ViewModelMap}
 import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
-import org.scryption.{GameMessagesChannel, GameMessagesInterface}
+import org.scryption.view.MapView
+import org.scryption.GameMessagesChannel
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.Panel
 
+
+
+object GameEvents:
+  type GameEvent = (Event, GameMessagesChannel => Panel)
+
+  val getANewCard: GameEvent = (getANewCardEvent, (ch: GameMessagesChannel) => new CardSelectionView(ViewModelDeckEvent(ch)))
+  val fight: GameEvent = (fightEvent, (ch: GameMessagesChannel) => new FightView(ViewModelFight(ch)))
+  val fireCampAttack: GameEvent = (fireCampEvent_Attack, (ch: GameMessagesChannel) => new FireCampAttackView(ViewModelDeckEvent(ch)))
+  val fireCampHealth: GameEvent = (fireCampEvent_Health, (ch: GameMessagesChannel) => new FireCampHealthView(ViewModelDeckEvent(ch)))
+  val mycologists: GameEvent = (mushRoomsExpertEvent, (ch: GameMessagesChannel) => new MycologistsView(ViewModelDeckEvent(ch)))
+  val sacrifice: GameEvent = (sacrificeEvent, (ch: GameMessagesChannel) => new StrangeStonesView(ViewModelDeckEvent(ch)))
+  val getANewItem: GameEvent = (getANewItemEvent, (ch: GameMessagesChannel) => new ItemSelectionView(ViewModelItemEvent(ch)))
+
+  val listOfNotFightEvents = List(getANewItem, getANewCard, fireCampAttack, fireCampHealth, mycologists, sacrifice)
+
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
-  private type GameEvent = (Event, GameMessagesInterface => Panel)
-
-  private val getANewCard: GameEvent     = (getANewCardEvent, (ch: GameMessagesInterface) => new CardSelectionView(ViewModelDeckEvent(ch)))
-  private val fight: GameEvent           = (fightEvent, (ch: GameMessagesInterface) => new FightView(ViewModelFight(ch)))
-  private val fireCampAttack: GameEvent  = (fireCampEvent_Attack, (ch: GameMessagesInterface) => new FireCampAttackView(ViewModelDeckEvent(ch)))
-  private val fireCampHealth: GameEvent  = (fireCampEvent_Health, (ch: GameMessagesInterface) => new FireCampHealthView(ViewModelDeckEvent(ch)))
-  private val mycologists: GameEvent     = (mushRoomsExpertEvent, (ch: GameMessagesInterface) => new MycologistsView(ViewModelDeckEvent(ch)))
-  private val sacrifice: GameEvent       = (sacrificeEvent, (ch: GameMessagesInterface) => new StrangeStonesView(ViewModelDeckEvent(ch)))
-  private val getANewItem: GameEvent     = (getANewItemEvent, (ch: GameMessagesInterface) => new ItemSelectionView(ViewModelItemEvent(ch)))
+  import org.scryption.game.model.GameMap
+  import org.scryption.game.model.events.MapEvent
 
   @volatile private var running = false
 
@@ -30,38 +39,39 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
     if !running then
       running = true
       val initialState = GameState.getInitialGameState
-
-      val listEvents: List[GameEvent] = List(
-        getANewItem,
-        getANewItem,
-        getANewItem,
-        getANewItem,
-        getANewItem,
-        getANewCard,
-        fight,
-        fireCampAttack,
-        fireCampHealth,
-        mycologists,
-        sacrifice
-      )
+      val map = GameMap()
 
       Future {
         try
-          gameLoop(initialState, listEvents)
+          gameLoop(initialState, map)
         finally
           running = false
           onGameOver()
       }
 
   @tailrec
-  private def gameLoop(gameState: GameState, events: List[GameEvent]): Unit =
-    (gameState, events) match
-      case (_, Nil) | (GameState(_, _, true), _) =>
-        println(s"=== PARTITA TERMINATA ===")
-        println(s"Mazzo Finale: ${gameState.deck}")
+  private def gameLoop(gameState: GameState, map: GameMap): Unit =
+    if gameState.isGameOver then
+      println("=== GAME OVER ===")
+    else
 
-      case (_, (event, createView) :: remainingEvents) =>
-        val ch = GameMessagesChannel()
-        onViewChange(createView(ch))
-        val nextState = event(gameState, ch)
-        gameLoop(nextState, remainingEvents)
+      val (eventLogic, createView) = map.currentEvent
+      val eventCh = GameMessagesChannel()
+      onViewChange(createView(eventCh))
+      val nextState = eventLogic(gameState, eventCh)
+
+
+      val currentNode = map.Left
+      val hasNext = currentNode.nextNode.isDefined || currentNode.left.isDefined || currentNode.right.isDefined
+
+      if !hasNext || nextState.isGameOver then
+        println("=== PARTITA COMPLETATA ===")
+      else
+
+        val mapCh = GameMessagesChannel()
+        val vm = ViewModelMap(mapCh, map)
+        onViewChange(new MapView(vm))
+
+        val nextMap = MapEvent(map, mapCh)
+
+        gameLoop(nextState, nextMap)
