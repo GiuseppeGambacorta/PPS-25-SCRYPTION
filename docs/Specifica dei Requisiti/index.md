@@ -42,7 +42,7 @@ Creare un sistema in grado di poter effettuare una partita a carte stile Inscryp
 * **Gestione Mazzo:** Man mano che il gioco prosegue, le carte verranno rimosse/aggiunte/modificate in base agli eventi, i modificatori che avvengono durante le partire non hanno nessun effetto sul mazzo del giocatore nei combattimenti successivi
 * **Al termine della partita:** Al termine della partita, il giocatore si ritroverà nella schermata iniziale del gioco, dovendo ripartire da zero.
 * **Sequenza degli Eventi:**
-    * Il primo evento di ogni nuova partita è sempre un combattimento.
+    * Il primo evento di ogni nuova partita è sempre un evento "Scelta nuova carta".
     * Al termine di ogni battaglia viene sempre proposto un evento successivo o una scelta tra due percorsi/eventi distinti, non deve essere proposta un'altra battaglia.
 * **Tipologia eventi sulla mappa:**
     * **Scelta nuova carta :** Presenta una scelta tra tre carte casuali, il giocatore ne deve scegliere una che verrà poi aggiunto al proprio mazzo.
