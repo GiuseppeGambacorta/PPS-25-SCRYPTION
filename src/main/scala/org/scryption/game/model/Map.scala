@@ -1,9 +1,26 @@
 package org.scryption.game.model
-import org.scryption.game.model.events.Event
+import org.scryption.GameEvents.{GameEvent, fight, fireCampAttack, fireCampHealth, getANewCard, getANewItem, listOfNotFightEvents, mycologists, sacrifice}
+import scala.util.Random
+import scala.language.implicitConversions
 
-enum Path:
-  case Node(event: Event, next: Path)
-  case Fork(left: Path, right: Path)
-  case End
+implicit def NodeToOption(node: Node): Option[Node] = Some(node)
 
-case class ActualMap(actualNode : Path.Node, map: Path)
+
+case class GameMap(Done: List[Node], Left: Node):
+  def currentEvent: GameEvent = Left.event
+
+  case class Node(event: GameEvent, nextNode: Option[Node] = None, left: Option[Node]= None, right: Option[Node]= None)
+
+object GameMap:
+  def apply(): GameMap =
+    val lastPath = Node(randomEvent, Node(fight))
+    val left = Node(randomEvent, Node(randomEvent, lastPath))
+    val right = Node(randomEvent, Node(randomEvent, lastPath))
+
+
+
+    val firstPath = Node(getANewCard, Node(randomEvent, None, left, right))
+
+    GameMap(Nil, firstPath)
+
+  private def randomEvent : GameEvent = Random.shuffle(listOfNotFightEvents).head

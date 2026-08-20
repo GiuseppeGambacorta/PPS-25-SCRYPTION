@@ -3,12 +3,12 @@ package org.scryption.view
 import org.scryption.game.model.Card
 import org.scryption.game.model.items.GameItem
 import org.scryption.view.common.{CardViewInfo, ItemViewInfo, cardToViewInfo, itemToViewInfo}
-import org.scryption.{EventMessages, GameMessagesInterface}
+import org.scryption.{EventMessages, GameMessagesChannel}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ViewModelItemEvent(channel: GameMessagesInterface):
+class ViewModelItemEvent(channel: GameMessagesChannel):
 
   private var currentItems: List[GameItem] = Nil
   private var currentCard: Option[Card[?]] = None

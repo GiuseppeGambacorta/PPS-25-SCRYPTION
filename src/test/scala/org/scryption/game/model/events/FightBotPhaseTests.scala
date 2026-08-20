@@ -3,7 +3,7 @@ package org.scryption.game.model.events
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.{GUIChannel, GUIChannelInterface, GameMessage}
+import org.scryption.{GameMessagesChannel, GameMessage}
 import org.scryption.game.model.*
 import org.scryption.game.model.boardModel.*
 
@@ -28,14 +28,15 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
       bones = bones,
       deck = Deck.empty,
       playerHand = PlayerHand.empty,
-      board = board
+      board = board,
+      inventory = Nil
     )
 
   Feature("Bot Fight Phase - Attacks From Central Row Against Player Row") {
 
     Scenario("Bot creature in central row attacks player directly when player slot is empty") {
       Given("a Bot Raven (2 ATK) in the central row (index 1) and empty player slot (index 2)")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
 
       val initialBoard = (x           | x | x | x) || // Index 0: Bot back row
         (Some(raven) | x | x | x) || // Index 1: Central row (Bot attacking card)
@@ -44,7 +45,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
       When("handleFightPhase is called with isPlayerAttacking = false")
-      val (nextTurn, updatedState) = handleFightPhase(initialState, channel, isPlayerAttacking = false)
+      val (nextTurn, updatedState) = handleFightPhase(initialState, isPlayerAttacking = false)
 
       Then("scale points should DECREASE by Raven's attack damage (-2 points)")
       updatedState.scalePoints shouldBe -2
@@ -55,7 +56,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
 
     Scenario("Bot creature in central row fights player creature in player row") {
       Given("a Bot Wolf (3 ATK) in index 1 facing a Player Bear (6 HP) in index 2")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
 
       val initialBoard = (x          | x | x | x) || // Index 0: Bot back row
         (Some(wolf) | x | x | x) || // Index 1: Central row (Bot card)
@@ -64,7 +65,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
       When("handleFightPhase is called with isPlayerAttacking = false")
-      val (nextTurn, updatedState) = handleFightPhase(initialState, channel, isPlayerAttacking = false)
+      val (nextTurn, updatedState) = handleFightPhase(initialState, isPlayerAttacking = false)
 
       Then("scale points should remain unchanged (0 delta)")
       updatedState.scalePoints shouldBe 0
@@ -77,7 +78,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
 
     Scenario("Bot destroys Player creature and player gains bones for lost creature") {
       Given("a Bot Wolf (3 ATK) in index 1 facing a Player Squirrel (1 HP) in index 2")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
 
       val initialBoard = (x              | x | x | x) || // Index 0: Bot back row
         (Some(wolf)     | x | x | x) || // Index 1: Central row (Bot card)
@@ -86,7 +87,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0, bones = 0)
 
       When("handleFightPhase is called with isPlayerAttacking = false")
-      val (nextTurn, updatedState) = handleFightPhase(initialState, channel, isPlayerAttacking = false)
+      val (nextTurn, updatedState) = handleFightPhase(initialState, isPlayerAttacking = false)
 
       Then("the Player Squirrel should be destroyed")
       updatedState.board(2)(0) shouldBe None
@@ -100,7 +101,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
 
     Scenario("Bot direct attacks push scale points to BotWinningPoints (-6)") {
       Given("Bot creatures with total 4 ATK facing empty player slots and scale points already at -3")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
 
       val initialBoard = (x           | x          | x | x) ||
         (Some(raven) | Some(raven)| x | x) || // 2 ATK + 2 ATK = 4 ATK
@@ -109,7 +110,7 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
       val initialState = createInitialFightState(board = initialBoard, scalePoints = -3)
 
       When("handleFightPhase is called with isPlayerAttacking = false")
-      val (nextTurn, updatedState) = handleFightPhase(initialState, channel, isPlayerAttacking = false)
+      val (nextTurn, updatedState) = handleFightPhase(initialState, isPlayerAttacking = false)
 
       Then("scale points should decrease to -7 (reaching or passing BotWinningPoints threshold of -6)")
       updatedState.scalePoints shouldBe -7

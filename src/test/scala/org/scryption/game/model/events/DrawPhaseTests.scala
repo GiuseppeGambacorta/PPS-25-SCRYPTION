@@ -3,7 +3,7 @@ package org.scryption.game.model.events
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scryption.{GUIChannel, GUIChannelInterface, FightMessages}
+import org.scryption.{GameMessagesChannel, FightMessages}
 import org.scryption.game.model.*
 import org.scryption.game.model.boardModel.*
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -18,14 +18,15 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       bones = 0,
       deck = Deck.fromList(List(wolf, wolf, wolf, wolf)),
       playerHand = PlayerHand.empty,
-      board = Board.empty
+      board = Board.empty,
+      inventory = Nil
     )
 
   Feature("Draw Phase Handling") {
 
     Scenario("Drawing from squirrel deck adds a squirrel to the player hand and moves to playerTurn") {
       Given("an initial FightState and a GUIChannel with a DrawFromSquirrel message")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
       val initialFightState = createInitialFightState()
 
       channel.sendToGame(FightMessages.DrawFromSquirrel)
@@ -42,7 +43,7 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("Drawing from main deck adds a card to the player hand, decreases deck size, and moves to playerTurn") {
       Given("an initial FightState with a non-empty deck and a GUIChannel with a DrawFromDeck message")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
       val initialFightState = createInitialFightState()
       val initialHandSize = initialFightState.playerHand.toList.size
       val initialDeckSize = initialFightState.deck.toList.size
@@ -65,7 +66,7 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("Attempting to draw from an empty main deck does not change FightState and remains in draw state") {
       Given("a FightState with an empty deck and a GUIChannel with a DrawFromDeck message")
-      val channel: GUIChannelInterface = GUIChannel.getNewChannel
+      val channel: GameMessagesChannel = GameMessagesChannel()
 
       // Creiamo uno stato con mazzo vuoto
       val emptyDeckState = createInitialFightState().copy(deck = Deck.empty)

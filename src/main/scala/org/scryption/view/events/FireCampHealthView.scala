@@ -1,6 +1,6 @@
 package org.scryption.view.events
 
-import org.scryption.GameMessagesInterface
+import org.scryption.GameMessagesChannel
 import org.scryption.view.ViewModelDeckEvent
 import org.scryption.view.common.StatBonus
 
