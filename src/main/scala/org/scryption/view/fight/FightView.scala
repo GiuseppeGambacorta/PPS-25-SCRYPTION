@@ -7,9 +7,7 @@ import org.scryption.game.model.items.GameItem
 import org.scryption.view.ViewModelFight
 
 import scala.swing.*
-import java.awt.{Color, Dimension}
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import java.awt.Color
 
 class FightView(viewModel : ViewModelFight) extends BorderPanel:
 
@@ -37,12 +35,10 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
 
             card.sacrificeAttribute match
               case SacrificeAttribute.Blood(amount) =>
-                val hasEnoughBlood = selectedSacrifices.length >= amount
-                /* alternative approach:
                 val currentBlood = currentBoard.map { board =>
-                  SacrificeManager.resolveSacrifices(board, selectedSacrifices).generatedBlood
+                  viewModel.calculateBlood(board, selectedSacrifices)
                 }.getOrElse(0)
-                 */
+                val hasEnoughBlood = currentBlood >= amount
                 val isTargetingSacrifice = selectedSacrifices.contains((row, col))
                 if hasEnoughBlood && (isSlotEmpty || isTargetingSacrifice) then
                   viewModel.cardToPlayWithSacrifices(card, col, selectedSacrifices)
@@ -80,7 +76,6 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
     else
       viewModel.useItem(item)
 
-
   // To fill empty borders of board
   opaque = true
   background = new Color(20, 20, 22)
@@ -97,12 +92,12 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
   layout(statsView) = BorderPanel.Position.West
   layout(decksView) = BorderPanel.Position.East
 
-
-
-
-
   private def updateViews(fightState: FightState, turn: TurnState): Unit =
       Swing.onEDT {
+        if turn == TurnState.playerFight then
+          boardView.flashAttackingRow(2, new Color(255, 215, 0))
+        else if turn == TurnState.botFight then
+          boardView.flashAttackingRow(1, new Color(255, 50, 50))
         val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
         boardView.interactable = isPlayerActive
         handView.interactable = isPlayerActive
