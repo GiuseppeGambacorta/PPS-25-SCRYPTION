@@ -4,6 +4,7 @@ import org.scryption.game.model.Card
 import org.scryption.game.model.BoardPosition
 import org.scryption.game.model.boardModel.Board
 import org.scryption.game.model.events.{FightState, TurnState}
+import org.scryption.game.model.managers.SacrificeManager
 import org.scryption.{FightMessages, GameMessagesChannel}
 
 import javax.swing.Timer
