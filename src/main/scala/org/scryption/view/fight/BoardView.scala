@@ -19,6 +19,17 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
   private val renderer = new CardView(geometry, new CardViewAssets)
   private var highlightedSacrifices: List[(Int, Int)] = List.empty
   var interactable = true
+  private var flashingRow: Option[(Int, Color)] = None
+
+  def flashAttackingRow(row: Int, color: Color): Unit =
+    flashingRow = Some((row, color))
+    repaint()
+    val timer = new javax.swing.Timer(800, _ => {
+      flashingRow = None
+      repaint()
+    })
+    timer.setRepeats(false)
+    timer.start()
 
   def updateSacrificeHighlights(sacrifices: List[(Int, Int)]): Unit =
     highlightedSacrifices = sacrifices
@@ -102,15 +113,23 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
         g.drawImage(img, bounds.x, bounds.y, bounds.width, bounds.height, null)
       }
 
-      if highlightedSacrifices.contains((row, col)) then
-        g.setStroke(new BasicStroke(5))
-        g.setColor(new Color(255, 30, 30))
-        g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
-      else if isHovered then
-        g.setStroke(new BasicStroke(4))
-        if row == 2 then g.setColor(new Color(100, 200, 255))
-        else g.setColor(new Color(255, 100, 100))
-        g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
+      flashingRow match
+        case Some((r, color)) if r == row && currentImage.isDefined && currentImage != getDefaultIcon(row) =>
+          g.setStroke(new BasicStroke(6))
+          g.setColor(color)
+          g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
+          g.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 70))
+          g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height)
+        case _ =>
+          if highlightedSacrifices.contains((row, col)) then
+            g.setStroke(new BasicStroke(5))
+            g.setColor(new Color(255, 30, 30))
+            g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
+          else if isHovered then
+            g.setStroke(new BasicStroke(4))
+            if row == 2 then g.setColor(new Color(100, 200, 255))
+            else g.setColor(new Color(255, 100, 100))
+            g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1)
 
   private val gridPanel = new GridPanel(RowsCount, ColsCount):
     opaque = false
