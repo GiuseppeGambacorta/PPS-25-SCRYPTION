@@ -3,13 +3,13 @@ import org.scryption.GameEvents.{GameEvent, fight, fireCampAttack, fireCampHealt
 import scala.util.Random
 import scala.language.implicitConversions
 
+case class Node(event: GameEvent, nextNode: Option[Node] = None, left: Option[Node]= None, right: Option[Node]= None)
+
 implicit def NodeToOption(node: Node): Option[Node] = Some(node)
 
 
 case class GameMap(Done: List[Node], Left: Node):
   def currentEvent: GameEvent = Left.event
-
-  case class Node(event: GameEvent, nextNode: Option[Node] = None, left: Option[Node]= None, right: Option[Node]= None)
 
 object GameMap:
   def apply(): GameMap =
