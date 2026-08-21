@@ -1,17 +1,20 @@
 package org.scryption
 
+import org.scryption.GameEvents.GameEvent
 import org.scryption.game.model.events.*
-import org.scryption.game.model.GameState
+import org.scryption.game.model.{GameState, MapScript, MapTemplates}
 import org.scryption.view.{ViewModelDeckEvent, ViewModelFight, ViewModelItemEvent, ViewModelMap}
 import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
 import org.scryption.view.MapView
 import org.scryption.GameMessagesChannel
+import org.scryption.game.model.Maps.Path
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.Panel
+import scala.util.Random
 
 
 
@@ -27,6 +30,7 @@ object GameEvents:
   val getANewItem: GameEvent = (getANewItemEvent, (ch: GameMessagesChannel) => new ItemSelectionView(ViewModelItemEvent(ch)))
 
   val listOfNotFightEvents = List(getANewItem, getANewCard, fireCampAttack, fireCampHealth, mycologists, sacrifice)
+  def randomEvent : GameEvent = Random.shuffle(listOfNotFightEvents).head
 
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
@@ -39,7 +43,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
     if !running then
       running = true
       val initialState = GameState.getInitialGameState
-      val map = GameMap()
+      val map = MapTemplates.newGameMap
 
       Future {
         try
@@ -50,19 +54,21 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       }
 
   @tailrec
-  private def gameLoop(gameState: GameState, map: GameMap): Unit =
+  private def gameLoop(gameState: GameState, map: Path[GameEvent]): Unit =
     if gameState.isGameOver then
       println("=== GAME OVER ===")
     else
 
-      val (eventLogic, createView) = map.currentEvent
+      val (eventLogic , createView) = map match
+        case Path.Node(event, _) => event
+        
       val eventCh = GameMessagesChannel()
       onViewChange(createView(eventCh))
       val nextState = eventLogic(gameState, eventCh)
 
-
-      val currentNode = map.Left
-      val hasNext = currentNode.nextNode.isDefined || currentNode.left.isDefined || currentNode.right.isDefined
+      val hasNext = map match
+        case Path.End() => false
+        case _ => true
 
       if !hasNext || nextState.isGameOver then
         println("=== PARTITA COMPLETATA ===")
