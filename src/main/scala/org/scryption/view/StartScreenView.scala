@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage
 import java.awt.{Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel}
 import scala.swing.{FlowPanel, Panel}
+import scala.swing.event.UIElementResized
 
 class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoadGame: () => Unit, onQuit: () => Unit)
     extends FlowPanel:
@@ -69,6 +70,12 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
   peer.setLayout(null)
   focusable = true
 
+  listenTo(this)
+  reactions += {
+    case UIElementResized(_) =>
+      if (menuVisible) updateMenuLayout()
+  }
+
   peer.addMouseListener(new MouseAdapter {
     override def mouseClicked(e: MouseEvent): Unit = {
       if (!menuVisible) showMenu()
@@ -78,12 +85,18 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
   private val textLabel: JLabel = new JLabel() {
     setOpaque(false)
     setVisible(false)
+    override def paintComponent(g: java.awt.Graphics): Unit = {
+      if (getIcon != null) g.drawImage(getIcon.asInstanceOf[ImageIcon].getImage, 0, 0, getWidth, getHeight, null)
+    }
   }
 
   private val slotLabel: JLabel = new JLabel() {
     setOpaque(false)
     setCursor(new Cursor(Cursor.HAND_CURSOR))
     setVisible(false)
+    override def paintComponent(g: java.awt.Graphics): Unit = {
+      if (getIcon != null) g.drawImage(getIcon.asInstanceOf[ImageIcon].getImage, 0, 0, getWidth, getHeight, null)
+    }
   }
 
   slotLabel.addMouseListener(new MouseAdapter {
@@ -114,34 +127,50 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
     repaint()
   }
 
-  private def buildMenu(): Unit = {
+  private def buildMenu(): Unit =
+    if (buttons.isEmpty) {
+      buttons = menuDefs.map { cardDef =>
+        val btn = new MenuButton(cardDef, 0, 0)
+        peer.add(btn.label)
+        btn
+      }
+    }
+    textLabel.setVisible(true)
+    slotLabel.setIcon(slotImage.orNull)
+    slotLabel.setVisible(true)
+    updateMenuLayout()
+
+  private def updateMenuLayout(): Unit =
     val w = size.width
     val h = size.height
 
-    textLabel.setBounds((w - geo.textWidth) / 2, geo.part1Y, geo.textWidth, geo.textHeight)
-    textLabel.setVisible(true)
+    val scale = Math.min(1.0, w.toDouble / 1920.0)
+    val scaledBtnW = (geo.buttonWidth * scale).toInt
+    val scaledBtnH = (geo.buttonHeight * scale).toInt
+    val scaledGap = (geo.buttonGap * scale).toInt
+    val scaledTextW = (geo.textWidth * scale).toInt
+    val scaledTextH = (geo.textHeight * scale).toInt
+    val scaledSlotW = (geo.slotWidth * scale).toInt
+    val scaledSlotH = (geo.slotHeight * scale).toInt
+    val textY = (h * 0.15).toInt
+    val slotY = (h * 0.35).toInt
+    val buttonsY = (h * 0.70).toInt
 
-    slotLabel.setBounds((w - geo.slotWidth) / 2, geo.part2Y, geo.slotWidth, geo.slotHeight)
-    slotLabel.setIcon(slotImage.orNull)
-    slotLabel.setVisible(true)
-
-    val totalButtonsWidth = menuDefs.length * geo.buttonWidth + (menuDefs.length - 1) * geo.buttonGap
+    textLabel.setBounds((w - scaledTextW) / 2, textY, scaledTextW, scaledTextH)
+    slotLabel.setBounds((w - scaledSlotW) / 2, slotY, scaledSlotW, scaledSlotH)
+    val totalButtonsWidth = menuDefs.length * scaledBtnW + (menuDefs.length - 1) * scaledGap
     val startX = (w - totalButtonsWidth) / 2
-
-    buttons = menuDefs.zipWithIndex.map { case (cardDef, i) =>
-      val baseX = startX + i * (geo.buttonWidth + geo.buttonGap)
-      val btn = new MenuButton(cardDef, baseX, geo.part3Y)
-      peer.add(btn.label)
-      btn
+    buttons.zipWithIndex.foreach { case (btn, i) =>
+      val newX = startX + i * (scaledBtnW + scaledGap)
+      btn.updatePosition(newX, buttonsY, scaledBtnW, scaledBtnH, scaledSlotW, scaledSlotH)
     }
 
     refreshTextPreview()
     refreshSlotIcon()
     peer.revalidate()
     peer.repaint()
-  }
 
-  private class MenuButton(val cardDef: MenuCardDef, val baseX: Int, val baseY: Int) {
+  private class MenuButton(var cardDef: MenuCardDef, var baseX: Int, var baseY: Int) {
 
     private var isInSlot: Boolean = false
 
@@ -150,7 +179,22 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
       setOpaque(false)
       setCursor(new Cursor(Cursor.HAND_CURSOR))
       setFocusable(false)
+      override def paintComponent(g: java.awt.Graphics): Unit = {
+        if (getIcon != null) g.drawImage(getIcon.asInstanceOf[ImageIcon].getImage, 0, 0, getWidth, getHeight, null)
+      }
     }
+
+    def updatePosition(newBaseX: Int, newBaseY: Int, w: Int, h: Int, slotW: Int, slotH: Int): Unit =
+      baseX = newBaseX
+      baseY = newBaseY
+      label.setSize(w, h)
+      if (isInSlot) {
+        val slotX = slotLabel.getX + (slotW - w) / 2
+        val slotY = slotLabel.getY + (slotH - h) / 2
+        label.setLocation(slotX, slotY)
+      } else {
+        label.setLocation(baseX, baseY)
+      }
 
     label.addMouseListener(new MouseAdapter {
       override def mouseEntered(e: MouseEvent): Unit = {
