@@ -1,6 +1,6 @@
 package org.scryption.game.model.events
 
-import org.scryption.{GUIChannelInterface, GUIMessages}
+import org.scryption.{FightMessages, GameMessagesInterface}
 import org.scryption.game.model.Deck.Deck
 import org.scryption.game.model.{Card, CardLibrary, DrawDecks, GameState, PlayerHand, SacrificeAttribute}
 import org.scryption.game.model.PlayerHand.PlayerHand
@@ -10,6 +10,7 @@ import org.scryption.game.model.managers.{CombatManager, MovementManager, Sacrif
 import org.scryption.game.model.managers.CombatManager.given
 import org.scryption.game.model.GameState
 import org.scryption.game.model.bot.{BotStrategy, RandomBotStrategy}
+import org.scryption.game.model.items.*
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -26,7 +27,8 @@ case class FightState(
                        bones: Int,
                        deck: Deck,
                        playerHand: PlayerHand,
-                       board: Board
+                       board: Board,
+                       inventory: List[GameItem]
                      )
 
 private val PlayerWinningPoints = 6
@@ -35,21 +37,22 @@ private val NumberOfCardsAtTheStartOfTheFight = 4
 private val PlayerWon = false
 private val PlayerLost = true
 
-def fight(gameState: GameState, ch: GUIChannelInterface): GameState =
+def fightEvent(gameState: GameState, ch: GameMessagesInterface): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
   val initialFightState = FightState(
     scalePoints = 0,
     bones = 0,
     deck = remainingDeck,
     playerHand = PlayerHand.fromList(initialCards),
-    board = generateRandomStartingBoard()
+    board = generateRandomStartingBoard(),
+    inventory = gameState.inventory
   )
 
-  GameState(gameState.deck, isGameOver = loop(TurnState.draw, initialFightState, ch))
+  GameState(gameState.deck, gameState.inventory ,isGameOver = loop(TurnState.draw, initialFightState, ch))
 
 @tailrec
-private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInterface): Boolean =
-  ch.sendToGui(GUIMessages.FightState(fightState, turnState))
+private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesInterface): Boolean =
+  ch.sendToGui(FightMessages.State(fightState, turnState))
 
   turnState match
     case TurnState.draw =>
@@ -63,7 +66,7 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
       loop(nextTurn, nextState, ch)
 
     case TurnState.playerFight =>
-      val (nextTurn, nextState) = handleFightPhase(fightState, ch, isPlayerAttacking = true)
+      val (nextTurn, nextState) = handleFightPhase(fightState, isPlayerAttacking = true)
       loop(nextTurn, nextState, ch)
 
     case TurnState.botTurn =>
@@ -74,20 +77,20 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GUIChannelInt
         loop(TurnState.botFight, fightStateAfterBotPlays, ch)
 
     case TurnState.botFight =>
-      val (nextTurn, nextState) = handleFightPhase(fightState, ch, isPlayerAttacking = false)
+      val (nextTurn, nextState) = handleFightPhase(fightState, isPlayerAttacking = false)
       loop(nextTurn, nextState, ch)
 
 // ============================================================================
 // Phase Handlers (Restituiscono la tupla (TurnState, FightState))
 // ============================================================================
 
-private def handleDrawPhase(fightState: FightState, ch: GUIChannelInterface): (TurnState, FightState) =
+private def handleDrawPhase(fightState: FightState, ch: GameMessagesInterface): (TurnState, FightState) =
   ch.receiveFromGui match
-    case GUIMessages.DrawFromSquirrel =>
+    case FightMessages.DrawFromSquirrel =>
       val updatedHand = fightState.playerHand addCard CardLibrary.squirrel
       (TurnState.playerTurn, fightState.copy(playerHand = updatedHand))
 
-    case GUIMessages.DrawFromDeck =>
+    case FightMessages.DrawFromDeck =>
       DrawDecks(fightState.deck).drawFromMain() match
         case Some((drawnCard, updatedDrawDecks)) =>
           val nextState = fightState.copy(
@@ -102,27 +105,31 @@ private def handleDrawPhase(fightState: FightState, ch: GUIChannelInterface): (T
       ch.clear()
       (TurnState.draw, fightState)
 
-private def handlePlayerTurnPhase(fightState: FightState, ch: GUIChannelInterface): (TurnState, FightState) =
+private def handlePlayerTurnPhase(fightState: FightState, ch: GameMessagesInterface): (TurnState, FightState) =
   ch.receiveFromGui match
-    case GUIMessages.CardToPlay(card, position) =>
+    case FightMessages.CardToPlay(card, position) =>
       val updatedState = playCardWithoutSacrifice(fightState, card, position)
       (TurnState.playerTurn, updatedState)
 
-    case GUIMessages.CardToPlayWithSacrifices(card, position, sacrificesPositions) =>
+    case FightMessages.CardToPlayWithSacrifices(card, position, sacrificesPositions) =>
       val updatedState = playCardWithSacrifices(fightState, card, position, sacrificesPositions)
       (TurnState.playerTurn, updatedState)
 
-    // Esempio: aggiungi qui l'evento di fine turno se la GUI invia un messaggio EndTurn
-    // case GUIMessages.EndTurn => (TurnState.playerFight, fightState)
-    case GUIMessages.EndPlayerTurn => (TurnState.playerFight, fightState)
+    case FightMessages.UseItem(item, target) =>
+      if fightState.inventory.contains(item) then
+        val updatedState = item.use(fightState, target)
+        (TurnState.playerTurn, updatedState)
+      else
+        (TurnState.playerTurn, fightState)
 
+    case FightMessages.EndPlayerTurn =>
+      (TurnState.playerFight, fightState)
 
     case _ =>
       (TurnState.playerTurn, fightState)
 
 private def handleFightPhase(
                               fightState: FightState,
-                              ch: GUIChannelInterface,
                               isPlayerAttacking: Boolean
                             ): (TurnState, FightState) =
   val (attackerRowIdx, defenderRowIdx) =
@@ -151,7 +158,8 @@ private def handleFightPhase(
     board = boardAfterQueue,
     bones = fightState.bones + result.earnedBones,
     playerHand = fightState.playerHand.addCards(result.returnedToHandCards),
-    deck = fightState.deck
+    deck = fightState.deck,
+    inventory = fightState.inventory
   )
 
   (nextTurn, newState)

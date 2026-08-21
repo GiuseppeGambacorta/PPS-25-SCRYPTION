@@ -1,4 +1,4 @@
-package org.scryption.view
+package org.scryption.view.common
 
 import java.awt.image.BufferedImage
 import javax.swing.ImageIcon

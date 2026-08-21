@@ -1,8 +1,8 @@
 package org.scryption.view
 
-import org.scryption.view.GUIAssets.StartScreenViewAssets
-import org.scryption.view.ResourceLoader
-import org.scryption.view.GUIGeometry.StartScreenGeometry
+import org.scryption.view.common.GUIAssets.StartScreenViewAssets
+import org.scryption.view.common.GUIGeometry.StartScreenGeometry
+import org.scryption.view.common.ResourceLoader
 
 import java.awt.event.{MouseAdapter, MouseEvent}
 import java.awt.image.BufferedImage

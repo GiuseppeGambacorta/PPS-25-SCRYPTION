@@ -1,6 +1,8 @@
-package org.scryption.view
+package org.scryption.view.common
 
 import org.scryption.game.model.*
+
+import scala.annotation.targetName
 
 final case class CardViewInfo(
                                name: String,
@@ -15,7 +17,7 @@ final case class CardViewInfo(
 //  Converts a game-model Card into the view-facing CardViewInfo
 
 extension (card: Card[?])
-  def toViewInfo: CardViewInfo =
+  def cardToViewInfo: CardViewInfo =
     val (defaultSeals, addedSeals) = CardViewConversions.splitSeals(card)
 
     CardViewInfo(
