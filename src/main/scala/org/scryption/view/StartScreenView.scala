@@ -10,7 +10,8 @@ import java.awt.{Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel}
 import scala.swing.{FlowPanel, Panel}
 
-class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onQuit: () => Unit) extends FlowPanel {
+class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoadGame: () => Unit, onQuit: () => Unit)
+    extends FlowPanel:
 
   val assets = StartScreenViewAssets()
 
@@ -29,7 +30,6 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onQui
   private val slotHighlightedImage: Option[ImageIcon] =
     loadIcon(assets.menuHighlightedSlotPath, geo.slotWidth, geo.slotHeight)
 
-
   private case class MenuCardDef(
                                   id: String,
                                   cardIcon: ImageIcon,
@@ -43,6 +43,12 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onQui
       loadIcon(assets.menuCardPath("newgame"), geo.buttonWidth, geo.buttonHeight).orNull,
       loadIcon(assets.menuTextPath("newgame"), geo.textWidth, geo.textHeight),
       () => startGame()
+    ),
+    MenuCardDef(
+      "continue",
+      loadIcon(assets.menuCardPath("continue"), geo.buttonWidth, geo.buttonHeight).orNull,
+      loadIcon(assets.menuTextPath("continue"), geo.textWidth, geo.textHeight),
+      () => onLoadGame()
     ),
     MenuCardDef(
       "startscreen",
@@ -223,4 +229,3 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onQui
   private def quitGame(): Unit = {
     onQuit()
   }
-}

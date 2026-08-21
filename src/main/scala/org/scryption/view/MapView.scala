@@ -111,13 +111,15 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
         case ButtonClicked(_) => onClick()
       }
 
-  private val leftButton    = createNavButton("⬅ Sinistra", viewModelMap.canGoLeft, () => viewModelMap.onLeft())
-  private val forwardButton = createNavButton("⬆ Avanti", viewModelMap.canGoForward, () => viewModelMap.onForward())
-  private val rightButton   = createNavButton("Destra ➡", viewModelMap.canGoRight, () => viewModelMap.onRight())
+  private val leftButton    = createNavButton("⬅ Left", viewModelMap.canGoLeft, () => viewModelMap.onLeft())
+  private val forwardButton = createNavButton("⬆ Forward", viewModelMap.canGoForward, () => viewModelMap.onForward())
+  private val rightButton   = createNavButton("Right ➡", viewModelMap.canGoRight, () => viewModelMap.onRight())
+  private val saveButton = createNavButton("Save", true, () => viewModelMap.saveGame())
 
   private val controlPanel = new BoxPanel(Orientation.Horizontal):
     opaque = true
     background = Color.BLACK
+    contents += saveButton
     contents += Swing.HGlue
     contents += leftButton
     contents += Swing.HStrut(20)
@@ -125,6 +127,7 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
     contents += Swing.HStrut(20)
     contents += rightButton
     contents += Swing.HGlue
+    contents += Swing.HStrut(160)
 
   opaque = true
   background = Color.BLACK
