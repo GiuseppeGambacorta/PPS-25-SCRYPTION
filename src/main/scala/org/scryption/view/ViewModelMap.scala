@@ -58,6 +58,7 @@ class ViewModelMap(val channel: GameMessagesChannel, val gameMap: GameMap):
       case `mycologists`    => mycologistsNode
       case `sacrifice`      => SacrificeNode
       case `getANewItem`    => NewItemNode
+      case `trial`          => TrialNode
       case _                => fightNode
 
   val currentNode: ViewNode = ViewNode(gameMap.Left, toNodeType(gameMap.Left))
