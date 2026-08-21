@@ -8,6 +8,12 @@ object MapTemplates:
     MapScript(List(
       MapLevel(List(
         MapBranch.Node(3, randomEvent)
+      )),
+      MapLevel(List(
+        MapBranch.Node(3, randomEvent)
+      )),
+      MapLevel(List(
+        MapBranch.Fork(3, randomEvent, randomEvent)
       ))
     ))
   )

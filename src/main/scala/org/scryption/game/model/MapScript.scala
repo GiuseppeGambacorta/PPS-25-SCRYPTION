@@ -1,7 +1,5 @@
 package org.scryption.game.model
 
-import scala.IArray.foreach
-
 sealed trait MapBranch[+E]
 
 object MapBranch:

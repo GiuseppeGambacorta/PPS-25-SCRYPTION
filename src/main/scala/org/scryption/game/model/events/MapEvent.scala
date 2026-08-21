@@ -11,11 +11,11 @@ import scala.annotation.tailrec
 def MapEvent(gameMap: Path[GameEvent], ch: GameMessagesChannel): Path[GameEvent] =
 
   val msg = ch.receiveFromGui
-  
+
   gameMap match
-    case Path.Node(_, next) => msg match 
+    case Path.Node(_, next) => msg match
       case MapMessages.forward => next
-      case _ => 
+      case _ =>
         ch.clear()
         MapEvent(gameMap, ch)
     case Path.Fork(left, right) => msg match

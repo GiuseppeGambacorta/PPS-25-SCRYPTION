@@ -1,70 +1,44 @@
 package org.scryption.view
 
-import org.scryption.game.model.{GameMap, Node}
+import org.scryption.GameEvents.GameEvent
+import org.scryption.game.model.Maps.Path
 import org.scryption.{GameMessagesChannel, MapMessages}
+
 import java.awt.Color
 
 case class ViewNode(
-                     node: Node,
-                     nodeType: NodeType
+                     node: GameEvent,
+                     iconPath: String
                    )
 
-sealed trait NodeType:
-  def color: Color
-  def iconPath: String
+class ViewModelMap(val channel: GameMessagesChannel, val gameMap: Path[GameEvent]):
 
-case object fightNode extends NodeType:
-  val color: Color = new Color(200, 60, 60)
-  val iconPath: String = "map/animated_cardbattlenode_1.png"
+  def toString(event: GameEvent): String = event match
+    case getANewCard => "cardchoicenode"
+    case fight => "fight"
+    case fireCampAttack => "campfire"
+    case fireCampHealth => "campfire"
+    case mycologists => "mushrooms"
+    case sacrifice => "cardmergenode"
+    case getANewItem => "backpack"
+    case _ => ""
 
-case object getANewCardNode extends NodeType:
-  val color: Color = new Color(220, 180, 50)
-  val iconPath: String = "map/animated_cardchoicenode_1.png"
+  val currentNode: ViewNode           = gameMap match
+    case Path.Node(event, _) => ViewNode(event, toString(event))
 
-case object fireCampAttackNode extends NodeType:
-  val color: Color = new Color(60, 180, 80)
-  val iconPath: String = "map/animated_campfire_1.png"
-
-case object fireCampHealthNode extends NodeType:
-  val color: Color = new Color(60, 180, 80)
-  val iconPath: String = "map/animated_campfire_1.png"
-
-case object mycologistsNode extends NodeType:
-  val color: Color = new Color(140, 80, 200)
-  val iconPath: String = "map/animated_mushrooms_1.png"
-
-case object TrialNode extends NodeType:
-  val color: Color = new Color(7, 180, 186)
-  val iconPath: String = "map/animated_decktrialnode_1.png"
-
-case object NewItemNode extends NodeType:
-  val color: Color = new Color(220, 180, 50)
-  val iconPath: String = "map/animated_backpack_1.png"
-
-case object SacrificeNode extends NodeType:
-  val color: Color = new Color(220, 180, 50)
-  val iconPath: String = "map/animated_cardmergenode_1.png"
-
-class ViewModelMap(val channel: GameMessagesChannel, val gameMap: GameMap):
-
-  import org.scryption.GameEvents.*
-
-  private def toNodeType(node: Node): NodeType =
-    node.event match
-      case `fight`          => fightNode
-      case `getANewCard`    => getANewCardNode
-      case `fireCampAttack` => fireCampAttackNode
-      case `fireCampHealth` => fireCampHealthNode
-      case `mycologists`    => mycologistsNode
-      case `sacrifice`      => SacrificeNode
-      case `getANewItem`    => NewItemNode
-      case _                => fightNode
-
-  val currentNode: ViewNode = ViewNode(gameMap.Left, toNodeType(gameMap.Left))
-
-  val forwardOption: Option[ViewNode] = gameMap.Left.nextNode.map(n => ViewNode(n, toNodeType(n)))
-  val leftOption: Option[ViewNode]    = gameMap.Left.left.map(n => ViewNode(n, toNodeType(n)))
-  val rightOption: Option[ViewNode]   = gameMap.Left.right.map(n => ViewNode(n, toNodeType(n)))
+  val forwardOption: Option[ViewNode] = gameMap match
+    case Path.Node(_, next) => next match
+      case Path.Node(event, _) => Some(ViewNode(event, toString(event)))
+  
+  val leftOption: Option[ViewNode]    = gameMap match
+    case Path.Node(_, next) => next match
+      case Path.Fork(left, _) => left match
+        case Path.Node(event, _) => Some(ViewNode(event, toString(event)))
+        
+  val rightOption: Option[ViewNode]   = gameMap match
+    case Path.Node(_, next) => next match
+      case Path.Fork(_, right) => right match
+        case Path.Node(event, _) => Some(ViewNode(event, toString(event)))
 
   def canGoForward: Boolean = forwardOption.isDefined
   def canGoLeft: Boolean    = leftOption.isDefined

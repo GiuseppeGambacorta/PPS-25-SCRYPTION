@@ -33,8 +33,7 @@ object GameEvents:
   def randomEvent : GameEvent = Random.shuffle(listOfNotFightEvents).head
 
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
-
-  import org.scryption.game.model.GameMap
+  
   import org.scryption.game.model.events.MapEvent
 
   @volatile private var running = false

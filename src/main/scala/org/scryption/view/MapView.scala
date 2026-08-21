@@ -1,6 +1,5 @@
 package org.scryption.view
 
-import org.scryption.game.model.Node
 import org.scryption.view.common.ResourceLoader
 
 import java.awt.{BasicStroke, Color, Dimension, Font, Graphics2D, Point, RenderingHints, Toolkit}
@@ -16,18 +15,6 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
   private val backgroundImage = ResourceLoader.loadTemplateImage("map/map.png")
   private val nodeRadius = 28
   private val nodeIconSize = 38
-
-
-  private val nodeIcons: Map[NodeType, Option[java.awt.Image]] = List(
-    fightNode,
-    getANewCardNode,
-    fireCampAttackNode,
-    fireCampHealthNode,
-    mycologistsNode,
-    TrialNode,
-    SacrificeNode,
-    NewItemNode
-  ).map(nt => nt -> ResourceLoader.loadImage(nt.iconPath, nodeIconSize)).toMap
 
   private val mapCanvas: Panel = new Panel:
     preferredSize = fixedSize
@@ -60,17 +47,15 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
       if viewModelMap.forwardOption.isDefined then g.drawLine(currentPos.x, currentPos.y, forwardPos.x, forwardPos.y)
       if viewModelMap.rightOption.isDefined then g.drawLine(currentPos.x, currentPos.y, rightPos.x, rightPos.y)
 
-      def drawNode(pos: Point, nType: NodeType, isCurrent: Boolean, isAvailable: Boolean): Unit =
+      def drawNode(pos: Point, iconPath: String, isCurrent: Boolean, isAvailable: Boolean): Unit =
 
         g.setColor(new Color(0, 0, 0, 60))
         g.fillOval(pos.x - nodeRadius + 3, pos.y - nodeRadius + 3, nodeRadius * 2, nodeRadius * 2)
 
-
-        g.setColor(nType.color)
         g.fillOval(pos.x - nodeRadius, pos.y - nodeRadius, nodeRadius * 2, nodeRadius * 2)
 
 
-        nodeIcons.getOrElse(nType, None).foreach { icon =>
+        ResourceLoader.loadImage(iconPath, nodeIconSize).foreach { icon =>
           g.drawImage(icon, pos.x - nodeIconSize / 2, pos.y - nodeIconSize / 2, nodeIconSize, nodeIconSize, null)
         }
 
@@ -85,12 +70,12 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
           g.drawOval(pos.x - nodeRadius, pos.y - nodeRadius, nodeRadius * 2, nodeRadius * 2)
 
 
-      viewModelMap.leftOption.foreach(vn => drawNode(leftPos, vn.nodeType, false, true))
-      viewModelMap.forwardOption.foreach(vn => drawNode(forwardPos, vn.nodeType, false, true))
-      viewModelMap.rightOption.foreach(vn => drawNode(rightPos, vn.nodeType, false, true))
+      viewModelMap.leftOption.foreach(vn => drawNode(leftPos, vn.iconPath, false, true))
+      viewModelMap.forwardOption.foreach(vn => drawNode(forwardPos, vn.iconPath, false, true))
+      viewModelMap.rightOption.foreach(vn => drawNode(rightPos, vn.iconPath, false, true))
 
 
-      drawNode(currentPos, viewModelMap.currentNode.nodeType, true, false)
+      drawNode(currentPos, viewModelMap.currentNode.iconPath, true, false)
 
   private def createNavButton(label: String, isAvailable: Boolean, onClick: () => Unit): Button =
     new Button(label):
