@@ -12,7 +12,6 @@ object MainWindow extends SimpleSwingApplication:
 
     minimumSize = new Dimension(800, 600)
 
-
     peer.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH)
 
     val centerContainer = new BorderPanel()
@@ -26,6 +25,7 @@ object MainWindow extends SimpleSwingApplication:
     lazy val startScreen: StartScreenView = new StartScreenView(
       StartScreenGeometry(1920),
       onNewGame = () => controller.startNewGame(),
+      onLoadGame = () => controller.loadGame(),
       onQuit = () => System.exit(0)
     )
 

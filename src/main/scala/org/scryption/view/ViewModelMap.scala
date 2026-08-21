@@ -1,7 +1,9 @@
 package org.scryption.view
 
-import org.scryption.game.model.{GameMap, Node}
+import org.scryption.game.model.managers.SaveManager
+import org.scryption.game.model.{GameMap, GameState, Node}
 import org.scryption.{GameMessagesChannel, MapMessages}
+
 import java.awt.Color
 
 case class ViewNode(
@@ -45,7 +47,7 @@ case object SacrificeNode extends NodeType:
   val color: Color = new Color(220, 180, 50)
   val iconPath: String = "map/animated_cardmergenode_1.png"
 
-class ViewModelMap(val channel: GameMessagesChannel, val gameMap: GameMap):
+class ViewModelMap(val channel: GameMessagesChannel, val gameMap: GameMap, val gameState: GameState):
 
   import org.scryption.GameEvents.*
 
@@ -74,3 +76,6 @@ class ViewModelMap(val channel: GameMessagesChannel, val gameMap: GameMap):
   def onForward(): Unit = channel.sendToGame(MapMessages.forward)
   def onLeft(): Unit    = channel.sendToGame(MapMessages.left)
   def onRight(): Unit   = channel.sendToGame(MapMessages.right)
+
+  def saveGame(): Unit =
+    SaveManager.saveGame(gameState, gameMap)

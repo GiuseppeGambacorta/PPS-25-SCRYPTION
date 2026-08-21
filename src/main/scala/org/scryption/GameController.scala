@@ -7,13 +7,12 @@ import org.scryption.view.events.*
 import org.scryption.view.fight.FightView
 import org.scryption.view.MapView
 import org.scryption.GameMessagesChannel
+import org.scryption.game.model.managers.SaveManager
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.Panel
-
-
 
 object GameEvents:
   type GameEvent = (Event, GameMessagesChannel => Panel)
@@ -41,14 +40,43 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       running = true
       val initialState = GameState.getInitialGameState
       val map = GameMap()
+      startGameThread(initialState, map)
 
-      Future {
-        try
-          gameLoop(initialState, map)
-        finally
-          running = false
-          onGameOver()
-      }
+  def loadGame(): Unit =
+    if !running then
+      SaveManager.loadGame() match
+        case Some((loadedState, loadedMap)) =>
+          running = true
+          Future {
+            try
+              resumeFromMap(loadedState, loadedMap)
+            finally
+              running = false
+              onGameOver()
+          }
+        case None =>
+          println("No save found")
+
+  private def resumeFromMap(gameState: GameState, map: GameMap): Unit =
+    val currentNode = map.Left
+    val hasNext = currentNode.nextNode.isDefined || currentNode.left.isDefined || currentNode.right.isDefined
+
+    if !hasNext || gameState.isGameOver then
+      println("Game ended")
+    else
+      val mapCh = GameMessagesChannel()
+      val vm = ViewModelMap(mapCh, map, gameState)
+      onViewChange(new MapView(vm))
+      val nextMap = MapEvent(map, mapCh)
+      gameLoop(gameState, nextMap)
+
+  private def startGameThread(state: GameState, map: GameMap): Unit =
+    Future {
+      try gameLoop(state, map)
+      finally
+        running = false
+        onGameOver()
+    }
 
   @tailrec
   private def gameLoop(gameState: GameState, map: GameMap): Unit =
@@ -61,7 +89,6 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       onViewChange(createView(eventCh))
       val nextState = eventLogic(gameState, eventCh)
 
-
       val currentNode = map.Left
       val hasNext = currentNode.nextNode.isDefined || currentNode.left.isDefined || currentNode.right.isDefined
 
@@ -70,7 +97,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       else
 
         val mapCh = GameMessagesChannel()
-        val vm = ViewModelMap(mapCh, map)
+        val vm = ViewModelMap(mapCh, map, nextState)
         onViewChange(new MapView(vm))
 
         val nextMap = MapEvent(map, mapCh)
