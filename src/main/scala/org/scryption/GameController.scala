@@ -25,7 +25,8 @@ object GameEvents:
   val mycologists: GameEvent = (mushRoomsExpertEvent, (ch: GameMessagesChannel) => new MycologistsView(ViewModelDeckEvent(ch)))
   val sacrifice: GameEvent = (sacrificeEvent, (ch: GameMessagesChannel) => new StrangeStonesView(ViewModelDeckEvent(ch)))
   val getANewItem: GameEvent = (getANewItemEvent, (ch: GameMessagesChannel) => new ItemSelectionView(ViewModelItemEvent(ch)))
-
+  val trial     : GameEvent = (trialEvent, (ch: GameMessagesChannel) => new TrialView(ViewModelDeckEvent(ch)))
+  
   val listOfNotFightEvents = List(getANewItem, getANewCard, fireCampAttack, fireCampHealth, mycologists, sacrifice)
 
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):

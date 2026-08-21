@@ -35,7 +35,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("The MapScript must not be empty") {
       Given("a MapLevel List with a MapStep List with an Event")
-      val levels: List[MapLevel[Event]] = List(MapLevel(List(Node(0, (gameState, ch) => getANewCard(gameState, ch)))))
+      val levels: List[MapLevel[Event]] = List(MapLevel(List(Node(0, (gameState, ch) => getANewCardEvent(gameState, ch)))))
 
       When("creating a new MapScript")
       val script: MapScript[Event] = MapScript[Event](levels)
@@ -62,7 +62,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must be a Node") {
 
       Given("a MapScript with an event")
-      val event = (gameState, ch) => getANewCard(gameState, ch)
+      val event = (gameState, ch) => getANewCardEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(MapLevel(List(Node(3, event)))))
 
@@ -76,9 +76,9 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must be a sequence of Nodes") {
 
       Given("a MapScript with a few linear events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event3 = (gameState, ch) => getANewCardEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List (
         MapLevel(List (
@@ -102,9 +102,9 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a two branches") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event3 = (gameState, ch) => getANewCardEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(
         MapLevel(List(
@@ -125,11 +125,11 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a two longer branches") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event5 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event3 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event4 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event5 = (gameState, ch) => getANewCardEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(
         MapLevel(List(
@@ -157,10 +157,10 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a two branches that join back") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
+      val event1 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event3 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event4 = (gameState, ch) => fireCampEvent_Attack(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(
         MapLevel(List(
@@ -187,12 +187,12 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have three branches") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event5 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event6 = (gameState, ch) => sacrifice(gameState, ch)
+      val event1 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event3 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event4 = (gameState, ch) => fireCampEvent_Attack(gameState, ch)
+      val event5 = (gameState, ch) => fireCampEvent_Health(gameState, ch)
+      val event6 = (gameState, ch) => sacrificeEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(
         MapLevel(List(
@@ -223,16 +223,16 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a four branches that join back") {
 
       Given("a MapScript with some events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event5 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event6 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event7 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event8 = (gameState, ch) => getANewCard(gameState, ch)
-      val event9 = (gameState, ch) => sacrifice(gameState, ch)
-      val event10 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event1 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event2 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event3 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event4 = (gameState, ch) => fireCampEvent_Attack(gameState, ch)
+      val event5 = (gameState, ch) => fireCampEvent_Health(gameState, ch)
+      val event6 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event7 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event8 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event9 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event10 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(
         MapLevel(List(
@@ -273,15 +273,15 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have expected structure") {
 
       Given("some events and a MapScript")
-      val event1 = (gameState, ch) => getANewCard(gameState, ch)
-      val event2 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event3 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event4 = (gameState, ch) => getANewCard(gameState, ch)
-      val event5 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event6 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event7 = (gameState, ch) => sacrifice(gameState, ch)
-      val event8 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event9 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event2 = (gameState, ch) => fireCampEvent_Attack(gameState, ch)
+      val event3 = (gameState, ch) => fireCampEvent_Health(gameState, ch)
+      val event4 = (gameState, ch) => getANewCardEvent(gameState, ch)
+      val event5 = (gameState, ch) => fireCampEvent_Attack(gameState, ch)
+      val event6 = (gameState, ch) => fireCampEvent_Health(gameState, ch)
+      val event7 = (gameState, ch) => sacrificeEvent(gameState, ch)
+      val event8 = (gameState, ch) => mushRoomsExpertEvent(gameState, ch)
+      val event9 = (gameState, ch) => getANewCardEvent(gameState, ch)
 
       val script: MapScript[Event] = MapScript(List(
         MapLevel(List (

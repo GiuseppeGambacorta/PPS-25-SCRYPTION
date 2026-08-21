@@ -1,5 +1,6 @@
 package org.scryption.game.model
-import org.scryption.GameEvents.{GameEvent, fight, fireCampAttack, fireCampHealth, getANewCard, getANewItem, listOfNotFightEvents, mycologists, sacrifice}
+import org.scryption.GameEvents.{GameEvent, fight, fireCampAttack, fireCampHealth, getANewCard, getANewItem, listOfNotFightEvents, mycologists, sacrifice, trial}
+
 import scala.util.Random
 import scala.language.implicitConversions
 
@@ -19,7 +20,7 @@ object GameMap:
 
 
 
-    val firstPath = Node(getANewCard, Node(randomEvent, None, left, right))
+    val firstPath = Node(trial, Node(randomEvent, None, left, right))
 
     GameMap(Nil, firstPath)
 
