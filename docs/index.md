@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Architettura del Sistema
+title: Report
 ---
 
-# Architettura del Sistema
+# Report
 
 - [Introduzione](Introduzione/)
 - [Processo di Sviluppo](Processo di Sviluppo/)
