@@ -13,10 +13,11 @@ Per introdurre una nuova meccanica, infatti, è sufficiente espandere il dominio
 
 Di seguito il diagramma delle classi che mostra come è stato strutturato il componente Card:
 
-```mermaid
+{% raw %}
+<pre class="mermaid">
 classDiagram
-    class Card~C~ {
-        <<trait>>
+    class Card {
+        <<sealed_trait>>
         +id: UUID
         +name: String
         +health: Int
@@ -27,7 +28,6 @@ classDiagram
         +withHealth(h: Int): C
         +withSacrificeAttribute(attr: SacrificeAttribute): C
         +addSeal(s: Seal): C
-        
     }
 
     class CreatureCard {
@@ -40,7 +40,6 @@ classDiagram
         +seals: Set~Seal~
         +rarity: Rarity
         +withAttack(a: Int): CreatureCard
-        
     }
 
     class SupportCard {
@@ -51,19 +50,18 @@ classDiagram
         +sacrificeAttribute: SacrificeAttribute
         +seals: Set~Seal~
         +rarity: Rarity
-        
     }
 
     class SacrificeAttribute {
-        <<enum>>
-        Blood(value: Int)
-        Bones(value: Int)
-        Nil()
+        <<enumeration>>
+        Blood
+        Bones
+        Nil
         +isValid(): Boolean
     }
 
     class Seal {
-        <<enum>>
+        <<enumeration>>
         Airborne
         Wall
         BifurcatedStrike
@@ -77,7 +75,7 @@ classDiagram
     }
     
     class Rarity {
-        <<enum>>
+        <<enumeration>>
         Common
         Rare
     }
@@ -87,4 +85,10 @@ classDiagram
     Card *-- SacrificeAttribute
     Card *-- Seal
     Card *-- Rarity
-```
+</pre>
+{% endraw %}
+
+<script type="module">
+  import mermaid from '[https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs](https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs)';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
