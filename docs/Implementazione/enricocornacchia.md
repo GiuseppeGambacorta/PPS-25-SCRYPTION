@@ -19,8 +19,8 @@ funzionalità avanzate del type system di Scala 3 per garantire immutabilità e 
 L'entità base è definita tramite il `sealed trait Card[C <: Card[C]]`. L'utilizzo dell'F-Bounded Polymorphism
 (il parametro di tipo ricorsivo `C`) è una scelta architetturale cruciale: permette ai metodi della superclasse
 (come `withHealth` o `addSeal`) di restituire sempre l'esatto tipo concreto della sottoclasse che li invoca
-(`CreatureCard` o `SupportCard`), senza richiedere cast espliciti a tempo di compilazione.
-Per mantenere l'immutabilità senza duplicare la logica, il trait impone il metodo protetto `copyCard`,
+(`CreatureCard` o `SupportCard`), senza richiedere cast espliciti a compile time.
+Per mantenere immutabilità senza andare a duplicare la logica, il trait impone il metodo protetto `copyCard`,
 che viene implementato dalle singole *case class* per fare da ponte verso il loro metodo nativo `copy`.
 
 Di seguito un estratto che illustra questo pattern:
