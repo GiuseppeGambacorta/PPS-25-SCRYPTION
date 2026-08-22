@@ -42,7 +42,7 @@ flowchart TD
     GE -->|Invia Messaggi Dedicati / Eventi| CH
     CH -->|Consuma Eventi| VM
 ```
-pre>
+</pre>
 
 A differenza di un approccio monolitico o guidato strettamente da chiamate bloccanti, in questa architettura il Controller ha una responsabilità focalizzata: inizializza le componenti, inietta gli estremi del canale di comunicazione tra il Model e il ViewModel, e gestisce il ciclo principale di esecuzione (Game Loop).
 
@@ -100,7 +100,7 @@ sequenceDiagram
     M->>CH: send(StatoAggiornato / Esito)
     CH->>VM: Notifica esito
     VM->>UI: Aggiorna / Renderizza esito a schermo
-pre>
+</pre>
 
 
 <script type="module">
