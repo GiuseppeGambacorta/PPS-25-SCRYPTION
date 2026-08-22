@@ -55,15 +55,16 @@ classDiagram
     }
 
     class SacrificeAttribute {
-        <<enum>>
-        Blood(value: Int)
-        Bones(value: Int)
-        Nil()
+        <<enumeration>>
+        Blood
+        Bones
+        Nil
+        
         +isValid(): Boolean
     }
 
     class Seal {
-        <<enum>>
+        <<enumeration>>
         Airborne
         Wall
         BifurcatedStrike
@@ -77,7 +78,7 @@ classDiagram
     }
     
     class Rarity {
-        <<enum>>
+        <<enumeration>>
         Common
         Rare
     }

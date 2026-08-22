@@ -1,0 +1,3 @@
+GameMessagesChannel
+
+Il GameMessagesChannel è l'astrazione che realizza concretamente il Monitor concorrente già introdotto nella sezione sul design architetturale: rappresenta l'unico punto di contatto tra il thread del Model e il thread della UI, e garantisce che lo scambio di informazioni tra i due avvenga in modo sicuro e ordinato, senza che le due parti debbano condividere direttamente stato mutabile.
