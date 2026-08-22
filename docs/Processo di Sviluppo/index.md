@@ -12,6 +12,7 @@ Il processo di sviluppo adottato si ispira a **Scrum**, strutturato su *sprint* 
 - Una vista (tabella/Kanban) per il **Product Backlog** generale, ordinato per priorità;
 - Viste dedicate (tabella/Kanban) per ciascuno **Sprint**, utilizzate per monitorare lo stato di avanzamento e l'assegnazione dei task dell'iterazione corrente.
 
+Link Projects : https://github.com/users/GiuseppeGambacorta/projects/4
 ## Ruoli
 
 Il team di sviluppo è composto da tre membri: **Giuseppe Gambacorta**, **Enrico Cornacchia** e **Patricia Sanchez Lomas**. All'interno del gruppo sono state definite le seguenti responsabilità:
