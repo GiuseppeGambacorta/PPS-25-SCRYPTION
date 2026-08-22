@@ -1,0 +1,81 @@
+{
+  "deck": [
+    {
+      "name": "Stoat",
+      "attack": 1,
+      "health": 2,
+      "isCreature": true
+    },
+    {
+      "name": "Stoat",
+      "attack": 1,
+      "health": 3,
+      "isCreature": true
+    },
+    {
+      "name": "Stoat",
+      "attack": 1,
+      "health": 2,
+      "isCreature": true
+    },
+    {
+      "name": "Wolf",
+      "attack": 3,
+      "health": 2,
+      "isCreature": true
+    },
+    {
+      "name": "Wolf",
+      "attack": 3,
+      "health": 2,
+      "isCreature": true
+    }
+  ],
+  "inventory": [],
+  "map": {
+    "eventName": "sacrifice",
+    "next": null,
+    "left": {
+      "eventName": "getANewItem",
+      "next": {
+        "eventName": "mycologists",
+        "next": {
+          "eventName": "getANewCard",
+          "next": {
+            "eventName": "fight",
+            "next": null,
+            "left": null,
+            "right": null
+          },
+          "left": null,
+          "right": null
+        },
+        "left": null,
+        "right": null
+      },
+      "left": null,
+      "right": null
+    },
+    "right": {
+      "eventName": "mycologists",
+      "next": {
+        "eventName": "getANewItem",
+        "next": {
+          "eventName": "getANewCard",
+          "next": {
+            "eventName": "fight",
+            "next": null,
+            "left": null,
+            "right": null
+          },
+          "left": null,
+          "right": null
+        },
+        "left": null,
+        "right": null
+      },
+      "left": null,
+      "right": null
+    }
+  }
+}
