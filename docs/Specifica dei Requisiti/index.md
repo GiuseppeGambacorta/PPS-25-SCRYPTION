@@ -107,7 +107,7 @@ Il sistema gestisce l'applicazione e l'esecuzione dei seguenti sigilli:
 ## Di implementazione
 - Utilizzo di Scala 3.x
 - Utilizzo di JDK 25+
-- Utilizzo di ScalaTest e ScalaCheck
+- Utilizzo di ScalaTest
 ## Opzionali
 
 

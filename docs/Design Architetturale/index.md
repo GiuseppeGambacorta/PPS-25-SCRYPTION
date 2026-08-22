@@ -1,48 +1,46 @@
-
 ---
+layout: default
 title: Design architetturale
 parent: Report
+nav_order: 3
 ---
 
 
 # Design architetturale
 
-Il pattern architetturale adottato si basa su una variante del modello **Model-View-ViewModel (MVVM)** orchestrata da un **Controller** centrale. L'architettura è stata progettata per garantire un disaccoppiamento netto tra la logica di dominio e l'interfaccia grafica (Swing), sfruttando un canale di comunicazione per lo scambio di messaggi, eventi e comandi.
+Il pattern architetturale adottato si basa su una variante del modello **Model-View-ViewModel (MVVM)** orchestrata da un **Controller** centrale. L'architettura è stata progettata per garantire un disaccoppiamento netto e asincrono tra la logica di dominio (Model) e il livello di presentazione (Swing View).
 
+Model e View vivono su **thread di esecuzione separati**: la sincronizzazione e lo scambio dati avvengono per mezzo di un canale di messaggi (`GameMessagesChannel`) che funge da **Monitor** concorrente (produttore-consumatore thread-safe).
 ```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    namespace controller {
-        class GameController {
-            +startGameLoop()
-        }
-    }
-    namespace viewmodel {
-        class ViewModel {
-            +handleEvent(GameEvent)
-            +sendAction(PlayerAction)
-        }
-    }
-    namespace view {
-        class SwingView {
-            +render()
-        }
-    }
-    namespace model {
-        class GameEngine {
-            +processAction(PlayerAction)
-        }
-    }
+flowchart TD
+    subgraph Execution["Thread Orchestration"]
+        GC["GameController (Game Loop)"]
+    end
 
-    GameController ..> GameEngine : inizializza e inietta canale
-    GameController ..> ViewModel : inizializza e inietta canale
-    ViewModel --> SwingView : effettua data-binding / aggiorna stato UI
-    SwingView --> ViewModel : inoltra input utente
-    ViewModel <--> GameEngine : comunicano tramite Canale
+    subgraph PresentationThread["UI Thread (Swing Event Dispatch Thread)"]
+        SV["SwingView (Specifica per Schermata)"]
+        VM["ViewModel (Dedicato alla View)"]
+    end
+
+    subgraph Communication["Concurrence & Synchronization"]
+        CH[("GameMessagesChannel (Monitor)")]
+    end
+
+    subgraph EngineThread["Model / Domain Thread"]
+        GE["Model (GameEngine / State)"]
+    end
+
+    GC -.->|Inizializza & Inietta Canale| GE
+    GC -.->|Inizializza & Inietta Canale| VM
+
+    SV -->|Inoltra Input Utente| VM
+    VM -->|Data-binding / Aggiorna Stato UI| SV
+
+    VM -->|Invia Messaggi Dedicati / Azioni| CH
+    CH -->|Consuma Azioni| GE
+
+    GE -->|Invia Messaggi Dedicati / Eventi| CH
+    CH -->|Consuma Eventi| VM
 ```
 
 A differenza di un approccio monolitico o guidato strettamente da chiamate bloccanti, in questa architettura il Controller ha una responsabilità focalizzata: inizializza le componenti, inietta gli estremi del canale di comunicazione tra il Model e il ViewModel, e gestisce il ciclo principale di esecuzione (Game Loop).
@@ -51,9 +49,9 @@ A differenza di un approccio monolitico o guidato strettamente da chiamate blocc
 
 Il Model incapsula lo stato interno e le regole del gioco. Rimane completamente agnostico rispetto alla tecnologia grafica utilizzata.
 
-- È progettato per essere autonomo e deterministico, ricevendo azioni dal canale ed elaborando le transizioni di stato;
-- Al verificarsi di cambiamenti di stato (es. distribuzione delle carte, turni, calcolo punteggi), emette eventi sul canale destinati al livello di presentazione;
-- È completamente isolato e verificabile in modo deterministico tramite test automatici unitari e di integrazione.
+- Riceve messaggi tipizzati dal canale (azioni del giocatore), calcola le transizioni di stato e deposita sul canale i relativi messaggi di notifica o di richiesta input;
+
+- È completamente disaccoppiato dalla GUI e isolabile per l'esecuzione di test unitari automatici.
 
 ## ViewModel
 
@@ -81,22 +79,24 @@ Il flusso di interazione tra i componenti tramite canale è illustrato nel segue
 
 ```mermaid
 sequenceDiagram
-    participant UI as SwingView
+    autonumber
+    participant UI as SwingView (EDT Thread)
     participant VM as ViewModel
-    participant CH as Canale di Comunicazione
-    participant M as Model (GameEngine)
+    participant CH as GameMessagesChannel (Monitor)
+    participant M as Model (Engine Thread)
     participant C as GameController
 
-    Note over C,M: Controller avvia il Game Loop
-    C->>M: Avvio nuovo turno / step di gioco
-    M->>CH: Emette evento di stato (es. carte distribuite)
-    CH->>VM: Notifica nuovo evento
-    VM->>UI: Aggiorna stato visuale
-    UI-->>VM: Input utente (es. azione "Chiedi Carta")
-    VM->>CH: Invia azione (PlayerAction)
-    CH->>M: Inoltra azione al motore di gioco
-    M->>M: Aggiorna stato interno
-    M->>CH: Emette esito / nuovo stato
+    Note over C,M: Controller avvia il ciclo di gioco
+    C->>M: Avvio step / evento
+    M->>CH: send(MessaggioSpecificoEvento)
+    Note over M: Model si sospende in attesa sul canale
+    CH->>VM: receive() consuma il messaggio
+    VM->>UI: Aggiorna stato e componenti visuali
+    UI-->>VM: Input utente (click / selezione)
+    VM->>CH: send(MessaggioRispostaDedicato)
+    CH->>M: receive() risveglia il Model
+    M->>M: Calcola transizione di stato
+    M->>CH: send(StatoAggiornato / Esito)
     CH->>VM: Notifica esito
-    VM->>UI: Renderizza esito a schermo
+    VM->>UI: Aggiorna / Renderizza esito a schermo
 ```
