@@ -10,4 +10,5 @@ title: Report
 - [Specifica dei Requisiti](Specifica dei Requisiti/)
 - [Design Architetturale](Design Architetturale/)
 - [Testing](Testing/)
+- [Retrospettiva](Retrospettiva/)
 - [API Reference (ScalaDoc)](./api/)
