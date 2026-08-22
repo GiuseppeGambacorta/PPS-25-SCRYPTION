@@ -7,10 +7,10 @@ parent: Report
 
 ## Approccio
 
-Lo sviluppo dei test non ha seguito rigorosamente il ciclo *red–green–refactor* del Test-Driven Development: nella maggior parte dei casi i test sono stati scritti **in parallelo** all'implementazione, piuttosto che sistematicamente prima di essa. La strategia di test copre comunque in modo esteso tutti i componenti: *model*, *view* e *controller*, con particolare attenzione alla logica di gioco e alla gestione della comunicazione tramite il canale di messaggi tra Model e ViewModel.
+Lo sviluppo dei test non ha seguito rigorosamente il ciclo *red–green–refactor* del Test-Driven Development: nella maggior parte dei casi i test sono stati scritti **in parallelo** all'implementazione, piuttosto che sistematicamente prima di essa. La strategia di test copre comunque in modo esteso tutti i component del *model* con particolare attenzione alla logica di gioco e alla gestione della comunicazione tramite il canale di messaggi tra Model e ViewModel.
 
 ## ScalaTest
-
+qui devi dire che abbiamo seguito i requisiti del gioco e
 Per i test è stata utilizzata la libreria **ScalaTest**, in stile **BDD** con `AnyFeatureSpec`, `GivenWhenThen` e i `Matchers` (`shouldBe`). Ogni funzionalità è organizzata in `Feature` e `Scenario`, con i passaggi descritti tramite `Given` / `When` / `Then` / `And`, per rendere esplicito sia il comportamento atteso sia il contesto in cui viene verificato.
 
 Un esempio dai test degli eventi di gioco (`ChangeDeckEventsTest`), che verifica l'evento di aggiunta di una nuova carta al mazzo:
@@ -59,8 +59,15 @@ private def runMockGuiWithRetry(ch: GameMessagesChannel)(wrongResponses: List[Ev
 
 Questo pattern viene riutilizzato in più scenari (ad esempio *Firecamp Attack* e *Sacrifice*) per verificare che, a fronte di un messaggio del tipo sbagliato (`Cards` invece di `SingleCard`, oppure `End` inatteso), l'evento richieda correttamente un nuovo messaggio e prosegua non appena riceve quello valido.
 
-Non tutti i test necessitano di questa simulazione: quando la funzionalità testata è una trasformazione pura dello stato di gioco (ad esempio l'uso di un oggetto dall'inventario, che restituisce un nuovo `FightState` aggiornato), il test costruisce direttamente lo stato iniziale desiderato e verifica lo stato risultante, senza passare dal canale.
+Non tutti i test necessitano di questa simulazione: quando la funzionalità testata è una trasformazione pura dello stato di gioco (ad esempio l'uso di un oggetto dall'inventario, che restituisce un nuovo `FightState` aggiornato), il test costruisce direttamente lo stato iniziale desiderato e verifica lo stato risultante, senza passare da un canale.
 
 ## Copertura
+La suite di test offre una copertura approfondita di tutti gli aspetti core della logica di gioco:
 
-La suite copre gli eventi principali del motore di gioco, verificando per ciascuno sia il caso "felice" (input valido ricevuto al primo messaggio) sia i casi limite legati a messaggi inattesi sul canale o a stati particolari del mazzo, oltre alla condizione finale di fine partita (`isGameOver`).
+   - Eventi e gestione mazzo: verifica di ogni evento relativo all'aggiunta, sacrificio, potenziamento e modifica delle carte;
+
+   - Oggetti: logica di acquisizione, gestione dell'inventario e consumo degli oggetti con i relativi effetti di gioco;
+
+   - Combattimento: copertura di ogni casistica interna alla fase di scontro (calcolo danni, risoluzione dei sigilli/seals, posizionamento e movimento delle carte sulla Board, turni dell'IA);
+
+   - Casi limite e stati terminali: gestione di messaggi inattesi/non validi sul canale di comunicazione, condizioni del mazzo vuoto e verifica della condizione di fine partita (isGameOver).
