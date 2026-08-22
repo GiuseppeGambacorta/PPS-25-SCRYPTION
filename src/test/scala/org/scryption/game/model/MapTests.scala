@@ -5,7 +5,7 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scryption.game.model.MapBranch.*
 import org.scryption.game.model.Maps.Path
-import org.scryption.game.model.events.*
+import org.scryption.GameEvents.*
 
 class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
@@ -13,10 +13,10 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("The MapScript must be empty if there's no levels") {
       Given("an empty MapLevel List")
-      val levels: List[MapLevel[Event]] = List.empty
+      val levels: List[MapLevel[GameEvent]] = List.empty
 
       When("creating a new MapScript")
-      val script: MapScript[Event] = MapScript[Event](levels)
+      val script: MapScript[GameEvent] = MapScript[GameEvent](levels)
 
       Then("The result should be empty")
       script.isEmpty.shouldBe(true)
@@ -24,21 +24,21 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("The MapScript must be empty if there's no steps") {
       Given("a MapLevel List with an empty MapStep List")
-      val levels: List[MapLevel[Event]] = List(MapLevel(List.empty))
+      val levels: List[MapLevel[GameEvent]] = List(MapLevel(List.empty))
 
       When("creating a new MapScript")
-      val script: MapScript[Event] = MapScript[Event](levels)
+      val script: MapScript[GameEvent] = MapScript[GameEvent](levels)
 
       Then("The result should be empty")
       script.isEmpty.shouldBe(true)
     }
 
     Scenario("The MapScript must not be empty") {
-      Given("a MapLevel List with a MapStep List with an Event")
-      val levels: List[MapLevel[Event]] = List(MapLevel(List(Node(0, (gameState, ch) => getANewCard(gameState, ch)))))
+      Given("a MapLevel List with a MapStep List with an GameEvent")
+      val levels: List[MapLevel[GameEvent]] = List(MapLevel(List(Node(3, randomEvent))))
 
       When("creating a new MapScript")
-      val script: MapScript[Event] = MapScript[Event](levels)
+      val script: MapScript[GameEvent] = MapScript[GameEvent](levels)
 
       Then("The result should be a Node")
       script.isEmpty.shouldBe(false)
@@ -50,10 +50,10 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must be End") {
 
       Given("an empty MapScript")
-      val script: MapScript[Event] = MapScript(List.empty)
+      val script: MapScript[GameEvent] = MapScript(List.empty)
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must be End")
       gameMap.shouldBe(Path.End())
@@ -62,12 +62,12 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must be a Node") {
 
       Given("a MapScript with an event")
-      val event = (gameState, ch) => getANewCard(gameState, ch)
+      val event = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(MapLevel(List(Node(3, event)))))
+      val script: MapScript[GameEvent] = MapScript(List(MapLevel(List(Node(3, event)))))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must be a Node")
       gameMap.shouldBe(Path.Node(event, Path.End()))
@@ -76,11 +76,11 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must be a sequence of Nodes") {
 
       Given("a MapScript with a few linear events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List (
+      val script: MapScript[GameEvent] = MapScript(List (
         MapLevel(List (
           Node(3, event1)
         )),
@@ -93,7 +93,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must be a sequence of Node")
       gameMap.shouldBe(Path.Node(event1, Path.Node(event2, Path.Node(event3, Path.End()))))
@@ -102,11 +102,11 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a two branches") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(
+      val script: MapScript[GameEvent] = MapScript(List(
         MapLevel(List(
           Node(3, event1)
         )),
@@ -116,7 +116,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must have two branches")
       gameMap.shouldBe(Path.Node(event1, Path.Fork(Path.Node(event2, Path.End()), Path.Node(event3, Path.End()))))
@@ -125,13 +125,13 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a two longer branches") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event5 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
+      val event4 = randomEvent
+      val event5 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(
+      val script: MapScript[GameEvent] = MapScript(List(
         MapLevel(List(
           Node(3, event1)
         )),
@@ -145,7 +145,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must have two longer branches")
       gameMap.shouldBe(Path.Node(event1, Path.Fork(
@@ -157,12 +157,12 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a two branches that join back") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
+      val event4 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(
+      val script: MapScript[GameEvent] = MapScript(List(
         MapLevel(List(
           Node(3, event1)
         )),
@@ -175,7 +175,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must have two branches")
       gameMap.shouldBe(Path.Node(event1, Path.Fork(
@@ -187,14 +187,14 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have three branches") {
 
       Given("a MapScript with a few events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event5 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event6 = (gameState, ch) => sacrifice(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
+      val event4 = randomEvent
+      val event5 = randomEvent
+      val event6 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(
+      val script: MapScript[GameEvent] = MapScript(List(
         MapLevel(List(
           Node(3, event1)
         )),
@@ -208,7 +208,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must have three branches")
       gameMap.shouldBe(Path.Node(event1, Path.Fork(
@@ -223,18 +223,18 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have a four branches that join back") {
 
       Given("a MapScript with some events")
-      val event1 = (gameState, ch) => sacrifice(gameState, ch)
-      val event2 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event3 = (gameState, ch) => getANewCard(gameState, ch)
-      val event4 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event5 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event6 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event7 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event8 = (gameState, ch) => getANewCard(gameState, ch)
-      val event9 = (gameState, ch) => sacrifice(gameState, ch)
-      val event10 = (gameState, ch) => mushRoomsExpert(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
+      val event4 = randomEvent
+      val event5 = randomEvent
+      val event6 = randomEvent
+      val event7 = randomEvent
+      val event8 = randomEvent
+      val event9 = randomEvent
+      val event10 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(
+      val script: MapScript[GameEvent] = MapScript(List(
         MapLevel(List(
           Node(3, event1)
         )),
@@ -255,7 +255,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result must have four branches")
       gameMap.shouldBe(Path.Node(event1, Path.Fork(
@@ -273,17 +273,17 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("The Path must have expected structure") {
 
       Given("some events and a MapScript")
-      val event1 = (gameState, ch) => getANewCard(gameState, ch)
-      val event2 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event3 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event4 = (gameState, ch) => getANewCard(gameState, ch)
-      val event5 = (gameState, ch) => fireCamp_Attack(gameState, ch)
-      val event6 = (gameState, ch) => fireCamp_Health(gameState, ch)
-      val event7 = (gameState, ch) => sacrifice(gameState, ch)
-      val event8 = (gameState, ch) => mushRoomsExpert(gameState, ch)
-      val event9 = (gameState, ch) => getANewCard(gameState, ch)
+      val event1 = randomEvent
+      val event2 = randomEvent
+      val event3 = randomEvent
+      val event4 = randomEvent
+      val event5 = randomEvent
+      val event6 = randomEvent
+      val event7 = randomEvent
+      val event8 = randomEvent
+      val event9 = randomEvent
 
-      val script: MapScript[Event] = MapScript(List(
+      val script: MapScript[GameEvent] = MapScript(List(
         MapLevel(List (
           Node(3, event1)
         )),
@@ -304,7 +304,7 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       ))
 
       When("creating a new Path")
-      val gameMap: Path[Event] = Path.fromScript(script)
+      val gameMap: Path[GameEvent] = Path.fromScript(script)
 
       Then("The result should be equal")
       gameMap.shouldBe(
