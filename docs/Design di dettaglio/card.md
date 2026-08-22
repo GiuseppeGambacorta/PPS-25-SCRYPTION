@@ -13,10 +13,10 @@ Per introdurre una nuova meccanica, infatti, è sufficiente espandere il dominio
 
 Di seguito il diagramma delle classi che mostra come è stato strutturato il componente Card:
 
-<pre class="mermaid">
+```mermaid
 classDiagram
     class Card~C~ {
-        <<sealed trait>>
+        <<trait>>
         +id: UUID
         +name: String
         +health: Int
@@ -27,10 +27,11 @@ classDiagram
         +withHealth(h: Int): C
         +withSacrificeAttribute(attr: SacrificeAttribute): C
         +addSeal(s: Seal): C
+        
     }
 
     class CreatureCard {
-        <<case class>>
+        <<case_class>>
         +id: UUID
         +name: String
         +attack: Int
@@ -39,16 +40,18 @@ classDiagram
         +seals: Set~Seal~
         +rarity: Rarity
         +withAttack(a: Int): CreatureCard
+        
     }
 
     class SupportCard {
-        <<case class>>
+        <<case_class>>
         +id: UUID
         +name: String
         +health: Int
         +sacrificeAttribute: SacrificeAttribute
         +seals: Set~Seal~
         +rarity: Rarity
+        
     }
 
     class SacrificeAttribute {
@@ -84,9 +87,4 @@ classDiagram
     Card *-- SacrificeAttribute
     Card *-- Seal
     Card *-- Rarity
-</pre>
-
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
-</script>
+```
