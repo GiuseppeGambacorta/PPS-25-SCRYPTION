@@ -1,8 +1,15 @@
+
 ---
 title: Design architetturale
 nav_order: 3
 parent: Report
 ---
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>
+
 
 # Design architetturale
 
