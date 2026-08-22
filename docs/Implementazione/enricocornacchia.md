@@ -131,7 +131,9 @@ pulito e il coupling basso. I risultati dell'attacco vengono incapsulati e resti
 immutabili `CombatResult` e `RowAttackResult`, che aggregano i danni inflitti, le ossa guadagnate dalle carte morte
 e la riga aggiornata.
 
-![Diagramma UML Combat Manager e Fight Resolver](images/combat_manager_url.png)
+<div align="center">
+  <img src="images/combat_manager_url.png" width="50%" alt="combatmanageruml">
+</div>
 
 ### MovementManager e SacrificeManager
 Le restanti meccaniche della board sono gestite da manager dedicati, implementati tramite computazioni
