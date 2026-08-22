@@ -1,8 +1,8 @@
-
-
 ---
+
 title: Design di Dettaglio
 parent: Report
+
 ---
 
 
