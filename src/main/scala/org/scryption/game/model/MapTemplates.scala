@@ -10,7 +10,7 @@ object MapTemplates:
   private val templateA: MapScript[GameEvent] =
     MapScript(List(
       MapLevel(List(
-        MapBranch.Node(3, fight)
+        MapBranch.Node(3, randomEvent) // FIGHT
       )),
       MapLevel(List(
         MapBranch.Node(3, getANewCard)
@@ -46,7 +46,7 @@ object MapTemplates:
   private val templateB: MapScript[GameEvent] =
     MapScript(List(
       MapLevel(List(
-        MapBranch.Node(3, fight)
+        MapBranch.Node(3, randomEvent) // FIGHT
       )),
       MapLevel(List(
         MapBranch.Node(3, getANewCard)
@@ -85,7 +85,7 @@ object MapTemplates:
   private val templateC: MapScript[GameEvent] =
     MapScript(List(
       MapLevel(List(
-        MapBranch.Node(3, fight)
+        MapBranch.Node(3, randomEvent) // FIGHT
       )),
       MapLevel(List(
         MapBranch.Node(3, getANewCard)
@@ -124,7 +124,7 @@ object MapTemplates:
   private val templateD: MapScript[GameEvent] =
     MapScript(List(
       MapLevel(List(
-        MapBranch.Node(3, fight)
+        MapBranch.Node(3, randomEvent) //FIGHT
       )),
       MapLevel(List(
         MapBranch.Node(3, getANewCard)
