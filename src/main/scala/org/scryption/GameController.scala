@@ -59,8 +59,9 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
     else
 
       val (eventLogic , createView) = map match
-        case Path.Node(event, _) => event
-        
+        case Path.Node(event, _) => event match
+          case (logic, view) => (logic, view)
+
       val eventCh = GameMessagesChannel()
       onViewChange(createView(eventCh))
       val nextState = eventLogic(gameState, eventCh)
