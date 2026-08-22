@@ -49,3 +49,22 @@ object Maps:
       }
       case _ if (level.tail.nonEmpty) => findBranch(offset, MapLevel(level.tail))
     }
+
+    @tailrec
+    def scrollScript[E](map: Path[E], script: MapScript[E]): MapScript[E] = {
+      var eventFound: Boolean = false
+      val event = map match
+        case Node(e, next) => e
+        case _             => script
+
+      script.head match
+        case level => level.branches.foreach {
+          case MapBranch.Node(_, e) if (e == event)                  => eventFound = true
+          case MapBranch.Fork(_, l, r) if (l == event || r == event) => eventFound = true
+          case MapBranch.Join(_, e) if (e == event)                  => eventFound = true
+          case _                                                     => ()
+        }
+
+      if eventFound then script
+      else scrollScript(map, MapScript(script.tail))
+    }

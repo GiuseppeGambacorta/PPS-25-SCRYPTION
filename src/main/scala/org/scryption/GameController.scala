@@ -42,7 +42,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
     if !running then
       running = true
       val initialState = GameState.getInitialGameState
-      val map = MapTemplates.newGameMap
+      val map = Path.fromScript(MapTemplates.newGameMap)
 
       Future {
         try
