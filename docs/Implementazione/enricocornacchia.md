@@ -131,37 +131,7 @@ pulito e il coupling basso. I risultati dell'attacco vengono incapsulati e resti
 immutabili `CombatResult` e `RowAttackResult`, che aggregano i danni inflitti, le ossa guadagnate dalle carte morte
 e la riga aggiornata.
 
-<pre class="mermaid">
-classDiagram
-    class CombatManager {
-        <<trait>>
-        +executeAttack(...)(using resolver)
-    }
-
-    class FightResolver {
-        <<trait>>
-        +getTargets(...)
-    }
-
-    class BasicResolver {
-        +getTargets(...)
-    }
-
-    class AirborneResolver {
-        <<trait>>
-        +getTargets(...)
-    }
-
-    class StrikeResolver {
-        <<trait>>
-        +getTargets(...)
-    }
-
-    CombatManager ..> FightResolver : using
-    FightResolver <|.. BasicResolver
-    FightResolver <|-- AirborneResolver : stackable trait
-    FightResolver <|-- StrikeResolver : stackable trait
-</pre>
+![Diagramma UML Combat Manager e Fight Resolver](images/combat_manager_url.png)
 
 ### MovementManager e SacrificeManager
 Le restanti meccaniche della board sono gestite da manager dedicati, implementati tramite computazioni
@@ -219,8 +189,3 @@ al Model.
 Infine, la reattività ai comandi è stata realizzata registrando i listener nativi di Scala Swing
 (`listenTo(mouse.clicks, mouse.moves)`) e destrutturando gli eventi tramite pattern matching all'interno dei blocchi
 dichiarativi `reactions`.
-
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
-</script>
