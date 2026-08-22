@@ -11,7 +11,7 @@ nav_order: 3
 Il pattern architetturale adottato si basa su una variante del modello **Model-View-ViewModel (MVVM)** orchestrata da un **Controller** centrale. L'architettura è stata progettata per garantire un disaccoppiamento netto e asincrono tra la logica di dominio (Model) e il livello di presentazione (Swing View).
 
 Model e View vivono su **thread di esecuzione separati**: la sincronizzazione e lo scambio dati avvengono per mezzo di un canale di messaggi (`GameMessagesChannel`) che funge da **Monitor** concorrente (produttore-consumatore thread-safe).
-```mermaid
+<pre class="mermaid">
 flowchart TD
     subgraph Execution["Thread Orchestration"]
         GC["GameController (Game Loop)"]
@@ -42,6 +42,7 @@ flowchart TD
     GE -->|Invia Messaggi Dedicati / Eventi| CH
     CH -->|Consuma Eventi| VM
 ```
+pre>
 
 A differenza di un approccio monolitico o guidato strettamente da chiamate bloccanti, in questa architettura il Controller ha una responsabilità focalizzata: inizializza le componenti, inietta gli estremi del canale di comunicazione tra il Model e il ViewModel, e gestisce il ciclo principale di esecuzione (Game Loop).
 
@@ -77,7 +78,7 @@ Il GameController rappresenta il punto di coordinamento principale:
 
 Il flusso di interazione tra i componenti tramite canale è illustrato nel seguente diagramma di sequenza:
 
-```mermaid
+<pre class="mermaid">
 sequenceDiagram
     autonumber
     participant UI as SwingView (EDT Thread)
@@ -99,4 +100,10 @@ sequenceDiagram
     M->>CH: send(StatoAggiornato / Esito)
     CH->>VM: Notifica esito
     VM->>UI: Aggiorna / Renderizza esito a schermo
-```
+pre>
+
+
+<script type="module">
+  import mermaid from '[https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs](https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs)';
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
