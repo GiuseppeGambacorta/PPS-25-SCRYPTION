@@ -1,39 +1,112 @@
-## Implementazione di Board
+# Documentazione dell'Architettura di Gioco
 
-Questa sezione descrive nel dettaglio l'implementazione del modello della board di gioco, definito nel modulo boardModel. A differenza della panoramica concettuale già vista in precedenza, qui si entra nel merito delle scelte tecniche adottate: i tipi opachi, il DSL di costruzione basato sugli operatori | e ||, e le operazioni di accesso e aggiornamento.
+---
 
-Tipi opachi: BoardRow e Board
+## 1. Implementazione di `Board`
 
-BoardRow e Board sono definiti come tipi opachi (opaque type), rispettivamente Vector[Slot] e Vector[BoardRow]. L'uso di tipi opachi permette di nascondere completamente la rappresentazione interna basata su Vector: dall'esterno del modulo, BoardRow e Board sono tipi a sé stanti, e possono essere manipolati solo attraverso le operazioni esposte come extension methods, senza alcuna possibilità di accedere direttamente alla struttura dati sottostante o di costruirli in modo non conforme alle regole del dominio.
+`BoardRow` e `Board` sono implementati come **opaque type** basati internamente su collezioni immutabili (`Vector[Slot]` e `Vector[BoardRow]`). L'adozione dei tipi opachi garantisce il totale incapsulamento della rappresentazione dati: all'esterno del modulo di definizione, `BoardRow` e `Board` sono tipi a sé stanti e possono essere manipolati esclusivamente attraverso i costruttori controllati e gli extension methods esposti, impedendo la creazione di stati non validi o l'accesso diretto alla struttura sottostante.
 
-Uno Slot è semplicemente un Option[Card[?]]: Some(carta) se la cella è occupata, None se è vuota. La costante x è definita come alias di None, pensata per essere usata come "cella vuota" all'interno delle espressioni del DSL, rendendole più leggibili.
+Uno `Slot` modella lo stato della singola cella come `Option[Card[?]]` (`Some(card)` per una cella occupata, `None` per una cella vuota). La costante `x` è definita come alias di `None` per rappresentare visivamente una cella vuota all'interno delle espressioni del DSL.
 
-Il DSL di costruzione: operatori | e ||
+### 1.1 Il DSL di costruzione: operatori `|` e `||`
 
-Il modulo espone un piccolo DSL interno per costruire righe e board in modo dichiarativo e leggibile, invece di dover chiamare esplicitamente costruttori o factory verbose. Il DSL si basa su due operatori, entrambi definiti come extension methods infissi:
+Il modulo fornisce un DSL dichiarativo per istanziare righe e board in modo intuitivo, evitando factory verbose o costruttori annidati. Il DSL sfrutta due extension methods infissi:
 
-| (pipe singola): compone singoli Slot in sequenza, accumulandoli in una BoardRow. È definito sia a partire da uno Slot (per iniziare una riga: slot1 | slot2) sia a partire da una BoardRow già esistente (per estenderla di uno slot alla volta: riga | nuovoSlot), con una require che garantisce di non superare ColsCount slot nella riga;
-|| (doppia pipe): compone BoardRow in una Board. È definito sia a partire da due BoardRow (per creare una board di due righe: riga1 || riga2) sia a partire da una Board già esistente (per aggiungerle un'ulteriore riga: board || riga3), sempre con require a garanzia del numero corretto di colonne e del limite massimo di righe (RowsCount).
+- **`|` (pipe singola)**: concatena singoli `Slot` per comporre una `BoardRow`. L'operatore permette sia di iniziare una riga (`slot1 | slot2`) sia di estendere una riga esistente (`riga | nuovoSlot`), con vincoli `require` che validano a runtime il limite esatto delle colonne consentite;
+- **`||` (doppia pipe)**: aggrega istanze di `BoardRow` per comporre una `Board`. L'operatore supporta la combinazione di due righe (`riga1 || riga2`) o l'aggiunta di una riga a una griglia (`board || riga3`), verificando la conformità sul numero totale di righe consentite.
 
-In pratica, l'uso combinato dei due operatori permette di scrivere una board leggibile quasi come una griglia visiva nel codice, ad esempio componendo celle vuote (x) e celle occupate (Some(carta)) slot per slot, riga per riga, per poi unire le righe tra loro con ||.
+L'uso combinato di questi operatori rende la definizione delle board visualmente isomorfa alla griglia di gioco:
 
-Sistema di Combattimento (fightEvent)
+```scala
+val initialBoard = (Some(squirrel) | x          | x | x) ||
+                   (x              | Some(bear) | x | x) ||
+                   (x              | x          | x | x)
+```
 
-Il combattimento è l'evento più articolato tra quelli previsti dal gioco: a differenza degli altri eventi, che modellano una singola interazione punto-a-punto con il giocatore, `fightEvent` gestisce un intero sotto-ciclo di gioco, scandito da più **stati** che si alternano fino al raggiungimento di una condizione di vittoria o sconfitta.
+In aggiunta al DSL visivo, è disponibile la factory esplicita per la costruzione rapida di singole righe:
 
-## Una macchina a stati
+```scala
+val row = BoardRow(Some(squirrel), Some(bear), Some(fox), x)
+```
 
-L'intero combattimento è governato da una macchina a stati finiti (`TurnState`), che rappresenta in ogni momento la fase in cui si trova il turno:
+Questa astrazione ha semplificato e velocizzato la stesura dei test automatici per le logiche di combattimento e il gameplay loop, permettendo di istanziare scenari di test complessi con una sintassi compatta e priva di boilerplate.
+
+---
+
+## 2. Architettura degli Eventi di Gioco
+
+### 2.1 Il tipo `Event`
+
+Nel sistema, un `Event` è l'astrazione fondamentale che descrive qualsiasi transizione di stato del gioco:
+
+```scala
+type Event = (GameState, GameMessagesChannel) => GameState
+```
+
+Dal punto di vista concettuale, un `Event` è una funzione che accetta lo stato corrente della partita (`GameState`) e un canale di sincronizzazione thread-safe (`GameMessagesChannel`), restituendo il nuovo stato risultante (`GameState`).
+
+L'adozione di questo type alias offre tre vantaggi architetturali:
+
+- **Firma uniforme**: ogni dinamica di gioco (combattimenti, pesca carte, potenziamenti al falò, sacrifici) rispetta la medesima interfaccia, permettendo al controller di trattare tutte le attività in modo del tutto polimorfo;
+- **Separazione tra logica e I/O**: la logica del Model calcola la trasformazione dello stato, usando il canale solo per sincronizzarsi asincronamente con l'utente senza conoscere dettagli grafici;
+- **Componibilità e testabilità**: un `Event` può essere eseguito e verificato passando un mock/stub del canale o verificando direttamente la transizione da `GameState` a `GameState`.
+
+### 2.2 Associazione Evento-Vista: `GameEvents`
+
+Per collegare in modo modulare la logica di dominio alla rispettiva interfaccia grafica senza creare dipendenze rigide, il modulo `GameEvents` definisce la tupla `GameEvent`:
+
+```scala
+type GameEvent = (Event, GameMessagesChannel => Panel)
+```
+
+Un `GameEvent` accoppia:
+
+1. La funzione di dominio (`Event`): calcola la transizione dello stato di gioco;
+2. La factory grafica (`GameMessagesChannel => Panel`): riceve l'istanza del canale condiviso, istanzia il rispettivo `ViewModel` e produce il `Panel` Swing per il rendering.
+
+```scala
+object GameEvents:
+  val getANewCard: GameEvent = (getANewCardEvent, ch => new CardSelectionView(ViewModelDeckEvent(ch)))
+  val fight: GameEvent       = (fightEvent, ch => new FightView(ViewModelFight(ch)))
+  val getANewItem: GameEvent = (getANewItemEvent, ch => new ItemSelectionView(ViewModelItemEvent(ch)))
+  // ... altri eventi di potenziamento (falò, micologi, sacrifici)
+```
+
+Questa struttura rende l'architettura altamente estensibile: l'introduzione di una nuova schermata o meccanica richiede esclusivamente l'aggiunta di una nuova coppia (funzione di transizione + factory della vista).
+
+### 2.3 Orchestrazione e Ciclo di Gioco: `GameController`
+
+Il `GameController` è il componente incaricato di coordinare l'esecuzione asincrona della partita, governando il passaggio tra schermate ed eventi.
+
+Le sue responsabilità principali includono:
+
+- **Esecuzione Asincrona su Thread Dedicato**: All'avvio (`startNewGame()`), il controller genera lo stato iniziale (`GameState`) e la mappa (`GameMap`), delegando l'esecuzione del `gameLoop` a un `Future` in background per non bloccare l'Event Dispatch Thread (EDT) di Swing durante le attese sul canale.
+- **Iniezione del Canale e Cambio Schermata**: Nel metodo ricorsivo di coda (`@tailrec def gameLoop`), per ciascun nodo della mappa:
+    1. Estrae la logica e la factory della vista da `map.currentEvent`;
+    2. Crea un'istanza dedicata di `GameMessagesChannel`;
+    3. Invia il nuovo pannello UI alla vista tramite la callback `onViewChange(createView(eventCh))`;
+    4. Esegue `eventLogic(gameState, eventCh)`, attendendo la risoluzione dell'evento.
+- **Avanzamento sulla Mappa**: Una volta ottenuto il `nextState`, se la partita continua il controller crea un nuovo canale per la mappa, monta la `MapView` tramite `ViewModelMap` ed esegue `MapEvent(map, mapCh)` per acquisire la scelta del percorso del giocatore prima di ricominciare il ciclo.
+
+---
+
+## 3. Sistema di Combattimento (`fightEvent`)
+
+Il combattimento è l'evento più articolato tra quelli previsti dal gioco: a differenza degli altri eventi, che modellano una singola interazione puntuale con il giocatore, `fightEvent` gestisce un intero sotto-ciclo di gioco scandito da più **stati** che si alternano fino al raggiungimento di una condizione di vittoria o sconfitta.
+
+### 3.1 Macchina a stati
+
+L'intero combattimento è governato da una macchina a stati finiti (`TurnState`), che rappresenta in ogni momento la fase attiva del turno:
 
 - **draw**: fase di pesca, in cui il giocatore sceglie una carta da aggiungere alla propria mano;
-- **playerTurn**: fase in cui il giocatore gioca le proprie carte sul campo o usa un oggetto;
-- **playerFight**: fase in cui viene risolto l'attacco del giocatore contro il bot;
-- **botTurn**: fase in cui è il bot a decidere e giocare la propria mossa;
-- **botFight**: fase in cui viene risolto l'attacco del bot contro il giocatore.
+- **playerTurn**: fase in cui il giocatore posiziona carte sulla board o utilizza oggetti;
+- **playerFight**: fase in cui viene risolto l'attacco delle creature del giocatore contro quelle del bot;
+- **botTurn**: fase in cui l'avversario calcola ed esegue le proprie mosse;
+- **botFight**: fase in cui viene risolto l'attacco delle creature del bot contro quelle del giocatore.
 
-Queste fasi si susseguono in un ciclo continuo, alternando il turno del giocatore a quello del bot, finché il punteggio di combattimento (`scalePoints`) non raggiunge una delle due soglie che decretano la fine dello scontro: superata in positivo si vince, superata in negativo si perde.
+Queste fasi si susseguono in un ciclo continuo, alternando le azioni delle due entità finché il bilanciamento della bilancia dei danni (`scalePoints`) non raggiunge una delle due soglie limite: superata in positivo decreta la vittoria del giocatore, superata in negativo la sconfitta.
 
-<pre class="mermaid">
+```mermaid
 stateDiagram-v2
     [*] --> draw
     draw --> playerTurn : pesca effettuata
@@ -43,17 +116,52 @@ stateDiagram-v2
     botTurn --> botFight
     botTurn --> [*] : vittoria (soglia positiva raggiunta)
     botFight --> draw
-</pre>
+```
 
+### 3.2 Decomposizione in Handler e Testing Modulare
 
+La logica di transizione della macchina a stati è centralizzata in una funzione ricorsiva di loop che fa pattern matching sullo stato corrente:
 
+```scala
+turnState match
+  case TurnState.draw =>
+    if fightState.scalePoints <= BotWinningPoints then PlayerLost
+    else
+      val (nextTurn, nextState) = handleDrawPhase(fightState, ch)
+      loop(nextTurn, nextState, ch)
 
+  case TurnState.playerTurn =>
+    val (nextTurn, nextState) = handlePlayerTurnPhase(fightState, ch)
+    loop(nextTurn, nextState, ch)
 
-# Implementazione di GameMessagesChannel
+  case TurnState.playerFight =>
+    val (nextTurn, nextState) = handleFightPhase(fightState, isPlayerAttacking = true)
+    loop(nextTurn, nextState, ch)
+
+  case TurnState.botTurn =>
+    if fightState.scalePoints >= PlayerWinningPoints then PlayerWon
+    else
+      val bot: BotStrategy = RandomBotStrategy()
+      val fightStateAfterBotPlays = bot.playTurn(fightState)
+      loop(TurnState.botFight, fightStateAfterBotPlays, ch)
+
+  case TurnState.botFight =>
+    val (nextTurn, nextState) = handleFightPhase(fightState, isPlayerAttacking = false)
+    loop(nextTurn, nextState, ch)
+```
+
+Per mantenere il codice manutenibile e modulare, l'effettiva computazione di ciascun passaggio è delegata a funzioni handler dedicate (`handleDrawPhase`, `handlePlayerTurnPhase`, `handleFightPhase`). Questa scomposizione garantisce:
+
+- **Isolamento delle responsabilità**: ogni handler incapsula esclusivamente le regole relative alla propria fase di gioco, gestendo in autonomia l'eventuale comunicazione asincrona sul canale `ch` o il calcolo deterministico del danno;
+- **Testabilità unitaria granulare**: ogni singolo handler è stato testato in completo isolamento rispetto al ciclo principale, verificando puntualmente le variazioni di stato (`fightState`), il calcolo dei danni alle carte, l'applicazione dei sacrifici e le risposte del canale tramite test di unità dedicati prima della loro integrazione nel loop complessivo.
+
+---
+
+## 4. Implementazione di `GameMessagesChannel`
 
 Questa sezione descrive nel dettaglio l'implementazione del canale di comunicazione tra Model e View, a partire dalla gerarchia dei messaggi che vi transitano fino ai meccanismi concreti di sincronizzazione.
 
-## La gerarchia dei messaggi: GameMessage
+### 4.1 La gerarchia dei messaggi: `GameMessage`
 
 Alla base di tutto c'è `GameMessage`, un `sealed trait` che rappresenta il tipo comune a cui appartiene ogni messaggio scambiabile sul canale. Essendo `sealed`, il compilatore conosce l'insieme chiuso dei suoi sottotipi diretti, il che consente pattern matching esaustivi (senza bisogno di un caso di default "a copertura") ovunque un messaggio venga gestito.
 
@@ -65,7 +173,7 @@ Da `GameMessage` derivano tre enum, ciascuno dedicato a un contesto di gioco spe
 
 Ogni enum estende `GameMessage`, quindi tutti i suoi casi sono automaticamente utilizzabili ovunque sia richiesto un `GameMessage` generico: il canale può così restare agnostico rispetto al contesto specifico, mentre chi invia e chi riceve un messaggio conosce (tramite pattern matching) a quale enum appartiene e come interpretarlo.
 
-## L'interfaccia: trait GameMessagesChannel
+### 4.2 L'interfaccia: `trait GameMessagesChannel`
 
 Il contratto del canale è definito da un trait, che espone cinque operazioni:
 
@@ -75,7 +183,7 @@ Il contratto del canale è definito da un trait, che espone cinque operazioni:
 
 Definire il canale come trait, anziché esporre direttamente la classe concreta, permette di programmare contro un'astrazione: il resto del sistema dipende solo da questa interfaccia, il che rende possibile sostituire l'implementazione (ad esempio con una versione fittizia per i test) senza alcun impatto sul codice che la utilizza.
 
-## L'implementazione concreta: GameMessagesChannelImpl
+### 4.3 L'implementazione concreta: `GameMessagesChannelImpl`
 
 `GameMessagesChannelImpl` realizza il trait appoggiandosi a due `LinkedBlockingQueue[GameMessage]`, una per ciascuna direzione (`toGui` e `toGame`). L'uso di una coda bloccante è la scelta chiave che rende il canale un vero Monitor produttore-consumatore:
 
@@ -84,47 +192,3 @@ Definire il canale come trait, anziché esporre direttamente la classe concreta,
 - l'operazione `clear` svuota entrambe le code, anch'essa protetta dallo stesso lock, per evitare che uno svuotamento avvenga in concomitanza con un invio in corso.
 
 Va notato che le operazioni di lettura (`take()`) non sono racchiuse nello stesso blocco `synchronized`: `LinkedBlockingQueue` è già internamente thread-safe per le operazioni di inserimento ed estrazione, quindi il lock esplicito serve unicamente a coordinare tra loro le scritture (e la pulizia), non le letture, che possono avvenire in sicurezza direttamente sulla coda.
-
-<pre class="mermaid">
-classDiagram
-    class GameMessage {
-        <<sealed trait>>
-    }
-    class EventMessages {
-        <<enum>>
-    }
-    class FightMessages {
-        <<enum>>
-    }
-    class MapMessages {
-        <<enum>>
-    }
-    GameMessage <|-- EventMessages
-    GameMessage <|-- FightMessages
-    GameMessage <|-- MapMessages
-
-    class GameMessagesChannel {
-        <<trait>>
-        +sendToGui(message)
-        +receiveFromGui() 
-        +sendToGame(message)
-        +receiveFromGame()
-        +clear()
-    }
-    class GameMessagesChannelImpl {
-        -toGui: LinkedBlockingQueue
-        -toGame: LinkedBlockingQueue
-        -lock: Object
-    }
-    GameMessagesChannel <|.. GameMessagesChannelImpl
-    GameMessagesChannelImpl --> GameMessage : contiene
-</pre>
-
-## Companion object: costruzione del canale
-
-Il companion object `GameMessagesChannel` espone un unico metodo `apply()`, che crea una nuova `GameMessagesChannelImpl` inizializzando al suo interno le due code vuote. Questo è l'unico punto in cui viene istanziata l'implementazione concreta: chi crea un canale ottiene sempre e solo il tipo `GameMessagesChannel` (il trait), senza mai venire a conoscenza dell'esistenza della classe `Impl` o dei dettagli con cui è realizzata — coerentemente con il principio di incapsulamento adottato anche altrove nel sistema.
-
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
-</script>
