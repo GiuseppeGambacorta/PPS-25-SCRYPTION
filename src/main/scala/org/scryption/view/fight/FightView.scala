@@ -23,6 +23,11 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
     selectedSacrifices = List.empty
     boardView.updateSacrificeHighlights(selectedSacrifices)
 
+  /** Handles the interaction of a user with a specific slot of the board.
+   *
+   * @param row The row of the slot selected.
+   * @param col The column of the slot selected.
+   */
   def onSlotClicked(row: Int, col: Int): Unit =
     selectedItem match
       case Some(item) =>

@@ -59,6 +59,12 @@ object SaveManager:
     else
       baseCard.asInstanceOf[SupportCard].withHealth(dto.health)
 
+  /** Saves the current game state and map.
+
+   * @param state The current game state.
+   * @param map The map left to traverse.
+   * @param filePath The path in which the game will be saved.
+   */
   def saveGame(state: GameState, map: GameMap, filePath: String = "savegame.json"): Unit =
     val deckDTO = state.deck.toList.map(cardToDTO)
     val itemsDTO = state.inventory.map(_.name)
@@ -70,6 +76,11 @@ object SaveManager:
     Files.write(Paths.get(filePath), jsonString.getBytes)
     println("Game saved in " + filePath)
 
+  /** Loads the last saved game stored.
+   *
+   * @param filePath Where the save file is located.
+   * @return if present, the last game saved.
+   * */
   def loadGame(filePath: String = "savegame.json"): Option[(GameState, GameMap)] =
     if !Files.exists(Paths.get(filePath)) then return None
 

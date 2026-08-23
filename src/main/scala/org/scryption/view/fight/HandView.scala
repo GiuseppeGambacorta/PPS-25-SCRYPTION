@@ -115,6 +115,8 @@ class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
         g.drawRect(2, yOffset + 2, cardW - 4, cardH - 4)
 
   /** Updates the player hand.
+   *
+   * @param cards The list of cards to update the hand with.
    */
   def updateHand(cards: List[Card[?]]): Unit =
     cardsContainer.contents.clear()
