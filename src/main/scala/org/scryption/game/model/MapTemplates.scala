@@ -22,10 +22,10 @@ object MapTemplates:
         MapBranch.Join(3, fight)
       )),
       MapLevel(List(
-        MapBranch.Fork(3, getANewCard, randomEvent)
+        MapBranch.Fork(3, getANewCard, trial)
       )),
       MapLevel(List(
-        MapBranch.Fork(1, getANewItem, randomEvent),
+        MapBranch.Fork(1, getANewItem, trial),
         MapBranch.Fork(5, fireCampHealth, sacrifice)
       )),
       MapLevel(List(
@@ -56,7 +56,7 @@ object MapTemplates:
       )),
       MapLevel(List(
         MapBranch.Fork(1, fight, getANewItem),
-        MapBranch.Fork(5, getANewCard, randomEvent)
+        MapBranch.Fork(5, getANewCard, trial)
       )),
       MapLevel(List(
         MapBranch.Node(0, getANewCard),
@@ -65,8 +65,8 @@ object MapTemplates:
         MapBranch.Node(6, getANewItem)
       )),
       MapLevel(List(
-        MapBranch.Join(1, randomEvent),
-        MapBranch.Join(5, randomEvent)
+        MapBranch.Join(1, trial),
+        MapBranch.Join(5, trial)
       )),
       MapLevel(List(
         MapBranch.Join(3, fight)
@@ -101,7 +101,7 @@ object MapTemplates:
         MapBranch.Fork(5, sacrifice, mycologists)
       )),
       MapLevel(List(
-        MapBranch.Fork(1, fight, randomEvent),
+        MapBranch.Fork(1, fight, trial),
         MapBranch.Join(5, fight)
       )),
       MapLevel(List(
@@ -114,7 +114,7 @@ object MapTemplates:
         MapBranch.Node(5, fireCampAttack)
       )),
       MapLevel(List(
-        MapBranch.Join(3, randomEvent)
+        MapBranch.Join(3, trial)
       )),
       MapLevel(List(
         MapBranch.Node(3, fight)
@@ -133,7 +133,7 @@ object MapTemplates:
         MapBranch.Fork(3, fireCampAttack, getANewItem)
       )),
       MapLevel(List(
-        MapBranch.Fork(1, getANewCard, randomEvent),
+        MapBranch.Fork(1, getANewCard, trial),
         MapBranch.Node(5, fight)
       )),
       MapLevel(List(
@@ -146,7 +146,7 @@ object MapTemplates:
       )),
       MapLevel(List(
         MapBranch.Node(1, getANewCard),
-        MapBranch.Fork(5, sacrifice, randomEvent)
+        MapBranch.Fork(5, sacrifice, trial)
       )),
       MapLevel(List(
         MapBranch.Node(1, sacrifice),

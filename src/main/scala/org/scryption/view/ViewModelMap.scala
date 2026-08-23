@@ -23,6 +23,7 @@ class ViewModelMap(val channel: GameMessagesChannel, val gameMap: Path[GameEvent
     case GameEvents.mycologists => "mushrooms"
     case GameEvents.sacrifice => "cardmergenode"
     case GameEvents.getANewItem => "backpack"
+    case GameEvents.trial => "decktrialnode"
     case _ => ""
 
   def getVisibleNodes(maxDepth: Int = 6): List[ViewNode] = {
