@@ -8,12 +8,20 @@ import java.util.concurrent.LinkedBlockingQueue
 
 sealed trait GameMessage
 
+enum Trial:
+  case Health
+  case Attack
+  case Seals
+
 enum EventMessages extends GameMessage:
   case Cards(cards: List[Card[?]])
   case SingleCard(card: Card[?])
+  case TrialChoice(trial: Trial)
   case Items(items: List[GameItem])
   case SingleItem(item:GameItem)
   case End
+
+
 
 enum FightMessages extends GameMessage:
   case State(fightState: FightState, turn: TurnState)

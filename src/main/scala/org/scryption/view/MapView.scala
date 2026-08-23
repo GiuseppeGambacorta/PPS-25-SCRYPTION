@@ -9,7 +9,7 @@ import java.awt.{BasicStroke, Color, Cursor, Dimension, Graphics2D, RenderingHin
 import scala.swing.*
 import scala.swing.event.*
 
-class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
+class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends BorderPanel:
   preferredSize = Toolkit.getDefaultToolkit.getScreenSize
   val assets = MapViewAssets()
 
@@ -189,8 +189,6 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
 
         case Path.End() =>
           Nil
-
-    // Helper to find the screen coordinates of the first Node in a branch
     private def findFirstNodeCoords(p: Path[GameEvent], row: Int, col: Int): Option[(Double, Double)] =
       p match
         case Path.Node(_, _) =>
@@ -224,3 +222,29 @@ class MapView(viewModelMap: ViewModelMap) extends BorderPanel:
   opaque = true
   background = new Color(20, 18, 16)
   layout(mapCanvas) = BorderPanel.Position.Center
+
+  private val saveButton = new Button("Save Game"):
+    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+    background = new Color(50, 40, 30)
+    foreground = Color.WHITE
+    font = ResourceLoader.loadFont("heavyweight-cufonfonts/HEAVYWEI.TTF", 24f)
+    tooltip = "Save your progress"
+
+  listenTo(saveButton)
+  reactions += {
+    case ButtonClicked(`saveButton`) =>
+      onSave()
+      saveButton.text = "Game Saved!"
+      saveButton.enabled = false
+  }
+
+  private val bottomPanel = new FlowPanel(FlowPanel.Alignment.Left)(saveButton):
+    opaque = false
+    border = Swing.EmptyBorder(0, 0, 20, 20)
+
+  opaque = true
+  background = new Color(20, 18, 16)
+
+  layout(mapCanvas) = BorderPanel.Position.Center
+  layout(bottomPanel) = BorderPanel.Position.South
+

@@ -9,14 +9,13 @@ import org.scryption.view.fight.FightView
 import org.scryption.view.MapView
 import org.scryption.GameMessagesChannel
 import org.scryption.game.model.Maps.Path
+import org.scryption.game.model.managers.SaveManager
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.swing.Panel
 import scala.util.Random
-
-
 
 object GameEvents:
   type GameEvent = (Event, GameMessagesChannel => Panel)
@@ -33,7 +32,7 @@ object GameEvents:
   def randomEvent : GameEvent = Random.shuffle(listOfNotFightEvents).head
 
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
-  
+
   import org.scryption.game.model.events.MapEvent
 
   @volatile private var running = false
@@ -42,42 +41,68 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
     if !running then
       running = true
       val initialState = GameState.getInitialGameState
-      val map = Path.fromScript(MapTemplates.newGameMap)
+      val initialScript = MapTemplates.newGameMap
+      val mapPath = Path.fromScript(initialScript)
 
       Future {
         try
-          gameLoop(initialState, map)
+          gameLoop(initialState, mapPath)
+        finally
+          running = false
+          onGameOver()
+      }
+
+  def loadGame(): Unit =
+    if !running then
+      running = true
+      Future {
+        try
+          SaveManager.loadGame() match
+            case Some((loadedState, loadedPath)) =>
+              println("Game loaded!")
+              gameLoop(loadedState, loadedPath, resumeFromMap = true)
+            case None =>
+              println("No save, start a new game...")
+              val initialState = GameState.getInitialGameState
+              val initialScript = MapTemplates.newGameMap
+              val mapPath = Path.fromScript(initialScript)
+              gameLoop(initialState, mapPath)
         finally
           running = false
           onGameOver()
       }
 
   @tailrec
-  private def gameLoop(gameState: GameState, map: Path[GameEvent]): Unit =
+  private def gameLoop(gameState: GameState, map: Path[GameEvent], resumeFromMap: Boolean = false): Unit =
     if gameState.isGameOver then
       println("=== GAME OVER ===")
     else
-
       val (eventLogic , createView) = map match
         case Path.Node(event, _) => event match
           case (logic, view) => (logic, view)
+        case _ => return
 
-      val eventCh = GameMessagesChannel()
-      onViewChange(createView(eventCh))
-      val nextState = eventLogic(gameState, eventCh)
+      val nextState = if resumeFromMap then
+        gameState
+      else
+        val eventCh = GameMessagesChannel()
+        onViewChange(createView(eventCh))
+        eventLogic(gameState, eventCh)
 
       val hasNext = map match
+        case Path.Node(_, Path.End()) => false
         case Path.End() => false
         case _ => true
 
       if !hasNext || nextState.isGameOver then
-        println("=== PARTITA COMPLETATA ===")
+        println("=== GAME COMPLETED ===")
       else
-
         val mapCh = GameMessagesChannel()
         val vm = ViewModelMap(mapCh, map)
-        onViewChange(new MapView(vm))
 
-        val nextMap = MapEvent(map, mapCh)
+        onViewChange(new MapView(vm, () => {
+          SaveManager.saveGame(nextState, map)
+        }))
 
-        gameLoop(nextState, nextMap)
+        val nextMapPath = MapEvent(map, mapCh)
+        gameLoop(nextState, nextMapPath, resumeFromMap = false)
