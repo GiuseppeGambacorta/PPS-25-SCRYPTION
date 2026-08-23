@@ -46,7 +46,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
       Future {
         try
-          gameLoop(initialState, mapPath, initialScript)
+          gameLoop(initialState, mapPath)
         finally
           running = false
           onGameOver()
@@ -58,32 +58,30 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       Future {
         try
           SaveManager.loadGame() match
-            case Some((loadedState, loadedScript)) =>
-              val mapPath = Path.fromScript(loadedScript)
+            case Some((loadedState, loadedPath)) =>
               println("Game loaded!")
-              gameLoop(loadedState, mapPath, loadedScript, resumeFromMap = true)
+              gameLoop(loadedState, loadedPath, resumeFromMap = true)
             case None =>
               println("No save, start a new game...")
               val initialState = GameState.getInitialGameState
               val initialScript = MapTemplates.newGameMap
               val mapPath = Path.fromScript(initialScript)
-              gameLoop(initialState, mapPath, initialScript)
+              gameLoop(initialState, mapPath)
         finally
           running = false
           onGameOver()
       }
 
   @tailrec
-  private def gameLoop(gameState: GameState, map: Path[GameEvent], script: MapScript[GameEvent], resumeFromMap: Boolean = false): Unit =
+  private def gameLoop(gameState: GameState, map: Path[GameEvent], resumeFromMap: Boolean = false): Unit =
     if gameState.isGameOver then
       println("=== GAME OVER ===")
     else
-      val currentScript = Path.scrollScript(map, script)
-
       val (eventLogic , createView) = map match
         case Path.Node(event, _) => event match
           case (logic, view) => (logic, view)
         case _ => return
+
       val nextState = if resumeFromMap then
         gameState
       else
@@ -95,13 +93,16 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
         case Path.Node(_, Path.End()) => false
         case Path.End() => false
         case _ => true
+
       if !hasNext || nextState.isGameOver then
         println("=== GAME COMPLETED ===")
       else
         val mapCh = GameMessagesChannel()
         val vm = ViewModelMap(mapCh, map)
+
         onViewChange(new MapView(vm, () => {
-          SaveManager.saveGame(nextState, currentScript)
+          SaveManager.saveGame(nextState, map)
         }))
+
         val nextMapPath = MapEvent(map, mapCh)
-        gameLoop(nextState, nextMapPath, script, resumeFromMap = false)
+        gameLoop(nextState, nextMapPath, resumeFromMap = false)
