@@ -12,7 +12,7 @@ Il processo di sviluppo adottato si ispira a **Scrum**, strutturato su *sprint* 
 - Una vista (tabella/Kanban) per il **Product Backlog** generale, ordinato per priorità;
 - Viste dedicate (tabella/Kanban) per ciascuno **Sprint**, utilizzate per monitorare lo stato di avanzamento e l'assegnazione dei task dell'iterazione corrente.
 
-[Link Github Projects](https://github.com/users/GiuseppeGambacorta/projects/4/views/13)
+- [Link Github Projects](https://github.com/users/GiuseppeGambacorta/projects/4/views/13)
 ## Ruoli
 
 Il team di sviluppo è composto da tre membri: **Giuseppe Gambacorta**, **Enrico Cornacchia** e **Patricia Sanchez Lomas**. All'interno del gruppo sono state definite le seguenti responsabilità:
@@ -35,14 +35,15 @@ I criteri di accettazione includono:
 
 ## Documentazione
 
-La documentazione è realizzata in formato **Markdown**, contenuta nella directory `docs`, e pubblicata come sito statico tramite **GitHub Pages** (tema [just-the-docs](https://just-the-docs.com/), diagrammi resi con **Mermaid**). Il codice è inoltre corredato di **Scaladoc** su tutte le API pubbliche dei moduli.
+La documentazione è realizzata in formato **Markdown**, contenuta nella directory `docs`, e pubblicata come sito statico tramite **GitHub Pages**. Il codice è inoltre corredato di **Scaladoc** su tutte le API pubbliche dei moduli.
 
 ## Versioning e Branching Strategy
 
 Il controllo di versione è gestito con **Git** e ospitato su **GitHub**. La strategia di branching adottata si basa su:
-- Un branch dedicato per ciascuno **sprint** (es. `sprint-1`, `sprint-2`, ...), utilizzato come linea di integrazione per l'iterazione in corso;
-- **Feature branch** specifici creati a partire dal branch dello sprint per lo sviluppo dei singoli task o funzionalità (aprendo una Pull Request verso lo sprint branch per completare la *Definition of Done*);
-- Il branch principale (`main`/`master`) destinato a raccogliere le integrazioni stabili a conclusione del progetto.
+- Un unico feature branch principale (es. feature/... o develop), utilizzato come base condivisa da cui sono state avviate e coordinate le diverse iterazioni.
+- Branch dedicati per ciascuno sprint (es. sprint-1, sprint-2, ...), creati a partire dal feature branch come linee di lavoro e integrazione per l'iterazione in corso (con Pull Request verso lo sprint branch per completare la Definition of Done).
+- Il branch principale (main/master), destinato a raccogliere esclusivamente i rilasci e le integrazioni stabili a conclusione del progetto.
+
 
 ## Strumenti
 

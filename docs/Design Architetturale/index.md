@@ -1,46 +1,37 @@
----
+\---
 layout: default
 title: Design architetturale
 parent: Report
 nav_order: 3
 ---
 
-
 # Design architetturale
 
 Il pattern architetturale adottato si basa su una variante del modello **Model-View-ViewModel (MVVM)** orchestrata da un **Controller** centrale. L'architettura è stata progettata per garantire un disaccoppiamento netto e asincrono tra la logica di dominio (Model) e il livello di presentazione (Swing View).
 
 Model e View vivono su **thread di esecuzione separati**: la sincronizzazione e lo scambio dati avvengono per mezzo di un canale di messaggi (`GameMessagesChannel`) che funge da **Monitor** concorrente (produttore-consumatore thread-safe).
+
 <pre class="mermaid">
-flowchart TD
-    subgraph Execution["Thread Orchestration"]
-        GC["GameController (Game Loop)"]
-    end
+classDiagram
+    direction TB
 
-    subgraph PresentationThread["UI Thread (Swing Event Dispatch Thread)"]
-        SV["SwingView (Specifica per Schermata)"]
-        VM["ViewModel (Dedicato alla View)"]
-    end
+    class GameController
+    class SwingView
+    class ViewModel
+    class Model
+    class GameMessagesChannel {
+        <<Monitor>>
+    }
 
-    subgraph Communication["Concurrence & Synchronization"]
-        CH[("GameMessagesChannel (Monitor)")]
-    end
+    GameController ..> Model : instantiates / controls
+    GameController ..> ViewModel : instantiates
+    GameController ..> GameMessagesChannel : creates & injects
 
-    subgraph EngineThread["Model / Domain Thread"]
-        GE["Model (GameEngine / State)"]
-    end
+    SwingView --> ViewModel : forwards input
+    ViewModel ..> SwingView : updates state
 
-    GC -.->|Inizializza & Inietta Canale| GE
-    GC -.->|Inizializza & Inietta Canale| VM
-
-    SV -->|Inoltra Input Utente| VM
-    VM -->|Data-binding / Aggiorna Stato UI| SV
-
-    VM -->|Invia Messaggi Dedicati / Azioni| CH
-    CH -->|Consuma Azioni| GE
-
-    GE -->|Invia Messaggi Dedicati / Eventi| CH
-    CH -->|Consuma Eventi| VM
+    ViewModel --> GameMessagesChannel : sends actions / receives events
+    Model --> GameMessagesChannel : sends events / receives actions
 </pre>
 
 A differenza di un approccio monolitico o guidato strettamente da chiamate bloccanti, in questa architettura il Controller ha una responsabilità focalizzata: inizializza le componenti, inietta gli estremi del canale di comunicazione tra il Model e il ViewModel, e gestisce il ciclo principale di esecuzione (Game Loop).
@@ -50,7 +41,6 @@ A differenza di un approccio monolitico o guidato strettamente da chiamate blocc
 Il Model incapsula lo stato interno e le regole del gioco. Rimane completamente agnostico rispetto alla tecnologia grafica utilizzata.
 
 - Riceve messaggi tipizzati dal canale (azioni del giocatore), calcola le transizioni di stato e deposita sul canale i relativi messaggi di notifica o di richiesta input;
-
 - È completamente disaccoppiato dalla GUI e isolabile per l'esecuzione di test unitari automatici.
 
 ## ViewModel
@@ -100,7 +90,6 @@ sequenceDiagram
     CH->>VM: Notifica esito
     VM->>UI: Aggiorna / Renderizza esito a schermo
 </pre>
-
 
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
