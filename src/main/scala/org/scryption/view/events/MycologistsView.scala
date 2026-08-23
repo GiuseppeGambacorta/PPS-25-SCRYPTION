@@ -3,23 +3,20 @@ package org.scryption.view.events
 import org.scryption.view.*
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, ZOrder}
 
-
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.swing.{FlowPanel, Panel, Swing}
 
 /** Mycologists event: pick two matching cards, merge them into one boosted card.
- *
- *  This doesn't fit the [[EventView]] template — the slot holds a *pair* of stacked
- *  labels rather than one, and confirming merges them into a single icon instead of
- *  just re-rendering the same label — so it keeps its own CardSlot. It does reuse the
- *  shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used
- *  to be copy-pasted here too.
- */
+  *
+  * This doesn't fit the [[EventView]] template — the slot holds a *pair* of stacked labels rather than one, and
+  * confirming merges them into a single icon instead of just re-rendering the same label — so it keeps its own
+  * CardSlot. It does reuse the shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used to be
+  * copy-pasted here too.
+  */
 class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
- 
   viewModel.ListenForCardsFromTheModel(renderHand)
 
   private val setup = CardView.forWidth(250)
@@ -47,7 +44,6 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   opaque = false
 
-
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
     backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
@@ -65,7 +61,6 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
       }
     }
   }
-
 
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
@@ -203,7 +198,7 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
     }
 
     private def sendCardToGameModel(): Unit = {
-       viewModel.sendCardToModel(index)
+      viewModel.sendCardToModel(index)
     }
   }
 

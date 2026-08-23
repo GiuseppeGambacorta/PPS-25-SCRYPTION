@@ -32,11 +32,11 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
     loadIcon(assets.menuHighlightedSlotPath, geo.slotWidth, geo.slotHeight)
 
   private case class MenuCardDef(
-                                  id: String,
-                                  cardIcon: ImageIcon,
-                                  textIcon: Option[ImageIcon],
-                                  onChosen: () => Unit
-                                )
+      id: String,
+      cardIcon: ImageIcon,
+      textIcon: Option[ImageIcon],
+      onChosen: () => Unit
+  )
 
   private val menuDefs: Vector[MenuCardDef] = Vector(
     MenuCardDef(
@@ -71,9 +71,8 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
   focusable = true
 
   listenTo(this)
-  reactions += {
-    case UIElementResized(_) =>
-      if (menuVisible) updateMenuLayout()
+  reactions += { case UIElementResized(_) =>
+    if (menuVisible) updateMenuLayout()
   }
 
   peer.addMouseListener(new MouseAdapter {
@@ -253,7 +252,8 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
   }
 
   private def refreshTextPreview(): Unit = {
-    val icon = slotCardId.orElse(hoveredButtonId)
+    val icon = slotCardId
+      .orElse(hoveredButtonId)
       .flatMap(id => menuDefs.find(_.id == id))
       .flatMap(_.textIcon)
     textLabel.setIcon(icon.orNull)

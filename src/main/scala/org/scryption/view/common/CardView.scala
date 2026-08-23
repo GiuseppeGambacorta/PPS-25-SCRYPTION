@@ -34,7 +34,6 @@ class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
       new ImageIcon(buffer)
     }
 
-
   private def drawImage(g2d: Graphics2D, img: Image, x: Int, y: Int, width: Int, height: Option[Int] = None): Unit =
     height match {
       case None    => g2d.drawImage(img, x, y, width, width, NoObserver)
@@ -43,7 +42,8 @@ class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
 
   private def drawPortrait(g2d: Graphics2D, name: String, addedSigils: List[String]): Unit =
     ResourceLoader.loadImage(assets.portraitPath(name), geo.portraitSize).foreach { img =>
-      drawImage(g2d, img, geo.portraitX, geo.portraitY, geo.portraitSize)}
+      drawImage(g2d, img, geo.portraitX, geo.portraitY, geo.portraitSize)
+    }
 
     if (addedSigils.nonEmpty) {
       ResourceLoader.loadImage(assets.emissionPath(name), geo.portraitSize).foreach { img =>
@@ -69,8 +69,8 @@ class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
       val nameX = centerPos(geo.cardWidth, textWidth)
       g2d.drawString(name, nameX, geo.nameY)
     }
-    
-  private def centerPos(containerW: Int, objectW: Int): Int = (containerW - objectW) / 2 
+
+  private def centerPos(containerW: Int, objectW: Int): Int = (containerW - objectW) / 2
 
   private def drawStats(g2d: Graphics2D, attack: String, health: String): Unit =
     g2d.setFont(statFont)
@@ -97,19 +97,24 @@ class CardView(val geo: CardGeometry, val assets: CardViewAssets) {
 
     if (addedSigils.nonEmpty) {
       val slots: Vector[(Int, Int)] = defaultSigils match {
-        case Nil   => (geo.patchCenterX, geo.patchCenterY) +: geo.addedSigilSlotCenters
-        case _     => geo.addedSigilSlotCenters
+        case Nil => (geo.patchCenterX, geo.patchCenterY) +: geo.addedSigilSlotCenters
+        case _   => geo.addedSigilSlotCenters
       }
 
-      addedSigils.zip(slots).foreach {
-        case (sigilName, (centerX, centerY)) =>
-          ResourceLoader.loadImage(assets.sigilPatchPath, geo.patchSize).foreach { patch =>
-            drawImage(g2d, patch, centerX - geo.patchSize/2 , centerY - geo.patchSize/2, geo.patchSize)
-          }
+      addedSigils.zip(slots).foreach { case (sigilName, (centerX, centerY)) =>
+        ResourceLoader.loadImage(assets.sigilPatchPath, geo.patchSize).foreach { patch =>
+          drawImage(g2d, patch, centerX - geo.patchSize / 2, centerY - geo.patchSize / 2, geo.patchSize)
+        }
 
-          ResourceLoader.loadImage(assets.sigilPath(sigilName), geo.sigilSize).foreach { sigilImg =>
-            drawImage(g2d, emission(sigilImg, geo.addedSigilSize), (centerX - geo.addedSigilSize / 2), (centerY - geo.addedSigilSize / 2), geo.addedSigilSize)
-          }
+        ResourceLoader.loadImage(assets.sigilPath(sigilName), geo.sigilSize).foreach { sigilImg =>
+          drawImage(
+            g2d,
+            emission(sigilImg, geo.addedSigilSize),
+            (centerX - geo.addedSigilSize / 2),
+            (centerY - geo.addedSigilSize / 2),
+            geo.addedSigilSize
+          )
+        }
       }
     }
   }

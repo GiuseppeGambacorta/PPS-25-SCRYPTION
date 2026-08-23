@@ -122,7 +122,6 @@ class TrialView(viewModel: ViewModelDeckEvent) extends FlowPanel {
         peer.repaint()
 
       case singleCard :: Nil =>
-
         val totalWidth = 900
         val cardX = (totalWidth - setup.geo.cardWidth) / 2
         val rewardSlot = new CardSlot(0, singleCard, cardX, isRewardMode = true)
@@ -147,7 +146,6 @@ class TrialView(viewModel: ViewModelDeckEvent) extends FlowPanel {
         peer.repaint()
 
       case multipleCards =>
-
         val cardsCount = multipleCards.length
         val totalCardsWidth = (setup.geo.cardWidth * cardsCount) + (cardGap * (cardsCount - 1))
         val panelWidth = Math.max(totalCardsWidth + 80, 850)
@@ -194,7 +192,6 @@ class TrialView(viewModel: ViewModelDeckEvent) extends FlowPanel {
         def handleChoice(choice: Trial): Unit = {
           allButtons.foreach(_.setEnabled(false))
           slots.foreach(_.flipToFront())
-
 
           val timer = new Timer(1000, null)
           timer.setRepeats(false)

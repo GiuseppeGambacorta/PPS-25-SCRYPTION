@@ -3,7 +3,6 @@ package org.scryption.view.events
 import org.scryption.view.*
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader}
 
-
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
@@ -43,7 +42,6 @@ class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   opaque = false
 
-
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
     backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
@@ -59,22 +57,20 @@ class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
   }
 
   private def drawSlotOverlay(
-                               g: Graphics2D,
-                               overlay: Option[ImageIcon],
-                               x: Int,
-                               y: Int,
-                               w: Int,
-                               h: Int,
-                               fallbackColor: Color
-                             ): Unit =
+      g: Graphics2D,
+      overlay: Option[ImageIcon],
+      x: Int,
+      y: Int,
+      w: Int,
+      h: Int,
+      fallbackColor: Color
+  ): Unit =
     overlay match {
       case Some(icon) => g.drawImage(icon.getImage, x, y, w, h, peer)
       case None =>
         g.setColor(fallbackColor)
         g.fillRoundRect(x, y, w, h, 20, 20)
     }
-
-
 
   private sealed trait SlotKind
   private object SlotKind {
@@ -255,7 +251,8 @@ class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
     cardSlots = slots
 
-    if (sacrificeIndex != -1 && sacrificeIndex < slots.length) slots(sacrificeIndex).moveToSlotCoords(SlotKind.Sacrifice)
+    if (sacrificeIndex != -1 && sacrificeIndex < slots.length)
+      slots(sacrificeIndex).moveToSlotCoords(SlotKind.Sacrifice)
     if (upgradeIndex != -1 && upgradeIndex < slots.length) slots(upgradeIndex).moveToSlotCoords(SlotKind.Upgrade)
 
     val confirm: JLabel = new JLabel(confirmIcon.orNull) {

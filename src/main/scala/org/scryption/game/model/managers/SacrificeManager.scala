@@ -4,34 +4,39 @@ import org.scryption.game.model.boardModel.Board
 import org.scryption.game.model.{BoardPosition, CreatureCard, Seal, boardModel}
 
 /** Represents the result of a sacrifice phase.
- *
- * @param updatedBoard The board state after the sacrifices are resolved.
- * @param generatedBlood The total amount of blood generated from the sacrificed cards.
- * @param generatedBones The total amount of bones generated from the sacrificed cards.
- */
+  *
+  * @param updatedBoard
+  *   The board state after the sacrifices are resolved.
+  * @param generatedBlood
+  *   The total amount of blood generated from the sacrificed cards.
+  * @param generatedBones
+  *   The total amount of bones generated from the sacrificed cards.
+  */
 case class SacrificeResult(updatedBoard: Board, generatedBlood: Int, generatedBones: Int)
 
 /** A trait representing a manager for card sacrifices.
- */
+  */
 trait SacrificeManager:
 
-  /** Manages the sacrifices on the board by clearing the appropriate slots,
-   * taking into account specific seals (for example ManyLives or BoneKing), and
-   * calculating the generated blood and bones.
-   *
-   * @param board The current state of the board.
-   * @param sacrificedSlots A list of (row, col) coordinates representing the cards chosen for sacrifice.
-   * @return a [[SacrificeResult]] containing the updated board and the total resources generated.
-   */
+  /** Manages the sacrifices on the board by clearing the appropriate slots, taking into account specific seals (for
+    * example ManyLives or BoneKing), and calculating the generated blood and bones.
+    *
+    * @param board
+    *   The current state of the board.
+    * @param sacrificedSlots
+    *   A list of (row, col) coordinates representing the cards chosen for sacrifice.
+    * @return
+    *   a [[SacrificeResult]] containing the updated board and the total resources generated.
+    */
   def resolveSacrifices(board: Board, sacrificedSlots: List[BoardPosition]): SacrificeResult
-
 
 object SacrificeManager:
 
   /** Creates a [[SacrificeManager]] with the default implementation.
-   *
-   * @return the default sacrifice manager.
-   */
+    *
+    * @return
+    *   the default sacrifice manager.
+    */
   def apply(): SacrificeManager = new SacrificeManagerImpl()
 
   private class SacrificeManagerImpl extends SacrificeManager:

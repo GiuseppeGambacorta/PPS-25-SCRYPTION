@@ -59,10 +59,10 @@ object GUIAssets {
 
     def menuTextPath(name: String): String = s"$menuFolder/menutext_$name.png"
   }
-  
+
   final case class MapViewAssets() {
     private val mapFolder = "map"
-    
+
     def eventIconPath(name: String): String = s"$mapFolder/$name.png"
   }
 }

@@ -9,7 +9,6 @@ import org.scryption.game.model.managers.CombatManager.given
 import org.scryption.game.model.managers.{AirborneResolver, BasicResolver, CombatManager, FightResolver, StrikeResolver}
 import org.scryption.game.model.{CardLibrary, CreatureCard, Seal}
 class CombatManagerTest extends AnyFeatureSpec with GivenWhenThen with Matchers with ScalaCheckPropertyChecks:
-  
 
   private val wolf = CardLibrary.wolf
   private val opossum = CardLibrary.opossum

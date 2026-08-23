@@ -5,14 +5,14 @@ import org.scryption.game.model.*
 import scala.annotation.targetName
 
 final case class CardViewInfo(
-                               name: String,
-                               cost: String,
-                               attack: String,
-                               health: String,
-                               defaultSigils: List[String] = Nil,
-                               addedSigils: List[String] = Nil,
-                               cardType: String = ""
-                             )
+    name: String,
+    cost: String,
+    attack: String,
+    health: String,
+    defaultSigils: List[String] = Nil,
+    addedSigils: List[String] = Nil,
+    cardType: String = ""
+)
 
 //  Converts a game-model Card into the view-facing CardViewInfo
 
@@ -39,8 +39,8 @@ private object CardViewConversions:
   def costLabel(attribute: SacrificeAttribute): String = attribute match
     case SacrificeAttribute.Blood(value) => s"${value}blood"
     case SacrificeAttribute.Bones(value) => s"${value}bone"
-    case _        => ""
-  
+    case _                               => ""
+
   def splitSeals(card: Card[?]): (Set[Seal], Set[Seal]) =
     val templateSeals: Set[Seal] =
       CardLibrary.byName(card.name).map(_.seals).getOrElse(Set.empty)

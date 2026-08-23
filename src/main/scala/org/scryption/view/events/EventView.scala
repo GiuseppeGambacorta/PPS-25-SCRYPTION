@@ -4,22 +4,21 @@ import org.scryption.view.*
 import org.scryption.view.common.GUIAssets.CardViewAssets
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, StatBonus, ZOrder}
 
-
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.swing.{FlowPanel, Panel, Swing}
 
 abstract class EventView(
-                          viewModel: ViewModelDeckEvent,
-                          cardWidth: Int,
-                          bonus: StatBonus,
-                          slotBgImagePath: String
-                        ) extends FlowPanel {
+    viewModel: ViewModelDeckEvent,
+    cardWidth: Int,
+    bonus: StatBonus,
+    slotBgImagePath: String
+) extends FlowPanel {
 
   private val setup = CardView.forWidth(cardWidth)
   private val assets = CardViewAssets()
-  
+
   viewModel.ListenForCardsFromTheModel(renderHand)
 
   private val cardGap = 100
@@ -37,7 +36,6 @@ abstract class EventView(
   private var slotCardIndex: Int = -1
 
   opaque = false
-
 
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
@@ -60,8 +58,6 @@ abstract class EventView(
         g.fillRoundRect(slotX + 10, slotY + 10, slotW - 20, slotH - 20, 15, 15)
     }
   }
-
-
 
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
@@ -157,7 +153,7 @@ abstract class EventView(
     }
 
     private def sendCardToGameModel(): Unit = {
-        viewModel.sendCardToModel(index)
+      viewModel.sendCardToModel(index)
     }
 
     private[EventView] def moveToSlotCoords(): Unit = {

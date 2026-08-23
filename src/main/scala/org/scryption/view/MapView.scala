@@ -81,7 +81,8 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
         else
           // Optional: Handle distant clicks or ignore
           // println(s"Clicked distant node: Row ${node.row}, Col ${node.col}")
-          ()
+          (
+        )
       }
 
     override protected def paintComponent(g: Graphics2D): Unit =
@@ -145,7 +146,6 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
               node :: paintPath(g, next, row + 1, col)
 
             case Path.Fork(leftBranch, rightBranch) =>
-
               val leftStart = col match
                 case 3 => findFirstNodeCoords(leftBranch, row + 1, col - 2)
                 case _ => findFirstNodeCoords(leftBranch, row + 1, col - 1)
@@ -177,15 +177,16 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
             case Path.End() =>
               List(node)
 
-        case Path.Fork(left, right) => col match
-          case 3 =>
-            val leftNodes = paintPath(g, left, row + 1, col - 2)
-            val rightNodes = paintPath(g, right, row + 1, col + 2)
-            leftNodes ++ rightNodes
-          case _ =>
-            val leftNodes = paintPath(g, left, row + 1, col - 1)
-            val rightNodes = paintPath(g, right, row + 1, col + 1)
-            leftNodes ++ rightNodes
+        case Path.Fork(left, right) =>
+          col match
+            case 3 =>
+              val leftNodes = paintPath(g, left, row + 1, col - 2)
+              val rightNodes = paintPath(g, right, row + 1, col + 2)
+              leftNodes ++ rightNodes
+            case _ =>
+              val leftNodes = paintPath(g, left, row + 1, col - 1)
+              val rightNodes = paintPath(g, right, row + 1, col + 1)
+              leftNodes ++ rightNodes
 
         case Path.End() =>
           Nil
@@ -193,9 +194,10 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
       p match
         case Path.Node(_, _) =>
           Some(getCoordinates((row, col)))
-        case Path.Fork(left, right) => col match
-          case 3 => findFirstNodeCoords(left, row + 1, col - 2) orElse findFirstNodeCoords(right, row + 1, col + 2)
-          case _ => findFirstNodeCoords(left, row + 1, col - 1) orElse findFirstNodeCoords(right, row + 1, col + 1)
+        case Path.Fork(left, right) =>
+          col match
+            case 3 => findFirstNodeCoords(left, row + 1, col - 2) orElse findFirstNodeCoords(right, row + 1, col + 2)
+            case _ => findFirstNodeCoords(left, row + 1, col - 1) orElse findFirstNodeCoords(right, row + 1, col + 1)
         case Path.End() =>
           None
 
@@ -216,7 +218,7 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
       println(node.iconPath)
 
       ResourceLoader.loadImage(assets.eventIconPath(node.iconPath), nodeSize).foreach { icon =>
-        g.drawImage(icon, ix - nodeSize/2, iy - nodeSize/2, nodeSize, nodeSize, null)
+        g.drawImage(icon, ix - nodeSize / 2, iy - nodeSize / 2, nodeSize, nodeSize, null)
       }
 
   opaque = true
@@ -231,11 +233,10 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
     tooltip = "Save your progress"
 
   listenTo(saveButton)
-  reactions += {
-    case ButtonClicked(`saveButton`) =>
-      onSave()
-      saveButton.text = "Game Saved!"
-      saveButton.enabled = false
+  reactions += { case ButtonClicked(`saveButton`) =>
+    onSave()
+    saveButton.text = "Game Saved!"
+    saveButton.enabled = false
   }
 
   private val bottomPanel = new FlowPanel(FlowPanel.Alignment.Left)(saveButton):
@@ -247,4 +248,3 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
 
   layout(mapCanvas) = BorderPanel.Position.Center
   layout(bottomPanel) = BorderPanel.Position.South
-

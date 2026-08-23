@@ -9,7 +9,7 @@ import scala.swing.*
 import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
 import java.awt.{Color, Cursor, Dimension, Font}
 
-class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) extends BorderPanel:
+class DecksView(viewModel: ViewModelFight, onItemClicked: GameItem => Unit) extends BorderPanel:
 
   var interactable = true
   private var isMainDeckEmpty = false
@@ -59,10 +59,8 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
 
     override protected def paintComponent(g: Graphics2D): Unit =
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      if isHovered then
-        g.setColor(new Color(120, 120, 120, 150))
-      else
-        g.setColor(new Color(60, 60, 65, 100))
+      if isHovered then g.setColor(new Color(120, 120, 120, 150))
+      else g.setColor(new Color(60, 60, 65, 100))
       g.fillRoundRect(5, 5, size.width - 10, size.height - 10, 20, 20)
       super.paintComponent(g)
 
@@ -115,9 +113,10 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
   }
 
   /** Updates the main deck on the board.
-   *
-   * @param deck The main deck to updated the view with.
-   */
+    *
+    * @param deck
+    *   The main deck to updated the view with.
+    */
   def updateDeck(deck: Deck): Unit =
     isMainDeckEmpty = deck.isEmpty
     if isMainDeckEmpty then
@@ -130,9 +129,10 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
       mainDeckLabel.cursor = new Cursor(Cursor.HAND_CURSOR)
 
   /** Updates th items on the board.
-   *
-   * @param items The list of items to update the board with.
-   */
+    *
+    * @param items
+    *   The list of items to update the board with.
+    */
   def updateItems(items: List[GameItem]): Unit =
     itemsContainer.contents.clear()
     for item <- items do

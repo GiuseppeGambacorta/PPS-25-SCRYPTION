@@ -49,7 +49,7 @@ class DrawDecksTest extends AnyFeatureSpec with GivenWhenThen with Matchers with
       squirrel2.name shouldBe "Squirrel"
 
       And("they should be distinct instances")
-      squirrel1.id shouldNot be (squirrel2)
+      squirrel1.id shouldNot be(squirrel2)
     }
 
   }
