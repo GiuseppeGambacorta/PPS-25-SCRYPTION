@@ -106,7 +106,7 @@ L'intero combattimento è governato da una macchina a stati finiti (`TurnState`)
 
 Queste fasi si susseguono in un ciclo continuo, alternando le azioni delle due entità finché il bilanciamento della bilancia dei danni (`scalePoints`) non raggiunge una delle due soglie limite: superata in positivo decreta la vittoria del giocatore, superata in negativo la sconfitta.
 
-```mermaid
+<pre class="mermaid">
 stateDiagram-v2
     [*] --> draw
     draw --> playerTurn : pesca effettuata
@@ -116,7 +116,7 @@ stateDiagram-v2
     botTurn --> botFight
     botTurn --> [*] : vittoria (soglia positiva raggiunta)
     botFight --> draw
-```
+</pre>
 
 ### 3.2 Decomposizione in Handler e Testing Modulare
 
@@ -167,8 +167,8 @@ Alla base di tutto c'è `GameMessage`, un `sealed trait` che rappresenta il tipo
 
 Da `GameMessage` derivano tre enum, ciascuno dedicato a un contesto di gioco specifico:
 
-- **`EventMessages`**: messaggi per gli eventi generici a singola interazione (`Cards`, `SingleCard`, `Items`, `SingleItem`, `End`) — usati ad esempio per la selezione di carte o oggetti;
-- **`FightMessages`**: messaggi dedicati al combattimento (`State`, `DrawFromSquirrel`, `DrawFromDeck`, `CardToPlay`, `CardToPlayWithSacrifices`, `UseItem`, `EndPlayerTurn`, `End`) — coprono sia le azioni che il giocatore può compiere sia la notifica dello stato corrente del turno;
+- **`EventMessages`**: messaggi per gli eventi generici a singola interazione (`Cards`, `SingleCard`, `Items`, `SingleItem`, `End`) usati ad esempio per la selezione di carte o oggetti;
+- **`FightMessages`**: messaggi dedicati al combattimento (`State`, `DrawFromSquirrel`, `DrawFromDeck`, `CardToPlay`, `CardToPlayWithSacrifices`, `UseItem`, `EndPlayerTurn`, `End`)  coprono sia le azioni che il giocatore può compiere sia la notifica dello stato corrente del turno;
 - **`MapMessages`**: messaggi per la navigazione sulla mappa (`left`, `right`, `forward`).
 
 Ogni enum estende `GameMessage`, quindi tutti i suoi casi sono automaticamente utilizzabili ovunque sia richiesto un `GameMessage` generico: il canale può così restare agnostico rispetto al contesto specifico, mentre chi invia e chi riceve un messaggio conosce (tramite pattern matching) a quale enum appartiene e come interpretarlo.
@@ -192,3 +192,9 @@ Definire il canale come trait, anziché esporre direttamente la classe concreta,
 - l'operazione `clear` svuota entrambe le code, anch'essa protetta dallo stesso lock, per evitare che uno svuotamento avvenga in concomitanza con un invio in corso.
 
 Va notato che le operazioni di lettura (`take()`) non sono racchiuse nello stesso blocco `synchronized`: `LinkedBlockingQueue` è già internamente thread-safe per le operazioni di inserimento ed estrazione, quindi il lock esplicito serve unicamente a coordinare tra loro le scritture (e la pulizia), non le letture, che possono avvenire in sicurezza direttamente sulla coda.
+
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
