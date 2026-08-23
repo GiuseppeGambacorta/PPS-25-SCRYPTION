@@ -16,9 +16,33 @@ val cardsNumberForGui = 5
  * Event: Draws 3 random cards from the library and sends them to the GUI.
  * The player picks one card to add to their deck.
  */
-@tailrec
 def getANewCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
-  ch.sendToGui(EventMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3)._1))
+  selectCardEvent(gameState, ch, EventMessages.Cards(CardLibrary.getDeckWithAverageCards.drawRandom(3)._1))
+}
+
+/**
+ * Event: Draws 3 random cards from the player's deck and sends them to the GUI.
+ * The player picks one card to add to their deck.
+ */
+private def getANewDuplicateCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
+  selectCardEvent(gameState, ch, EventMessages.Cards(gameState.deck.drawRandom(3)._1))
+}
+
+/**
+ * Event: Draws 3 random rare cards from the library and sends them to the GUI.
+ * The player picks one card to add to their deck.
+ */
+private def getANewRareCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
+  selectCardEvent(gameState, ch, EventMessages.Cards(CardLibrary.getADeckWithRareCards.drawRandom(3)._1))
+}
+
+/**
+ * Event: Receives 3 cards and sends them to the GUI.
+ * The player picks one card to add to their deck.
+ */
+@tailrec
+private def selectCardEvent(gameState: GameState, ch: GameMessagesChannel, cards: EventMessages.Cards): GameState = {
+  ch.sendToGui(cards)
   val message = ch.receiveFromGui
 
   message match {
@@ -27,7 +51,7 @@ def getANewCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
       gameState.copy(deck = gameState.deck.addCard(card))
     case _ =>
       ch.clear()
-      getANewCardEvent(gameState, ch)
+      selectCardEvent(gameState, ch, cards)
   }
 }
 
@@ -51,7 +75,7 @@ def mushRoomsExpertEvent(gameState: GameState, ch: GameMessagesChannel): GameSta
   if duplicateCards.nonEmpty then
     ch.sendToGui(EventMessages.Cards(duplicateCards.take(cardsNumberForGui)))
   else
-    return gameState
+    return getANewDuplicateCardEvent(gameState, ch)
 
   ch.receiveFromGui match {
     case EventMessages.SingleCard(selectedCard) =>
