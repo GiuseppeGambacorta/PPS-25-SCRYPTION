@@ -1,4 +1,4 @@
-### GameController e il Game Loop
+# GameController e il Game Loop
 
 Il **GameController** è il componente deputato all'orchestrazione complessiva: non include logica di dominio, ma ha la responsabilità di avviare, coordinare e far progredire l'intero ciclo di vita della partita.
 
