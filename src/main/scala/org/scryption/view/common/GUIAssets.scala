@@ -1,10 +1,9 @@
 package org.scryption.view.common
 
-import java.awt.image.BufferedImage
-import javax.swing.ImageIcon
-
 // Naming conventions for card asset files.
+
 object GUIAssets {
+
   final case class CardViewAssets() {
 
     private val costFolder = "costs"

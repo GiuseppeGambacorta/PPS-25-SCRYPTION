@@ -1,7 +1,5 @@
 package org.scryption.view.common
 
-import scala.swing.Dimension
-
 object GUIGeometry {
   final case class CardGeometry(cardWidth: Int) {
 
