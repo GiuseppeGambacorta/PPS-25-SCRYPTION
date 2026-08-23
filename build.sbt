@@ -15,6 +15,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "scryption",
     libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "upickle" % "4.4.3",
       "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
       "org.scalatest" %% "scalatest" % "3.2.20" % Test,
       "org.scalatestplus" %% "scalacheck-1-17" % "3.2.18.0" % Test,

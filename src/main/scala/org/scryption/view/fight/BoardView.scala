@@ -21,6 +21,11 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
   var interactable = true
   private var flashingRow: Option[(Int, Color)] = None
 
+  /** Realizes the attack animation.
+   *
+   * @param row The row to animate.
+   * @param color The color to use for the animation.
+   */
   def flashAttackingRow(row: Int, color: Color): Unit =
     flashingRow = Some((row, color))
     repaint()
@@ -31,6 +36,10 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
     timer.setRepeats(false)
     timer.start()
 
+  /** Highlights the sacrifice cards.
+   *
+   * @param sacrifices The list of cards to highlights.
+   */
   def updateSacrificeHighlights(sacrifices: List[(Int, Int)]): Unit =
     highlightedSacrifices = sacrifices
     repaint()
@@ -146,6 +155,8 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
   layout(gridPanel) = BorderPanel.Position.Center
 
   /** Updates all 12 slots based on the current state of the Board.
+   *
+   * @param board The current board.
    */
   def updateBoard(board: Board): Unit =
     for row <- 0 until RowsCount do

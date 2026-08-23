@@ -104,6 +104,8 @@ class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
   }
 
   /** Updates the bones counter.
+   *
+   * @param bones The amount of bones.
    */
   def updateBones(bones: Int): Unit =
     bonesLabel.text = s"Bones $bones"
@@ -128,6 +130,10 @@ class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
       scaleStatusLabel.text = "Losing!"
       scaleStatusLabel.foreground = new Color(255, 100, 100)
 
+  /** Updates the turn text.
+   *
+   * @param turn The new turn to update the text with.
+   */
   def updateTurn(turn: TurnState): Unit =
     turn match
       case TurnState.draw =>

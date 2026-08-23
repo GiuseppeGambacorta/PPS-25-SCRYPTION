@@ -114,6 +114,10 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
         viewModel.drawFromSquirrel()
   }
 
+  /** Updates the main deck on the board.
+   *
+   * @param deck The main deck to updated the view with.
+   */
   def updateDeck(deck: Deck): Unit =
     isMainDeckEmpty = deck.isEmpty
     if isMainDeckEmpty then
@@ -125,6 +129,10 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
       mainDeckLabel.tooltip = "Draw from Main Deck"
       mainDeckLabel.cursor = new Cursor(Cursor.HAND_CURSOR)
 
+  /** Updates th items on the board.
+   *
+   * @param items The list of items to update the board with.
+   */
   def updateItems(items: List[GameItem]): Unit =
     itemsContainer.contents.clear()
     for item <- items do
