@@ -13,21 +13,14 @@ Le principali caratteristiche di progettazione includono:
 classDiagram
     direction TB
 
-    class Board {
-    }
+    class Board
+    class BoardRow
+    class Slot
+    class Card
 
-    class BoardRow {
-    }
-
-    class Slot {
-    }
-
-    class Card {
-    }
-
-    Board "1" *-- "3" BoardRow
-    BoardRow "1" *-- "4" Slot
-    Slot o-- "0..1" Card
+    Board "1" *-- "3" BoardRow : contains
+    BoardRow "1" *-- "4" Slot : contains
+    Slot o-- "0..1" Card : contains
 </pre>
 
 <script type="module">
