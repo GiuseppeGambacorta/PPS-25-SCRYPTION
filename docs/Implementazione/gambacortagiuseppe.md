@@ -1,8 +1,6 @@
-# Documentazione dell'Architettura di Gioco
 
----
 
-## 1. Implementazione di `Board`
+## 1. Implementazione della `Board`
 
 `BoardRow` e `Board` sono implementati come **opaque type** basati internamente su collezioni immutabili (`Vector[Slot]` e `Vector[BoardRow]`). L'adozione dei tipi opachi garantisce il totale incapsulamento della rappresentazione dati: all'esterno del modulo di definizione, `BoardRow` e `Board` sono tipi a sé stanti e possono essere manipolati esclusivamente attraverso i costruttori controllati e gli extension methods esposti, impedendo la creazione di stati non validi o l'accesso diretto alla struttura sottostante.
 
@@ -110,12 +108,13 @@ Queste fasi si susseguono in un ciclo continuo, alternando le azioni delle due e
 stateDiagram-v2
     [*] --> draw
     draw --> playerTurn : pesca effettuata
-    draw --> [*] : sconfitta (soglia negativa raggiunta)
+    draw --> EndFight : sconfitta (soglia negativa raggiunta)
     playerTurn --> playerFight : fine turno giocatore
     playerFight --> botTurn
     botTurn --> botFight
-    botTurn --> [*] : vittoria (soglia positiva raggiunta)
+    botTurn --> EndFight : vittoria (soglia positiva raggiunta)
     botFight --> draw
+    EndFight
 </pre>
 
 ### 3.2 Decomposizione in Handler e Testing Modulare
