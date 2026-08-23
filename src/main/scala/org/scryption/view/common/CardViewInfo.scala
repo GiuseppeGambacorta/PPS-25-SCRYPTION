@@ -53,8 +53,8 @@ private object CardViewConversions:
   def sealLabel(seal: Seal): String = seal match
     case Seal.RabbitHole                => "rabbit_hole"
     case Seal.BeesWithin                => "bees_within"
-    case Seal.Sprinter(Direction.Right) => "sprinted"
-    case Seal.Sprinter(Direction.Left)  => "sprinted"
+    case Seal.Sprinter(Direction.Right) => "sprinter"
+    case Seal.Sprinter(Direction.Left)  => "sprinter"
     case Seal.TouchOfDeath              => "touch_of_death"
     case Seal.Fledgling                 => "fledgling"
     case Seal.DamBuilder                => "dam_builder"
