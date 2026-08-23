@@ -1,0 +1,5 @@
+# GameMessagesChannel
+
+Il `GameMessagesChannel` è l'astrazione che realizza concretamente il **Monitor concorrente** già introdotto nella sezione sul design architetturale: rappresenta l'unico punto di contatto tra il thread del Model e il thread della UI, e garantisce che lo scambio di informazioni tra i due avvenga in modo sicuro e ordinato, senza che le due parti debbano condividere direttamente stato mutabile.
+
+I messaggi che transitano sul canale non sono di un unico tipo generico, ma sono **suddivisi per tipologia** in base al contesto di gioco a cui appartengono: esistono messaggi dedicati agli **eventi** (es. selezione di carte o oggetti), messaggi dedicati al **combattimento** (es. stato del turno, carte giocate, uso di oggetti) e messaggi dedicati alla **mappa** (es. scelta della direzione da percorrere). Questa suddivisione mantiene ogni famiglia di messaggi coerente con il proprio dominio d'uso, evitando che un contesto di gioco debba conoscere o gestire messaggi pensati per un altro.
