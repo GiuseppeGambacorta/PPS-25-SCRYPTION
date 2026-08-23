@@ -1,4 +1,4 @@
-\---
+---
 layout: default
 title: Design architetturale
 parent: Report
@@ -19,9 +19,7 @@ classDiagram
     class SwingView
     class ViewModel
     class Model
-    class GameMessagesChannel {
-        <<Monitor>>
-    }
+    class GameMessagesChannel
 
     GameController ..> Model : instantiates / controls
     GameController ..> ViewModel : instantiates
