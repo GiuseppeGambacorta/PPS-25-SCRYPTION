@@ -151,9 +151,10 @@ stateful basate su foldLeft:
 ### SaveManager
 Come funzionalità aggiuntiva, è stato implementato un sistema di salvataggio dello stato di gioco.
 Per disaccoppiare la logica di dominio dal formato di output (JSON tramite la libreria uPickle),
-il `SaveManager` introduce dei Data Transfer Object, come CardDTO, NodeDTO etc. Lo stato della partita
-(mazzo, inventario e mappa) viene mappato su questi DTO, scritto su file, e ricostruito parsando il file e
-interrogando la `CardLibrary` per ripristinare le istanze corrette.
+il `SaveManager` introduce dei Data Transfer Object, come `CardDTO` e la gerarchia `PathDTO`
+(`PathNodeDTO`, `PathForkDTO`, `PathEndDTO`). Lo stato completo della partita, mazzo, inventario e mappa,
+viene mappato su questi DTO, scritto su file JSON, e ricostruito parsando il documento e interrogando
+la `CardLibrary` per ripristinare le istanze corrette, permettendo al *game loop* di riprendere correttamente.
 
 ## Fight UI
 
