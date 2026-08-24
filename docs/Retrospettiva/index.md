@@ -73,5 +73,24 @@ gli sforzi del team, tracciare i progressi ed evitare colli di bottiglia. Nel co
 sia stato un'occasione di crescita sia tecnica che metodologica.
 
 ### Gambacorta Giuseppe
+Dal punto di vista implementativo, l'aspetto più formativo è stato approfondire l'espressività del type system di Scala: 
+l'impiego di costrutti avanzati come enum, opaque types e l'utilizzo di extension methods per definire un DSL ha 
+permesso di garantire type safety e un'elevata leggibilità del codice, integrando agevolmente l'approccio funzionale con i pattern classici 
+della programmazione orientata agli oggetti (OOP).
+Rimane tuttavia il margine per spingersi oltre nel paradigma funzionale puro: ad esempio, per la gestione del FightState l'impiego di monadi 
+come la State Monad sarebbe stata una soluzione ideale, ma non padroneggiando ancora appieno questi concetti avanzati ho preferito non rischiare, 
+mantenendo un'implementazione più accessibile.
+
+Sul fronte del testing, è stata particolarmente apprezzata l'adozione di ScalaTest in stile BDD (Behavior-Driven Development), che ha reso la
+stesura dei test chiara, descrittiva e strettamente allineata alle specifiche di dominio.
+
+Sul piano metodologico e organizzativo, l'uso di GitHub Projects e della board Kanban si è rivelato fondamentale per coordinare le attività, 
+monitorare l'avanzamento dei task e mantenere chiara la visibilità sullo stato del progetto. Per quanto riguarda l'infrastruttura di CI/CD, 
+la mancanza di familiarità ha comportato alcune difficoltà di configurazione, evidenziando un'area di miglioramento su 
+cui concentrare ulteriori approfondimenti in futuro.
+
+Nel complesso, il progetto ha rappresentato un banco di prova concreto sia per affinare le competenze tecniche sul paradigma i
+brido di Scala e sul testing strutturato, sia per comprendere l'importanza di una pipeline di sviluppo e gestione ben orchestrata.
+
 
 ### Lomas Patricia Sachez
