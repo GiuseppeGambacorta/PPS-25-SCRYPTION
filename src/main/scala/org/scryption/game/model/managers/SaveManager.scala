@@ -37,6 +37,15 @@ object SaveManager:
   )
   private val stringToEvent: Map[String, GameEvent] = eventToString.map(_.swap)
 
+  private def getBasePath: java.nio.file.Path =
+    try
+      val uri = getClass.getProtectionDomain.getCodeSource.getLocation.toURI
+      val path = Paths.get(uri)
+      if Files.isDirectory(path) then path else path.getParent
+    catch case _: Exception => Paths.get(".")
+
+  private val defaultSavePath = getBasePath.resolve("savegame.json").toString
+
   private def pathToDTO(path: Path[GameEvent]): PathDTO = path match
     case Path.Node(event, next) => PathNodeDTO(eventToString.getOrElse(event, "fight"), pathToDTO(next))
     case Path.Fork(left, right) => PathForkDTO(pathToDTO(left), pathToDTO(right))
@@ -57,7 +66,7 @@ object SaveManager:
     if dto.isCreature then baseCard.asInstanceOf[CreatureCard].withAttack(dto.attack).withHealth(dto.health)
     else baseCard.asInstanceOf[SupportCard].withHealth(dto.health)
 
-  def saveGame(state: GameState, map: Path[GameEvent], filePath: String = "savegame.json"): Unit =
+  def saveGame(state: GameState, map: Path[GameEvent], filePath: String = defaultSavePath): Unit =
     val deckDTO = state.deck.toList.map(cardToDTO)
     val itemsDTO = state.inventory.map(_.name)
     val mapDTO = pathToDTO(map)
@@ -68,7 +77,7 @@ object SaveManager:
     Files.write(Paths.get(filePath), jsonString.getBytes)
     println("Game saved in " + filePath)
 
-  def loadGame(filePath: String = "savegame.json"): Option[(GameState, Path[GameEvent])] =
+  def loadGame(filePath: String = defaultSavePath): Option[(GameState, Path[GameEvent])] =
     if !Files.exists(Paths.get(filePath)) then return None
 
     try
