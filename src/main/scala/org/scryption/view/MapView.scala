@@ -204,7 +204,7 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
   private val saveButton = new Button("Save Game"):
     cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
     background = new Color(50, 40, 30)
-    foreground = Color.WHITE
+    foreground = Color.RED
     font = ResourceLoader.loadFont("heavyweight-cufonfonts/HEAVYWEI.TTF", 24f)
     tooltip = "Save your progress"
 
@@ -212,6 +212,7 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
   reactions += {
     case ButtonClicked(`saveButton`) =>
       onSave()
+      saveButton.foreground = Color.RED
       saveButton.text = "Game Saved!"
       saveButton.enabled = false
   }
