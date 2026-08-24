@@ -7,11 +7,13 @@ import org.scryption.game.model.Deck.*
 import org.scryption.game.model.Seal.{MightyLeap, Sprinter}
 import org.scryption.game.model.*
 import org.scryption.game.model.items.{HoggyBank, Pliers, Scissors, SquirrelBottle, allItems}
-import org.scryption.{EventMessages, GameMessagesInterface, GameMessagesChannel}
+import org.scryption.{EventMessages, GameMessagesChannel}
 
 class ItemsEventsTest extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
-  private def runMockGuiWithRetry(ch: GameMessagesInterface)(wrongResponses: List[EventMessages], correctResponses: List[EventMessages]): Thread =
+  private def runMockGuiWithRetry(
+      ch: GameMessagesChannel
+  )(wrongResponses: List[EventMessages], correctResponses: List[EventMessages]): Thread =
     val thread = new Thread(() => {
       ch.receiveFromGame
       wrongResponses.foreach(ch.sendToGame)

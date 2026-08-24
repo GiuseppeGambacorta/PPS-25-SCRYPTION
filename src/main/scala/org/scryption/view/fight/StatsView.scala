@@ -1,6 +1,6 @@
 package org.scryption.view.fight
 
-import org.scryption.{FightMessages, GameMessagesInterface, GameMessage}
+import org.scryption.{FightMessages, GameMessagesChannel, GameMessage}
 import org.scryption.game.model.events.TurnState
 import org.scryption.view.ViewModelFight
 import org.scryption.view.common.ResourceLoader
@@ -9,7 +9,7 @@ import scala.swing.*
 import scala.swing.event.ButtonClicked
 import java.awt.{Color, Cursor, Dimension}
 
-class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertical):
+class StatsView(viewModel: ViewModelFight) extends BoxPanel(Orientation.Vertical):
 
   var interactable = true
   opaque = true
@@ -73,17 +73,14 @@ class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
       // anti-aliasing to have a smooth button
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
       val isPressed = peer.getModel.isPressed
-      if isPressed then
-        g.setColor(new Color(110, 30, 30))
-      else
-        g.setColor(new Color(150, 50, 50))
+      if isPressed then g.setColor(new Color(110, 30, 30))
+      else g.setColor(new Color(150, 50, 50))
       g.fillOval(0, 0, size.width, size.height)
       if isPressed then
         g.translate(0, 3)
         super.paintComponent(g)
         g.translate(0, -3)
-      else
-        super.paintComponent(g)
+      else super.paintComponent(g)
 
   contents += scaleIconLabel
   contents += scaleValueLabel
@@ -96,22 +93,25 @@ class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
   contents += endTurnButton
 
   listenTo(endTurnButton)
-  reactions += {
-    case ButtonClicked(`endTurnButton`) =>
-      if interactable then
-        println("UI input: end turn")
-        viewModel.endTurn()
+  reactions += { case ButtonClicked(`endTurnButton`) =>
+    if interactable then
+      println("UI input: end turn")
+      viewModel.endTurn()
   }
 
   /** Updates the bones counter.
-   */
+    *
+    * @param bones
+    *   The amount of bones.
+    */
   def updateBones(bones: Int): Unit =
     bonesLabel.text = s"Bones $bones"
 
   /** Updates the scale text.
-   *
-   * @param balance Positive value is damage in your favor, negative is damage sustained by the player.
-   */
+    *
+    * @param balance
+    *   Positive value is damage in your favor, negative is damage sustained by the player.
+    */
   def updateScale(balance: Int): Unit =
     val displayValue = Math.abs(balance)
     scaleValueLabel.text = s"$displayValue / 5"
@@ -128,6 +128,11 @@ class StatsView(viewModel : ViewModelFight) extends BoxPanel(Orientation.Vertica
       scaleStatusLabel.text = "Losing!"
       scaleStatusLabel.foreground = new Color(255, 100, 100)
 
+  /** Updates the turn text.
+    *
+    * @param turn
+    *   The new turn to update the text with.
+    */
   def updateTurn(turn: TurnState): Unit =
     turn match
       case TurnState.draw =>

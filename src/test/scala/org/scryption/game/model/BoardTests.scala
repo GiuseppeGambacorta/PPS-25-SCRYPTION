@@ -103,8 +103,8 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("Creating an empty board with RowDSL") {
       When("creating a board using the || operator")
       val board = (x | x | x | x) ||
-                  (x | x | x | x) ||
-                  (x | x | x | x)
+        (x | x | x | x) ||
+        (x | x | x | x)
 
       Then("the board should contain 0 cards")
       board.numberOfCards shouldBe 0
@@ -112,9 +112,9 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("Creating a board from 3 rows using Board.apply and verifying card positions") {
       Given("three rows created with DSL containing cards")
-      val row0 = Some(squirrel) | x              | x          | x
-      val row1 = x              | Some(bear)     | x          | x
-      val row2 = x              | x              | Some(fox)  | Some(wolf)
+      val row0 = Some(squirrel) | x | x | x
+      val row1 = x | Some(bear) | x | x
+      val row2 = x | x | Some(fox) | Some(wolf)
 
       When("creating a board using Board.apply")
       val board = Board(row0, row1, row2)
@@ -138,7 +138,7 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       Then("an IllegalArgumentException should be thrown")
       an[IllegalArgumentException] should be thrownBy {
         (x | x | x | x) ||
-        (x | x | x)     ||
+        (x | x | x) ||
         (x | x | x | x)
       }
     }
@@ -147,10 +147,10 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       When("attempting to chain 4 rows directly with the || operator")
       Then("an IllegalArgumentException should be thrown")
       an[IllegalArgumentException] should be thrownBy {
-          (x | x | x | x) ||
-          (x | x | x | x) ||
-          (x | x | x | x) ||
-          (x | x | x | x)
+        (x | x | x | x) ||
+        (x | x | x | x) ||
+        (x | x | x | x) ||
+        (x | x | x | x)
       }
     }
   }
@@ -159,9 +159,9 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
     Scenario("Updating a slot directly on the Board using updatedSlot") {
       Given("a board created using DSL")
-      val initialBoard = (Some(squirrel) | x          | x | x) ||
-                         (x              | Some(bear) | x | x) ||
-                         (x              | x          | x | x)
+      val initialBoard = (Some(squirrel) | x | x | x) ||
+        (x | Some(bear) | x | x) ||
+        (x | x | x | x)
 
       initialBoard.numberOfCards shouldBe 2
 
@@ -183,8 +183,8 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     Scenario("Replacing an entire row on the Board using updateRow and DSL") {
       Given("a board initialized with empty rows using DSL")
       val initialBoard = (x | x | x | x) ||
-                         (x | x | x | x) ||
-                         (x | x | x | x)
+        (x | x | x | x) ||
+        (x | x | x | x)
 
       initialBoard.numberOfCards shouldBe 0
 
@@ -206,5 +206,4 @@ class BoardTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       updatedBoard.numberOfCards shouldBe newRow.numberOfCards
     }
 
-  
   }

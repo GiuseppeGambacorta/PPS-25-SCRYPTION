@@ -9,7 +9,7 @@ import scala.swing.*
 import scala.swing.event.{MouseClicked, MouseExited, MouseMoved}
 import java.awt.{Color, Cursor, Dimension, Font}
 
-class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) extends BoxPanel(Orientation.Vertical):
+class DecksView(viewModel: ViewModelFight, onItemClicked: GameItem => Unit) extends BorderPanel:
 
   var interactable = true
   private var isMainDeckEmpty = false
@@ -59,10 +59,8 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
 
     override protected def paintComponent(g: Graphics2D): Unit =
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      if isHovered then
-        g.setColor(new Color(120, 120, 120, 150))
-      else
-        g.setColor(new Color(60, 60, 65, 100))
+      if isHovered then g.setColor(new Color(120, 120, 120, 150))
+      else g.setColor(new Color(60, 60, 65, 100))
       g.fillRoundRect(5, 5, size.width - 10, size.height - 10, 20, 20)
       super.paintComponent(g)
 
@@ -79,15 +77,26 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
   private val itemsContainer = new BoxPanel(Orientation.Vertical):
     opaque = false
 
-  contents += mainDeckLabel
-  contents += Swing.VStrut(30)
-  contents += squirrelDeckLabel
-  contents += Swing.VGlue
-  contents += new Label("ITEMS"):
-    foreground = new Color(150, 150, 150)
-    font = ResourceLoader.loadFont(fontPath, 20f)
-  contents += Swing.VStrut(10)
-  contents += itemsContainer
+  private val topPanel = new BoxPanel(Orientation.Vertical):
+    opaque = false
+    contents += mainDeckLabel
+    contents += Swing.VStrut(30)
+    contents += squirrelDeckLabel
+    contents += Swing.VStrut(30)
+    contents += new Label("ITEMS"):
+      foreground = new Color(150, 150, 150)
+      font = ResourceLoader.loadFont(fontPath, 20f)
+    contents += Swing.VStrut(10)
+
+  private val scrollItems = new ScrollPane(itemsContainer):
+    opaque = false
+    peer.getViewport.setOpaque(false)
+    border = Swing.EmptyBorder(0)
+    horizontalScrollBarPolicy = ScrollPane.BarPolicy.Never
+    verticalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
+
+  layout(topPanel) = BorderPanel.Position.North
+  layout(scrollItems) = BorderPanel.Position.Center
 
   listenTo(mainDeckLabel.mouse.clicks, squirrelDeckLabel.mouse.clicks)
 
@@ -103,6 +112,11 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
         viewModel.drawFromSquirrel()
   }
 
+  /** Updates the main deck on the board.
+    *
+    * @param deck
+    *   The main deck to updated the view with.
+    */
   def updateDeck(deck: Deck): Unit =
     isMainDeckEmpty = deck.isEmpty
     if isMainDeckEmpty then
@@ -114,6 +128,11 @@ class DecksView(viewModel : ViewModelFight, onItemClicked: GameItem => Unit) ext
       mainDeckLabel.tooltip = "Draw from Main Deck"
       mainDeckLabel.cursor = new Cursor(Cursor.HAND_CURSOR)
 
+  /** Updates th items on the board.
+    *
+    * @param items
+    *   The list of items to update the board with.
+    */
   def updateItems(items: List[GameItem]): Unit =
     itemsContainer.contents.clear()
     for item <- items do
