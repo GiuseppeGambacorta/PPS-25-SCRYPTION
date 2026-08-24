@@ -8,23 +8,20 @@ type Slot = Option[Card[?]]
 /** (row, column) coordinates of a position on the board. */
 type BoardPosition = (Int, Int)
 
-/** Module that defines the representation of the game grid (`Board`) and its rows (`BoardRow`),
- * together with the declarative DSL used to build them via the `|` and `||` operators.
- */
+/** Module that defines the representation of the game grid (`Board`) and its rows (`BoardRow`), together with the
+  * declarative DSL used to build them via the `|` and `||` operators.
+  */
 object boardModel:
 
-  /** A row of the board, an opaque type backed by `Vector[Slot]`.
-   * Encapsulation prevents the underlying structure from being created or modified
-   * outside of the constructors and extension methods exposed by this module.
-   */
+  /** A row of the board, an opaque type backed by `Vector[Slot]`. Encapsulation prevents the underlying structure from
+    * being created or modified outside of the constructors and extension methods exposed by this module.
+    */
   opaque type BoardRow = Vector[Slot]
 
-  /** The full game grid, an opaque type backed by `Vector[BoardRow]`.
-   * As with `BoardRow`, the internal representation is encapsulated and can only be
-   * manipulated through the controlled operations defined here.
-   */
+  /** The full game grid, an opaque type backed by `Vector[BoardRow]`. As with `BoardRow`, the internal representation
+    * is encapsulated and can only be manipulated through the controlled operations defined here.
+    */
   opaque type Board = Vector[BoardRow]
-
 
   val RowsCount: Int = 3
   val ColsCount: Int = 4
@@ -36,16 +33,15 @@ object boardModel:
   val IndexOfPlayerRow = 2
 
   extension (slot: Slot)
-    /** Starts a `BoardRow` by concatenating two consecutive `Slot`s.
-     * DSL entry point: allows writing `slot1 | slot2` as the first step
-     * when building a row.
-     */
+    /** Starts a `BoardRow` by concatenating two consecutive `Slot`s. DSL entry point: allows writing `slot1 | slot2` as
+      * the first step when building a row.
+      */
     infix def |(next: Slot): BoardRow = Vector(slot, next)
 
   extension (position: BoardPosition)
-    /** Checks that the position lies within the board's boundaries (non-negative row and column,
-     * each below `RowsCount` and `ColsCount` respectively).
-     */
+    /** Checks that the position lies within the board's boundaries (non-negative row and column, each below `RowsCount`
+      * and `ColsCount` respectively).
+      */
     def isValid: Boolean =
       (position._1 < RowsCount && position._2 < ColsCount) && (position._1 >= 0 && position._2 >= 0)
 
@@ -60,17 +56,17 @@ object boardModel:
     @targetName("rowNumberOfCards")
     def numberOfCards: Int = row.count(_.isDefined)
 
-    /** Extends an existing `BoardRow` by appending a new `Slot` at the end.
-     * Validates at runtime that the resulting row does not exceed the `ColsCount` limit.
-     */
+    /** Extends an existing `BoardRow` by appending a new `Slot` at the end. Validates at runtime that the resulting row
+      * does not exceed the `ColsCount` limit.
+      */
     infix def |(next: Slot): BoardRow =
       val updatedRow = row :+ next
       require(updatedRow.length <= ColsCount, s"A row cannot exceed $ColsCount slots")
       updatedRow
 
-    /** Combines this row with a following one to form a two-row `Board`.
-     * Validates that both rows have exactly `ColsCount` columns.
-     */
+    /** Combines this row with a following one to form a two-row `Board`. Validates that both rows have exactly
+      * `ColsCount` columns.
+      */
     @targetName("rowConcat")
     infix def ||(nextRow: BoardRow): Board =
       require(row.length == ColsCount, s"A row must contain exactly $ColsCount slots")
@@ -94,10 +90,9 @@ object boardModel:
     @targetName("boardNumberOfCards")
     def numberOfCards: Int = b.map(_.numberOfCards).sum
 
-    /** Appends a new row to an existing `Board`.
-     * Validates that the row has exactly `ColsCount` columns and that the resulting board
-     * does not exceed the `RowsCount` limit.
-     */
+    /** Appends a new row to an existing `Board`. Validates that the row has exactly `ColsCount` columns and that the
+      * resulting board does not exceed the `RowsCount` limit.
+      */
     @targetName("boardConcatRow")
     infix def ||(nextRow: BoardRow): Board =
       require(nextRow.length == ColsCount, s"A row must contain exactly $ColsCount slots")
@@ -110,9 +105,9 @@ object boardModel:
     /** Returns an empty row, with all cells set to `None`. */
     def empty: BoardRow = Vector.fill(ColsCount)(None)
 
-    /** Builds a `BoardRow` from an explicit sequence of `Slot`s.
-     * Requires the number of slots to match `ColsCount` exactly.
-     */
+    /** Builds a `BoardRow` from an explicit sequence of `Slot`s. Requires the number of slots to match `ColsCount`
+      * exactly.
+      */
     def apply(slots: Slot*): BoardRow =
       require(slots.length == ColsCount, s"A row must contain exactly $ColsCount slots")
       slots.toVector

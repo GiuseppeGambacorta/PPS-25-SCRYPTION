@@ -13,26 +13,22 @@ type Event = (GameState, GameMessagesChannel) => GameState
 // Maximum number of cards sent to the GUI for selection
 val cardsNumberForGui = 5
 
-/**
- * Event: Draws 3 random cards from the library and sends them to the GUI.
- * The player picks one card to add to their deck.
- */
+/** Event: Draws 3 random cards from the library and sends them to the GUI. The player picks one card to add to their
+  * deck.
+  */
 def getANewCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   selectCardEvent(gameState, ch, EventMessages.Cards(CardLibrary.getDeckWithAverageCards.drawRandom(3)._1))
 }
 
-/**
- * Event: Draws 3 random rare cards from the library and sends them to the GUI.
- * The player picks one card to add to their deck.
- */
+/** Event: Draws 3 random rare cards from the library and sends them to the GUI. The player picks one card to add to
+  * their deck.
+  */
 private def getANewRareCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   selectCardEvent(gameState, ch, EventMessages.Cards(CardLibrary.getADeckWithRareCards.drawRandom(3)._1))
 }
 
-/**
- * Event: Receives 3 cards and sends them to the GUI.
- * The player picks one card to add to their deck.
- */
+/** Event: Receives 3 cards and sends them to the GUI. The player picks one card to add to their deck.
+  */
 @tailrec
 private def selectCardEvent(gameState: GameState, ch: GameMessagesChannel, cards: EventMessages.Cards): GameState = {
   ch.sendToGui(cards)
@@ -48,12 +44,10 @@ private def selectCardEvent(gameState: GameState, ch: GameMessagesChannel, cards
   }
 }
 
-/**
- * Event Mushroom Expert (Mycologists):
- * Checks for duplicate cards in the deck. If present, allows the GUI to pick one:
- * removes 2 copies of that card from the deck and adds 1 fused/boosted version (stats doubled).
- * If there are no duplicates in the deck, returns the unchanged GameState immediately.
- */
+/** Event Mushroom Expert (Mycologists): Checks for duplicate cards in the deck. If present, allows the GUI to pick one:
+  * removes 2 copies of that card from the deck and adds 1 fused/boosted version (stats doubled). If there are no
+  * duplicates in the deck, returns the unchanged GameState immediately.
+  */
 @tailrec
 def mushRoomsExpertEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   val deckList = gameState.deck.toList
@@ -65,17 +59,14 @@ def mushRoomsExpertEvent(gameState: GameState, ch: GameMessagesChannel): GameSta
     .keys
     .toList
 
-  if duplicateCards.nonEmpty then
-    ch.sendToGui(EventMessages.Cards(duplicateCards.take(cardsNumberForGui)))
+  if duplicateCards.nonEmpty then ch.sendToGui(EventMessages.Cards(duplicateCards.take(cardsNumberForGui)))
   else {
     return gameState
   }
 
   ch.receiveFromGui match {
     case EventMessages.SingleCard(selectedCard) =>
-      val upgradedCard = modifyCreature(selectedCard)(c =>
-        c withAttack (c.attack * 2) withHealth (c.health * 2)
-      )
+      val upgradedCard = modifyCreature(selectedCard)(c => c withAttack (c.attack * 2) withHealth (c.health * 2))
 
       // Remove two exact copies of the selected card
       val updatedDeck = gameState.deck
@@ -92,10 +83,8 @@ def mushRoomsExpertEvent(gameState: GameState, ch: GameMessagesChannel): GameSta
   }
 }
 
-/**
- * Event Firecamp (Attack):
- * Allows selecting a card from the deck to increase its attack stat by +1.
- */
+/** Event Firecamp (Attack): Allows selecting a card from the deck to increase its attack stat by +1.
+  */
 def fireCampEvent_Attack(gameState: GameState, ch: GameMessagesChannel): GameState =
   substituteACard(
     gameState,
@@ -103,10 +92,8 @@ def fireCampEvent_Attack(gameState: GameState, ch: GameMessagesChannel): GameSta
     card => modifyCreature(card)(c => c withAttack (c.attack + 1))
   )
 
-/**
- * Event Firecamp (Health):
- * Allows selecting a card from the deck to increase its health stat by +2.
- */
+/** Event Firecamp (Health): Allows selecting a card from the deck to increase its health stat by +2.
+  */
 def fireCampEvent_Health(gameState: GameState, ch: GameMessagesChannel): GameState =
   substituteACard(
     gameState,
@@ -114,11 +101,9 @@ def fireCampEvent_Health(gameState: GameState, ch: GameMessagesChannel): GameSta
     card => modifyCreature(card)(c => c withHealth (c.health + 2))
   )
 
-/**
- * Event Sacrifice:
- * Allows sacrificing a card with seals to transfer all its seals onto another card in the deck.
- * If no cards in the deck have any seals, the event terminates and returns the original GameState.
- */
+/** Event Sacrifice: Allows sacrificing a card with seals to transfer all its seals onto another card in the deck. If no
+  * cards in the deck have any seals, the event terminates and returns the original GameState.
+  */
 @tailrec
 def sacrificeEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   val cardsWithSeals = gameState.deck.toList.filter(c => c.seals.nonEmpty)
@@ -129,8 +114,7 @@ def sacrificeEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
         cardsWithSeals.take(cardsNumberForGui)
       )
     )
-  else
-    return gameState
+  else return gameState
 
   ch.receiveFromGui match {
     case EventMessages.SingleCard(cardToRemove) =>
@@ -166,15 +150,11 @@ def sacrificeEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   }
 }
 
-
-/**
- * Event Trial:
- * Invia alla GUI fino a un massimo di 10 carte del mazzo.
- * In base alla scelta ricevuta (TrialChoice), calcola la somma dell'attributo selezionato
- * e verifica il superamento della relativa soglia.
- * Se la prova è superata, viene proposta una carta casuale dalla libreria: una volta
- * confermata dalla GUI, viene aggiunta al mazzo. Altrimenti, l'evento termina.
- */
+/** Event Trial: Invia alla GUI fino a un massimo di 10 carte del mazzo. In base alla scelta ricevuta (TrialChoice),
+  * calcola la somma dell'attributo selezionato e verifica il superamento della relativa soglia. Se la prova è superata,
+  * viene proposta una carta casuale dalla libreria: una volta confermata dalla GUI, viene aggiunta al mazzo.
+  * Altrimenti, l'evento termina.
+  */
 @tailrec
 def trialEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   val healthThreshold = 10
@@ -226,9 +206,8 @@ def trialEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   }
 }
 
-/**
- * Helper ricorsivo in attesa della conferma da parte della GUI della carta ricompensa ricevuta.
- */
+/** Helper ricorsivo in attesa della conferma da parte della GUI della carta ricompensa ricevuta.
+  */
 @tailrec
 private def handleTrialReward(gameState: GameState, ch: GameMessagesChannel, rewardCard: Card[?]): GameState = {
   ch.receiveFromGui match {
@@ -242,10 +221,9 @@ private def handleTrialReward(gameState: GameState, ch: GameMessagesChannel, rew
   }
 }
 
-/**
- * Generic helper function for events that replace a card in the deck
- * with a modified version produced by transformation `f`.
- */
+/** Generic helper function for events that replace a card in the deck with a modified version produced by
+  * transformation `f`.
+  */
 @tailrec
 private def substituteACard(gameState: GameState, ch: GameMessagesChannel, f: Card[?] => Card[?]): GameState = {
   ch.sendToGui(
@@ -264,9 +242,8 @@ private def substituteACard(gameState: GameState, ch: GameMessagesChannel, f: Ca
   }
 }
 
-/**
- * Helper to modify card attributes only if the card is a CreatureCard.
- */
+/** Helper to modify card attributes only if the card is a CreatureCard.
+  */
 private def modifyCreature(card: Card[?])(f: CreatureCard => Card[?]): Card[?] = card match {
   case c: CreatureCard => f(c)
   case other           => other

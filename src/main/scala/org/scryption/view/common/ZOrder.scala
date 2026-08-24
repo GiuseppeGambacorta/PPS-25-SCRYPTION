@@ -4,12 +4,13 @@ import javax.swing.JLabel
 
 object ZOrder {
 
-  def apply[A]( items: Vector[A],
-                isInSlot: A => Boolean,
-                isHovered: A => Boolean,
-                index: A => Int,
-                labelsOf: A => List[JLabel]
-              ): Unit = {
+  def apply[A](
+      items: Vector[A],
+      isInSlot: A => Boolean,
+      isHovered: A => Boolean,
+      index: A => Int,
+      labelsOf: A => List[JLabel]
+  ): Unit = {
     if (items.isEmpty) return
     val parent = labelsOf(items.head).headOption.flatMap(l => Option(l.getParent)).orNull
     if (parent == null) return

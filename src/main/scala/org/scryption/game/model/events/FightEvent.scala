@@ -32,13 +32,13 @@ enum TurnState:
   case botFight
 
 case class FightState(
-                       scalePoints: Int,
-                       bones: Int,
-                       deck: Deck,
-                       playerHand: PlayerHand,
-                       board: Board,
-                       inventory: List[GameItem]
-                     )
+    scalePoints: Int,
+    bones: Int,
+    deck: Deck,
+    playerHand: PlayerHand,
+    board: Board,
+    inventory: List[GameItem]
+)
 
 private val PlayerWinningPoints = 6
 private val BotWinningPoints = -6
@@ -46,10 +46,9 @@ private val NumberOfCardsAtTheStartOfTheFight = 4
 private val PlayerWon = false
 private val PlayerLost = true
 
-/** Entry point of the combat sub-loop. Draws the starting hand, builds the initial
- * [[FightState]] and runs the turn-state machine until victory or defeat, returning
- * the resulting [[GameState]].
- */
+/** Entry point of the combat sub-loop. Draws the starting hand, builds the initial [[FightState]] and runs the
+  * turn-state machine until victory or defeat, returning the resulting [[GameState]].
+  */
 def fightEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
   val (initialCards, remainingDeck) = gameState.deck.drawRandom(NumberOfCardsAtTheStartOfTheFight)
   val initialFightState = FightState(
@@ -63,10 +62,10 @@ def fightEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
 
   GameState(gameState.deck, gameState.inventory, isGameOver = loop(TurnState.draw, initialFightState, ch))
 
-/** Tail-recursive turn-state machine driving the combat. Notifies the view of the current
- * state, dispatches to the appropriate phase handler based on `turnState`, and recurses
- * until a winning or losing threshold on `scalePoints` is reached.
- */
+/** Tail-recursive turn-state machine driving the combat. Notifies the view of the current state, dispatches to the
+  * appropriate phase handler based on `turnState`, and recurses until a winning or losing threshold on `scalePoints` is
+  * reached.
+  */
 @tailrec
 private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesChannel): Boolean =
   ch.sendToGui(FightMessages.State(fightState, turnState))
@@ -101,9 +100,9 @@ private def loop(turnState: TurnState, fightState: FightState, ch: GameMessagesC
 // Phase Handlers (Restituiscono la tupla (TurnState, FightState))
 // ============================================================================
 
-/** Handles the draw phase: waits for the player to draw from the squirrel deck or from the
- * main deck, updates the hand accordingly, and moves the turn state forward.
- */
+/** Handles the draw phase: waits for the player to draw from the squirrel deck or from the main deck, updates the hand
+  * accordingly, and moves the turn state forward.
+  */
 private def handleDrawPhase(fightState: FightState, ch: GameMessagesChannel): (TurnState, FightState) =
   ch.receiveFromGui match
     case FightMessages.DrawFromSquirrel =>
@@ -125,9 +124,9 @@ private def handleDrawPhase(fightState: FightState, ch: GameMessagesChannel): (T
       ch.clear()
       (TurnState.draw, fightState)
 
-/** Handles the player's turn: dispatches card placement (with or without sacrifices), item
- * usage, and the transition to the fight phase once the player ends their turn.
- */
+/** Handles the player's turn: dispatches card placement (with or without sacrifices), item usage, and the transition to
+  * the fight phase once the player ends their turn.
+  */
 private def handlePlayerTurnPhase(fightState: FightState, ch: GameMessagesChannel): (TurnState, FightState) =
   ch.receiveFromGui match
     case FightMessages.CardToPlay(card, position) =>
@@ -150,14 +149,13 @@ private def handlePlayerTurnPhase(fightState: FightState, ch: GameMessagesChanne
     case _ =>
       (TurnState.playerTurn, fightState)
 
-/** Resolves a full attack phase for either the player or the bot: computes the combat result
- * between attacker and defender rows, applies movement rules, updates the damage scale
- * (`scalePoints`), and determines the next turn state.
- */
+/** Resolves a full attack phase for either the player or the bot: computes the combat result between attacker and
+  * defender rows, applies movement rules, updates the damage scale (`scalePoints`), and determines the next turn state.
+  */
 private def handleFightPhase(
-                              fightState: FightState,
-                              isPlayerAttacking: Boolean
-                            ): (TurnState, FightState) =
+    fightState: FightState,
+    isPlayerAttacking: Boolean
+): (TurnState, FightState) =
   val (attackerRowIdx, defenderRowIdx) =
     if isPlayerAttacking then (IndexOfPlayerRow, IndexOfBotRow)
     else (IndexOfBotRow, IndexOfPlayerRow)
@@ -193,10 +191,9 @@ private def handleFightPhase(
 // Helper Functions for Card Placement Logic
 // ============================================================================
 
-/** Plays a card without sacrifices at the given position, if the slot is free and the card's
- * sacrifice requirement (none, or a satisfiable bone cost) is met; otherwise returns the
- * state unchanged.
- */
+/** Plays a card without sacrifices at the given position, if the slot is free and the card's sacrifice requirement
+  * (none, or a satisfiable bone cost) is met; otherwise returns the state unchanged.
+  */
 private def playCardWithoutSacrifice(fightState: FightState, card: Card[?], position: Int): FightState =
   fightState.board(IndexOfPlayerRow)(position) match
     case Some(_) => fightState // Slot occupato
@@ -220,16 +217,16 @@ private def playCardWithoutSacrifice(fightState: FightState, card: Card[?], posi
 
         case _ => fightState // Ossa insufficienti o tipo di sacrificio errato
 
-/** Plays a card that requires a blood sacrifice, resolving the sacrifice of the given board
- * positions first; the card is placed only if the target slot is valid and the resulting
- * blood meets the card's requirement, otherwise the state is returned unchanged.
- */
+/** Plays a card that requires a blood sacrifice, resolving the sacrifice of the given board positions first; the card
+  * is placed only if the target slot is valid and the resulting blood meets the card's requirement, otherwise the state
+  * is returned unchanged.
+  */
 private def playCardWithSacrifices(
-                                    fightState: FightState,
-                                    card: Card[?],
-                                    position: Int,
-                                    sacrificesPositions: List[(Int, Int)]
-                                  ): FightState =
+    fightState: FightState,
+    card: Card[?],
+    position: Int,
+    sacrificesPositions: List[(Int, Int)]
+): FightState =
   card.sacrificeAttribute match
     case Blood(amount) =>
       val currentSlot = fightState.board(IndexOfPlayerRow)(position)
@@ -253,10 +250,9 @@ private def playCardWithSacrifices(
 
     case _ => fightState
 
-/** Generates a random starting board for a fight, placing one or two random enemy creatures
- * on the bot row and, with a small independent probability per column, a random obstacle
- * on the player row.
- */
+/** Generates a random starting board for a fight, placing one or two random enemy creatures on the bot row and, with a
+  * small independent probability per column, a random obstacle on the player row.
+  */
 private def generateRandomStartingBoard(): Board =
   val random = new Random()
   val possibleBotCards = CardLibrary.getADeckWithAllTheLibrary.toList

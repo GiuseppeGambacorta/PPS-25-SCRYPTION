@@ -7,11 +7,11 @@ import org.scryption.game.model.Maps.Path
 
 import scala.annotation.tailrec
 
-/** Resolves the player's navigation choice on the map. Waits for a message from the view and,
- * depending on whether the current node leads to a single continuation or a fork, advances
- * along the map (`forward`) or picks a branch (`left`/`right`); any other message is ignored
- * and the wait is repeated. Returns the map position resulting from the player's choice.
- */
+/** Resolves the player's navigation choice on the map. Waits for a message from the view and, depending on whether the
+  * current node leads to a single continuation or a fork, advances along the map (`forward`) or picks a branch
+  * (`left`/`right`); any other message is ignored and the wait is repeated. Returns the map position resulting from the
+  * player's choice.
+  */
 @tailrec
 def MapEvent(gameMap: Path[GameEvent], ch: GameMessagesChannel): Path[GameEvent] =
 

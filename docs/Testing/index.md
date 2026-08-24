@@ -10,8 +10,12 @@ parent: Report
 Lo sviluppo dei test non ha seguito rigorosamente il ciclo *red–green–refactor* del Test-Driven Development: nella maggior parte dei casi i test sono stati scritti **in parallelo** all'implementazione, piuttosto che sistematicamente prima di essa. La strategia di test copre comunque in modo esteso tutti i component del *model* con particolare attenzione alla logica di gioco e alla gestione della comunicazione tramite il canale di messaggi tra Model e ViewModel.
 
 ## ScalaTest
-qui devi dire che abbiamo seguito i requisiti del gioco e
-Per i test è stata utilizzata la libreria **ScalaTest**, in stile **BDD** con `AnyFeatureSpec`, `GivenWhenThen` e i `Matchers` (`shouldBe`). Ogni funzionalità è organizzata in `Feature` e `Scenario`, con i passaggi descritti tramite `Given` / `When` / `Then` / `And`, per rendere esplicito sia il comportamento atteso sia il contesto in cui viene verificato.
+La creazione dei casi di test è stata guidata dai requisiti formali del gioco, con l'obiettivo di verificare
+che le meccaniche implementate rispettassero le regole di dominio. Per l'implementazione pratica è stata utilizzata
+la libreria **ScalaTest**, adottando uno stile **BDD** tramite `AnyFeatureSpec`, `GivenWhenThen` e i `Matchers`
+(`shouldBe`). Ogni funzionalità è organizzata in `Feature` e `Scenario`, con i singoli passaggi descritti
+dichiarativamente tramite `Given` / `When` / `Then` / `And`. Questo approccio ha permesso di rendere esplicito
+e leggibile sia il comportamento atteso della logica, sia il contesto in cui questo comportamento viene verificato.
 
 Un esempio dai test degli eventi di gioco (`ChangeDeckEventsTest`), che verifica l'evento di aggiunta di una nuova carta al mazzo:
 

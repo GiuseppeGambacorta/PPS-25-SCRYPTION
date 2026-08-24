@@ -415,6 +415,3 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       )
     }
   }
-
-
-

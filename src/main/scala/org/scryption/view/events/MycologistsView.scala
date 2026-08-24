@@ -3,16 +3,13 @@ package org.scryption.view.events
 import org.scryption.view.*
 import org.scryption.view.common.{CardView, CardViewInfo, ResourceLoader, ZOrder}
 
-
 import java.awt.event.{MouseEvent, MouseListener}
 import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.swing.{FlowPanel, Panel, Swing}
 
-
 class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
- 
   viewModel.ListenForCardsFromTheModel(renderHand)
 
   private val setup = CardView.forWidth(250)
@@ -34,11 +31,10 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   private val duplicateOffsetX = 20
   private var showSlotBackground: Boolean = true
-  
+
   private val visualStatBonus = 2
 
   opaque = false
-
 
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
@@ -57,7 +53,6 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
       }
     }
   }
-
 
   private class CardSlot(val index: Int, info: CardViewInfo, val baseX: Int, val baseY: Int) {
 
@@ -195,7 +190,7 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
     }
 
     private def sendCardToGameModel(): Unit = {
-       viewModel.sendCardToModel(index)
+      viewModel.sendCardToModel(index)
     }
   }
 
