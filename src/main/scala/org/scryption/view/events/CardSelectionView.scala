@@ -9,7 +9,6 @@ import javax.swing.{ImageIcon, JLabel, Timer}
 import scala.swing.*
 
 
-
 class CardSelectionView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   viewModel.ListenForCardsFromTheModel(showCards)
@@ -35,9 +34,7 @@ class CardSelectionView(viewModel: ViewModelDeckEvent) extends FlowPanel {
     backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
     super.paintComponent(g)
   }
-
-
-
+  
   private class CardSlot(val index: Int, info: CardViewInfo, posX: Int) {
     val frontIcon: ImageIcon =
       setup.render(info, assets.frontTemplatePath(info.cardType)).get

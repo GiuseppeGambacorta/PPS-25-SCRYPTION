@@ -1,10 +1,9 @@
 package org.scryption.view.common
 
-import java.awt.image.BufferedImage
-import javax.swing.ImageIcon
-
 // Naming conventions for card asset files.
+
 object GUIAssets {
+
   final case class CardViewAssets() {
 
     private val costFolder = "costs"
@@ -57,6 +56,12 @@ object GUIAssets {
 
     def menuCardPath(name: String): String = s"$menuFolder/menucard_$name.png"
 
-    def menuTextPath(name:String): String = s"$menuFolder/menutext_$name.png"
+    def menuTextPath(name: String): String = s"$menuFolder/menutext_$name.png"
+  }
+
+  final case class MapViewAssets() {
+    private val mapFolder = "map"
+
+    def eventIconPath(name: String): String = s"$mapFolder/$name.png"
   }
 }

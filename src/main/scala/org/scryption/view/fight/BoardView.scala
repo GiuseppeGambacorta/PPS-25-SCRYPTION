@@ -21,24 +21,41 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
   var interactable = true
   private var flashingRow: Option[(Int, Color)] = None
 
+  /** Realizes the attack animation.
+    *
+    * @param row
+    *   The row to animate.
+    * @param color
+    *   The color to use for the animation.
+    */
   def flashAttackingRow(row: Int, color: Color): Unit =
     flashingRow = Some((row, color))
     repaint()
-    val timer = new javax.swing.Timer(800, _ => {
-      flashingRow = None
-      repaint()
-    })
+    val timer = new javax.swing.Timer(
+      800,
+      _ => {
+        flashingRow = None
+        repaint()
+      }
+    )
     timer.setRepeats(false)
     timer.start()
 
+  /** Highlights the sacrifice cards.
+    *
+    * @param sacrifices
+    *   The list of cards to highlights.
+    */
   def updateSacrificeHighlights(sacrifices: List[(Int, Int)]): Unit =
     highlightedSacrifices = sacrifices
     repaint()
-  
+
   private def loadSlotIcon(path: String): Option[java.awt.Image] =
-    ResourceLoader.loadTemplateImage(path).map: img =>
-      val height = (geometry.cardWidth * 1.52).toInt
-      img.getScaledInstance(geometry.cardWidth, height, java.awt.Image.SCALE_SMOOTH)
+    ResourceLoader
+      .loadTemplateImage(path)
+      .map: img =>
+        val height = (geometry.cardWidth * 1.52).toInt
+        img.getScaledInstance(geometry.cardWidth, height, java.awt.Image.SCALE_SMOOTH)
 
   private val iconBotPrep = loadSlotIcon("board/slot_bot_prep.png")
   private val iconBotAttack = loadSlotIcon("board/slot_bot_attack.png")
@@ -92,11 +109,9 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
         repaint()
       case e: MouseClicked =>
         if interactable then
-          if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
           val bounds = getCardBounds
           val px = e.point.x; val py = e.point.y
-          if checkCardBounds(bounds, px, py) then
-            onSlotClicked(row, col)
+          if checkCardBounds(bounds, px, py) then onSlotClicked(row, col)
     }
 
     private def checkCardBounds(bounds: Rectangle, px: Int, py: Int) = {
@@ -109,7 +124,10 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
 
       currentImage.foreach { img =>
         // interpolation to scale properly the image in smaller dimensions
-        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+        g.setRenderingHint(
+          java.awt.RenderingHints.KEY_INTERPOLATION,
+          java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR
+        )
         g.drawImage(img, bounds.x, bounds.y, bounds.width, bounds.height, null)
       }
 
@@ -146,7 +164,10 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
   layout(gridPanel) = BorderPanel.Position.Center
 
   /** Updates all 12 slots based on the current state of the Board.
-   */
+    *
+    * @param board
+    *   The current board.
+    */
   def updateBoard(board: Board): Unit =
     for row <- 0 until RowsCount do
       for col <- 0 until ColsCount do

@@ -9,13 +9,13 @@ import org.scryption.view.ViewModelFight
 import scala.swing.*
 import java.awt.Color
 
-class FightView(viewModel : ViewModelFight) extends BorderPanel:
+class FightView(viewModel: ViewModelFight) extends BorderPanel:
 
   var selectedCard: Option[Card[?]] = None
   private var selectedSacrifices: List[(Int, Int)] = List.empty
   private var selectedItem: Option[GameItem] = None
   var currentBoard: Option[Board] = None
-  
+
   viewModel.listenForUpdatedState(updateViews)
 
   private def onCardSelectedFromHand(cardOpt: Option[Card[?]]): Unit =
@@ -23,6 +23,13 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
     selectedSacrifices = List.empty
     boardView.updateSacrificeHighlights(selectedSacrifices)
 
+  /** Handles the interaction of a user with a specific slot of the board.
+    *
+    * @param row
+    *   The row of the slot selected.
+    * @param col
+    *   The column of the slot selected.
+    */
   def onSlotClicked(row: Int, col: Int): Unit =
     selectedItem match
       case Some(item) =>
@@ -35,9 +42,11 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
 
             card.sacrificeAttribute match
               case SacrificeAttribute.Blood(amount) =>
-                val currentBlood = currentBoard.map { board =>
-                  viewModel.calculateBlood(board, selectedSacrifices)
-                }.getOrElse(0)
+                val currentBlood = currentBoard
+                  .map { board =>
+                    viewModel.calculateBlood(board, selectedSacrifices)
+                  }
+                  .getOrElse(0)
                 val hasEnoughBlood = currentBlood >= amount
                 val isTargetingSacrifice = selectedSacrifices.contains((row, col))
                 if hasEnoughBlood && (isSlotEmpty || isTargetingSacrifice) then
@@ -50,11 +59,6 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
                   else if !hasEnoughBlood then
                     selectedSacrifices = selectedSacrifices :+ (row, col)
                     boardView.updateSacrificeHighlights(selectedSacrifices)
-                    println(s"FightView: sacrifices as of now: $selectedSacrifices")
-                  else
-                    println(s"FightView: enough blood already, choose a slot to place the card.")
-                else
-                  println(s"FightView: not enough blood, currently: $amount.")
               case _ =>
                 if isSlotEmpty then
                   viewModel.cardToPlay(card, col)
@@ -66,15 +70,13 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
     boardView.updateSacrificeHighlights(selectedSacrifices)
 
   private def onItemSelected(item: GameItem): Unit =
-    if selectedItem.contains(item) then
-      selectedItem = None
+    if selectedItem.contains(item) then selectedItem = None
     else if item.name == "Scissors" then
       selectedItem = Some(item)
       selectedCard = None
       selectedSacrifices = List.empty
       boardView.updateSacrificeHighlights(selectedSacrifices)
-    else
-      viewModel.useItem(item)
+    else viewModel.useItem(item)
 
   // To fill empty borders of board
   opaque = true
@@ -93,23 +95,21 @@ class FightView(viewModel : ViewModelFight) extends BorderPanel:
   layout(decksView) = BorderPanel.Position.East
 
   private def updateViews(fightState: FightState, turn: TurnState): Unit =
-      Swing.onEDT {
-        if turn == TurnState.playerFight then
-          boardView.flashAttackingRow(2, new Color(255, 215, 0))
-        else if turn == TurnState.botFight then
-          boardView.flashAttackingRow(1, new Color(255, 50, 50))
-        val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
-        boardView.interactable = isPlayerActive
-        handView.interactable = isPlayerActive
-        statsView.interactable = isPlayerActive
-        decksView.interactable = isPlayerActive
-        if !isPlayerActive then resetSelection()
-        currentBoard = Some(fightState.board)
-        boardView.updateBoard(fightState.board)
-        decksView.updateDeck(fightState.deck)
-        decksView.updateItems(fightState.inventory)
-        handView.updateHand(fightState.playerHand.toList)
-        statsView.updateScale(fightState.scalePoints)
-        statsView.updateBones(fightState.bones)
-        statsView.updateTurn(turn)
-      }
+    Swing.onEDT {
+      if turn == TurnState.playerFight then boardView.flashAttackingRow(2, new Color(255, 215, 0))
+      else if turn == TurnState.botFight then boardView.flashAttackingRow(1, new Color(255, 50, 50))
+      val isPlayerActive = turn == TurnState.draw || turn == TurnState.playerTurn
+      boardView.interactable = isPlayerActive
+      handView.interactable = isPlayerActive
+      statsView.interactable = isPlayerActive
+      decksView.interactable = isPlayerActive
+      if !isPlayerActive then resetSelection()
+      currentBoard = Some(fightState.board)
+      boardView.updateBoard(fightState.board)
+      decksView.updateDeck(fightState.deck)
+      decksView.updateItems(fightState.inventory)
+      handView.updateHand(fightState.playerHand.toList)
+      statsView.updateScale(fightState.scalePoints)
+      statsView.updateBones(fightState.bones)
+      statsView.updateTurn(turn)
+    }

@@ -4,22 +4,20 @@ import org.scryption.game.model.boardModel.isValid
 import org.scryption.game.model.{BoardPosition, CardLibrary, boardModel}
 import org.scryption.game.model.events.FightState
 
-
-
 val allItems = List(SquirrelBottle(), HoggyBank(), Pliers(), Scissors())
-
 
 trait GameItem:
   def name: String
   def description: String
 
   /** Applies the items effect to the current fight state.
-   *
-   * @param state The current fight state.
-   * @return the updated FightState.
-   */
+    *
+    * @param state
+    *   The current fight state.
+    * @return
+    *   the updated FightState.
+    */
   def use(state: FightState, target: Option[BoardPosition] = None): FightState
-
 
 case class SquirrelBottle() extends GameItem:
   override def name: String = "Squirrel in a Bottle"
@@ -54,9 +52,10 @@ case class Scissors() extends GameItem:
 
   override def use(state: FightState, target: Option[BoardPosition] = None): FightState =
     target match
-      case Some(pos) if pos._1 == boardModel.IndexOfBotRow &&
-        pos.isValid &&
-        state.board(pos._1)(pos._2).isDefined =>
+      case Some(pos)
+          if pos._1 == boardModel.IndexOfBotRow &&
+            pos.isValid &&
+            state.board(pos._1)(pos._2).isDefined =>
         val newBoard = state.board.updatedSlot(pos, boardModel.x)
         val newInventory = state.inventory.diff(List(this))
         state.copy(board = newBoard, inventory = newInventory)

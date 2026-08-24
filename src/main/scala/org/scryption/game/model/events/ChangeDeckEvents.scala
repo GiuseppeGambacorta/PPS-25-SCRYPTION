@@ -4,6 +4,7 @@ import org.scryption.EventMessages
 import org.scryption.GameMessagesChannel
 import org.scryption.game.model.*
 import org.scryption.game.model.Deck
+import org.scryption.Trial
 
 import scala.annotation.tailrec
 
@@ -16,9 +17,25 @@ val cardsNumberForGui = 5
  * Event: Draws 3 random cards from the library and sends them to the GUI.
  * The player picks one card to add to their deck.
  */
-@tailrec
 def getANewCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
-  ch.sendToGui(EventMessages.Cards(CardLibrary.getADeckWithAllTheLibrary.drawRandom(3)._1))
+  selectCardEvent(gameState, ch, EventMessages.Cards(CardLibrary.getDeckWithAverageCards.drawRandom(3)._1))
+}
+
+/**
+ * Event: Draws 3 random rare cards from the library and sends them to the GUI.
+ * The player picks one card to add to their deck.
+ */
+private def getANewRareCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
+  selectCardEvent(gameState, ch, EventMessages.Cards(CardLibrary.getADeckWithRareCards.drawRandom(3)._1))
+}
+
+/**
+ * Event: Receives 3 cards and sends them to the GUI.
+ * The player picks one card to add to their deck.
+ */
+@tailrec
+private def selectCardEvent(gameState: GameState, ch: GameMessagesChannel, cards: EventMessages.Cards): GameState = {
+  ch.sendToGui(cards)
   val message = ch.receiveFromGui
 
   message match {
@@ -27,7 +44,7 @@ def getANewCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
       gameState.copy(deck = gameState.deck.addCard(card))
     case _ =>
       ch.clear()
-      getANewCardEvent(gameState, ch)
+      selectCardEvent(gameState, ch, cards)
   }
 }
 
@@ -50,8 +67,9 @@ def mushRoomsExpertEvent(gameState: GameState, ch: GameMessagesChannel): GameSta
 
   if duplicateCards.nonEmpty then
     ch.sendToGui(EventMessages.Cards(duplicateCards.take(cardsNumberForGui)))
-  else
+  else {
     return gameState
+  }
 
   ch.receiveFromGui match {
     case EventMessages.SingleCard(selectedCard) =>
@@ -145,6 +163,82 @@ def sacrificeEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
     case _ =>
       ch.clear()
       sacrificeEvent(gameState, ch)
+  }
+}
+
+
+/**
+ * Event Trial:
+ * Invia alla GUI fino a un massimo di 10 carte del mazzo.
+ * In base alla scelta ricevuta (TrialChoice), calcola la somma dell'attributo selezionato
+ * e verifica il superamento della relativa soglia.
+ * Se la prova è superata, viene proposta una carta casuale dalla libreria: una volta
+ * confermata dalla GUI, viene aggiunta al mazzo. Altrimenti, l'evento termina.
+ */
+@tailrec
+def trialEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
+  val healthThreshold = 10
+  val attackThreshold = 6
+  val sealsThreshold = 4
+
+  val cardsForTrial = gameState.deck.toList.take(10)
+  ch.sendToGui(EventMessages.Cards(cardsForTrial))
+
+  ch.receiveFromGui match {
+    case EventMessages.TrialChoice(choice) =>
+      val totalValue = choice match {
+        case Trial.Health =>
+          cardsForTrial.map(_.health).sum
+
+        case Trial.Attack =>
+          cardsForTrial.map {
+            case c: CreatureCard => c.attack
+            case _               => 0
+          }.sum
+
+        case Trial.Seals =>
+          cardsForTrial.map(_.seals.size).sum
+      }
+
+      val isSuccess = choice match {
+        case Trial.Health => totalValue >= healthThreshold
+        case Trial.Attack => totalValue >= attackThreshold
+        case Trial.Seals  => totalValue >= sealsThreshold
+      }
+
+      if isSuccess then
+        val (rewardList, _) = CardLibrary.getADeckWithRareCards.drawRandom(1)
+        rewardList.headOption match {
+          case Some(rewardCard) =>
+            ch.sendToGui(EventMessages.SingleCard(rewardCard))
+            handleTrialReward(gameState, ch, rewardCard)
+          case None =>
+            ch.sendToGui(EventMessages.End)
+            gameState
+        }
+      else
+        ch.sendToGui(EventMessages.End)
+        gameState
+
+    case _ =>
+      ch.clear()
+      trialEvent(gameState, ch)
+  }
+}
+
+/**
+ * Helper ricorsivo in attesa della conferma da parte della GUI della carta ricompensa ricevuta.
+ */
+@tailrec
+private def handleTrialReward(gameState: GameState, ch: GameMessagesChannel, rewardCard: Card[?]): GameState = {
+  ch.receiveFromGui match {
+    case EventMessages.SingleCard(card) if card == rewardCard =>
+      ch.sendToGui(EventMessages.End)
+      gameState.copy(deck = gameState.deck.addCard(card))
+    case _ =>
+      ch.clear()
+      ch.sendToGui(EventMessages.SingleCard(rewardCard))
+      handleTrialReward(gameState, ch, rewardCard)
   }
 }
 

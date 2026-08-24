@@ -14,9 +14,9 @@ class ViewModelItemEvent(channel: GameMessagesChannel):
   private var currentCard: Option[Card[?]] = None
 
   def listenForEvents(
-                       onItems: List[ItemViewInfo] => Unit,
-                       onCardFallback: CardViewInfo => Unit
-                     ): Unit =
+      onItems: List[ItemViewInfo] => Unit,
+      onCardFallback: CardViewInfo => Unit
+  ): Unit =
     Future {
       while true do
         val msg = channel.receiveFromGame
@@ -46,14 +46,10 @@ class ViewModelItemEvent(channel: GameMessagesChannel):
 
   def sendItemToModel(index: Int): Unit =
     val item =
-      if currentItems.isEmpty then
-        throw new IllegalStateException("Nessun item presente nel ViewModel.")
-      else if index >= 0 && index < currentItems.length then
-        currentItems(index)
-      else if index >= currentItems.length then
-        currentItems.last
-      else
-        currentItems.head
+      if currentItems.isEmpty then throw new IllegalStateException("Nessun item presente nel ViewModel.")
+      else if index >= 0 && index < currentItems.length then currentItems(index)
+      else if index >= currentItems.length then currentItems.last
+      else currentItems.head
 
     channel.sendToGame(EventMessages.SingleItem(item))
 

@@ -10,19 +10,19 @@ import org.scryption.game.model.boardModel.*
 class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
   // Carte Bot / Opponente (Attaccano dalla riga centrale - Index 1)
-  private val adder: CreatureCard    = CreatureCard.empty withAttack 1 named "Adder" withHealth 2
-  private val raven: CreatureCard    = CreatureCard.empty withAttack 2 named "Raven" withHealth 3
-  private val wolf: CreatureCard     = CreatureCard.empty withAttack 3 named "Wolf" withHealth 2
+  private val adder: CreatureCard = CreatureCard.empty withAttack 1 named "Adder" withHealth 2
+  private val raven: CreatureCard = CreatureCard.empty withAttack 2 named "Raven" withHealth 3
+  private val wolf: CreatureCard = CreatureCard.empty withAttack 3 named "Wolf" withHealth 2
 
   // Carte Giocatore (Difendono nella riga in basso - Index 2)
   private val squirrel: CreatureCard = CreatureCard.empty withAttack 1 named "squirrel" withHealth 1
-  private val bear: CreatureCard     = CreatureCard.empty withAttack 4 named "Bear" withHealth 6
+  private val bear: CreatureCard = CreatureCard.empty withAttack 4 named "Bear" withHealth 6
 
   private def createInitialFightState(
-                                       board: Board = Board.empty,
-                                       scalePoints: Int = 0,
-                                       bones: Int = 0
-                                     ): FightState =
+      board: Board = Board.empty,
+      scalePoints: Int = 0,
+      bones: Int = 0
+  ): FightState =
     FightState(
       scalePoints = scalePoints,
       bones = bones,
@@ -37,9 +37,9 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
     Scenario("Bot creature in central row attacks player directly when player slot is empty") {
       Given("a Bot Raven (2 ATK) in the central row (index 1) and empty player slot (index 2)")
 
-      val initialBoard = (x           | x | x | x) || // Index 0: Bot back row
+      val initialBoard = (x | x | x | x) || // Index 0: Bot back row
         (Some(raven) | x | x | x) || // Index 1: Central row (Bot attacking card)
-        (x           | x | x | x)    // Index 2: Player row (Empty)
+        (x | x | x | x) // Index 2: Player row (Empty)
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
@@ -56,9 +56,9 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
     Scenario("Bot creature in central row fights player creature in player row") {
       Given("a Bot Wolf (3 ATK) in index 1 facing a Player Bear (6 HP) in index 2")
 
-      val initialBoard = (x          | x | x | x) || // Index 0: Bot back row
+      val initialBoard = (x | x | x | x) || // Index 0: Bot back row
         (Some(wolf) | x | x | x) || // Index 1: Central row (Bot card)
-        (Some(bear) | x | x | x)    // Index 2: Player row (Player card)
+        (Some(bear) | x | x | x) // Index 2: Player row (Player card)
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
@@ -77,10 +77,9 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
     Scenario("Bot destroys Player creature and player gains bones for lost creature") {
       Given("a Bot Wolf (3 ATK) in index 1 facing a Player Squirrel (1 HP) in index 2")
 
-
-      val initialBoard = (x              | x | x | x) || // Index 0: Bot back row
-        (Some(wolf)     | x | x | x) || // Index 1: Central row (Bot card)
-        (Some(squirrel) | x | x | x)    // Index 2: Player row (Player card)
+      val initialBoard = (x | x | x | x) || // Index 0: Bot back row
+        (Some(wolf) | x | x | x) || // Index 1: Central row (Bot card)
+        (Some(squirrel) | x | x | x) // Index 2: Player row (Player card)
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0, bones = 0)
 
@@ -100,9 +99,9 @@ class FightBotPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers
     Scenario("Bot direct attacks push scale points to BotWinningPoints (-6)") {
       Given("Bot creatures with total 4 ATK facing empty player slots and scale points already at -3")
 
-      val initialBoard = (x           | x          | x | x) ||
-        (Some(raven) | Some(raven)| x | x) || // 2 ATK + 2 ATK = 4 ATK
-        (x           | x          | x | x)
+      val initialBoard = (x | x | x | x) ||
+        (Some(raven) | Some(raven) | x | x) || // 2 ATK + 2 ATK = 4 ATK
+        (x | x | x | x)
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = -3)
 
