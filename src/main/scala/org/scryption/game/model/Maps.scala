@@ -3,8 +3,14 @@ import org.scryption.game.model.MapScript
 
 import scala.annotation.tailrec
 
+/** Provides structures and utilities for modeling and generating game map paths.
+ */
 object Maps:
 
+  /** Represents a traversable tree/graph path structure within the game map.
+   *
+   * @tparam E the type of event held by each node in the path.
+   */
   enum Path[E]:
     case Node(event: E, next: Path[E])
     case Fork(left: Path[E], right: Path[E])

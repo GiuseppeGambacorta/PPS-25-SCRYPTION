@@ -5,24 +5,20 @@ parent: Report
 
 ---
 
-
 # Design di Dettaglio
 
 In questa sezione è documentata la progettazione dettagliata dei singoli componenti del sistema.
 
-### 1. Dominio e Strutture Dati
-Le entità fondamentali che definiscono le regole pure e lo stato del gioco:
+### 1. Modello di Dominio e Logica di Gioco
+Le entità fondamentali, le strutture dati e le regole che governano lo stato e le interazioni di gioco:
 *   [**Card e Sigilli**](card.md)
 *   [**Deck e PlayerHand**](deck.md)
-*   [**Board**](board.md)
-*   [**GameState**](game_state.md)
+*   [**Board e GameState**](board.md)
+*   [**Combattimento, Bot e Oggetti**](fight_and_manager.md)
+*   [**Mappa**](map.md)
+*   [**Eventi e Interazioni**](eventi_e_interazioni.md)
 
 ### 2. Orchestrazione e Concorrenza
-Il motore asincrono che fa girare il gioco e comunica con l'interfaccia grafica:
+Il layer applicativo responsabile del flusso di esecuzione e della comunicazione asincrona tra modello e interfaccia grafica:
 *   [**GameController e Game Loop**](game_controller.md)
 *   [**GameMessagesChannel**](game_messages_channel.md)
-
-### 3. Dinamiche di Gioco
-La risoluzione delle interazioni complesse sulla griglia:
-*   [**Combattimento, Bot e Oggetti**](fight_and_manager.md)
-*   [**Eventi e interazioni**](eventi_e_interazioni.md)

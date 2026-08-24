@@ -37,6 +37,7 @@ Gli sprint successivi sono stati così suddivisi:
 * **Sprint 5**:
     * Salvataggio della partita (*savegame*)
     * Aggiunta degli oggetti, integrazione nel combattimento e creazione di un nuovo evento dedicato
+    * Implementazione finale della mappa
 
 ## Git Workflow
 
@@ -54,9 +55,12 @@ Il ricorso ai test ha garantito solidità alla logica di gioco e ha reso agevoli
 
 Oltre alle difficoltà riscontrate nella corretta gestione del branching Git, non è stato facile stare al passo con i carichi di lavoro prefissati per ciascuno sprint. In questo contesto, l'utilizzo di **GitHub Projects** si è rivelato fondamentale per mantenere sott'occhio lo stato di avanzamento del progetto e coordinare le singole iterazioni.
 
+
+
 Tra i possibili **miglioramenti futuri** si segnalano:
 * Perfezionamento dell'**intelligenza artificiale per il bot**, per renderne il comportamento meno prevedibile
 * Introduzione di una **boss fight** con meccaniche dedicate
+* Riprogettazione dell'interfaccia grafica (UX): il vincolo di usabilità visiva non è stato rispettato, in quanto il layout attuale non scala correttamente e non garantisce una fruizione adeguata su tutti i tipi di schermo.
 
 
 ## Considerazioni Finali
@@ -76,7 +80,7 @@ sia stato un'occasione di crescita sia tecnica che metodologica.
 Dal punto di vista implementativo, l'aspetto più formativo è stato approfondire l'espressività del type system di Scala: 
 l'impiego di costrutti avanzati come enum, opaque types e l'utilizzo di extension methods per definire un DSL ha 
 permesso di garantire type safety e un'elevata leggibilità del codice, integrando agevolmente l'approccio funzionale con i pattern classici 
-della programmazione orientata agli oggetti (OOP).
+della programmazione orientata agli oggetti.
 Rimane tuttavia il margine per spingersi oltre nel paradigma funzionale puro: ad esempio, per la gestione del FightState l'impiego di monadi 
 come la State Monad sarebbe stata una soluzione ideale, ma non padroneggiando ancora appieno questi concetti avanzati ho preferito non rischiare, 
 mantenendo un'implementazione più accessibile.
