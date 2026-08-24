@@ -63,7 +63,6 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       updatedFightState.deck.toList.size shouldBe initialDeckSize - 1
     }
 
-
     Scenario("Attempting to draw from an empty main deck does not change FightState and remains in draw state") {
       Given("a FightState with an empty deck and a GUIChannel with a DrawFromDeck message")
       val channel: GameMessagesChannel = GameMessagesChannel()
@@ -85,6 +84,3 @@ class DrawPhaseTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
       updatedFightState.deck.toList shouldBe empty
     }
   }
-
-
-

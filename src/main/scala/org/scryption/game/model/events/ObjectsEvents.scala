@@ -6,11 +6,10 @@ import org.scryption.game.model.items.allItems
 import scala.annotation.tailrec
 import scala.util.Random
 
-/**
- * Event Item / Pack:
- * - If inventory has room (< 4), offers 2 random items to pick from.
- * - Otherwise (inventory is full), grants 1 random card directly from the library.
- */
+/** Event Item / Pack:
+  *   - If inventory has room (< 4), offers 2 random items to pick from.
+  *   - Otherwise (inventory is full), grants 1 random card directly from the library.
+  */
 @tailrec
 def getANewItemEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
   if gameState.inventory.size < 4 then
@@ -26,7 +25,7 @@ def getANewItemEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
         getANewItemEvent(gameState, ch)
     }
   else
-    
+
     val (randomCards, _) = CardLibrary.getADeckWithAllTheLibrary.drawRandom(1)
     val randomCard = randomCards.headOption.getOrElse(CardLibrary.squirrel)
 

@@ -11,7 +11,9 @@ import org.scryption.{EventMessages, GameMessagesChannel}
 
 class ItemsEventsTest extends AnyFeatureSpec with GivenWhenThen with Matchers:
 
-  private def runMockGuiWithRetry(ch: GameMessagesChannel)(wrongResponses: List[EventMessages], correctResponses: List[EventMessages]): Thread =
+  private def runMockGuiWithRetry(
+      ch: GameMessagesChannel
+  )(wrongResponses: List[EventMessages], correctResponses: List[EventMessages]): Thread =
     val thread = new Thread(() => {
       ch.receiveFromGame
       wrongResponses.foreach(ch.sendToGame)

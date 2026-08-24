@@ -31,7 +31,8 @@ class RandomBotStrategyTest extends AnyFeatureSpec with GivenWhenThen with Match
     Scenario("The bot must not overwrite existing cards in the preparation row"):
 
       Given("A board with the preparation row fully occupied by Wolves")
-      val fullPrepRow: BoardRow = Some(CardLibrary.wolf) | Some(CardLibrary.wolf) | Some(CardLibrary.wolf) | Some(CardLibrary.wolf)
+      val fullPrepRow: BoardRow =
+        Some(CardLibrary.wolf) | Some(CardLibrary.wolf) | Some(CardLibrary.wolf) | Some(CardLibrary.wolf)
       val fullBoard = Board.empty.updateRow(IndexOfBotPrepRow, fullPrepRow)
       val initialState = createDummyState(fullBoard)
 

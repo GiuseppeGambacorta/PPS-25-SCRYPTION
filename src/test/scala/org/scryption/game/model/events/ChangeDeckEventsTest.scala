@@ -14,17 +14,22 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
   private val bear: CreatureCard = CreatureCard.empty withAttack 2 named ("bear") withHealth 3
   private val fox: CreatureCard = CreatureCard.empty withAttack 1 named ("fox") withHealth 1
 
-  private val card1: CreatureCard = CreatureCard.empty withAttack 1 named ("firstCard") withHealth 1 addSeal Sprinter(Direction.Right) addSeal MightyLeap
+  private val card1: CreatureCard = CreatureCard.empty withAttack 1 named ("firstCard") withHealth 1 addSeal Sprinter(
+    Direction.Right
+  ) addSeal MightyLeap
   private val card2: CreatureCard = CreatureCard.empty withAttack 0 named ("secondCard") withHealth 1
 
-  private def runMockGuiWithRetry(ch: GameMessagesChannel)(wrongResponses: List[EventMessages], correctResponses: List[EventMessages]): Thread =
-    val thread = new Thread(new Runnable:
-      override def run(): Unit =
-        ch.receiveFromGame
-        wrongResponses.foreach(ch.sendToGame)
+  private def runMockGuiWithRetry(
+      ch: GameMessagesChannel
+  )(wrongResponses: List[EventMessages], correctResponses: List[EventMessages]): Thread =
+    val thread = new Thread(
+      new Runnable:
+        override def run(): Unit =
+          ch.receiveFromGame
+          wrongResponses.foreach(ch.sendToGame)
 
-        ch.receiveFromGame
-        correctResponses.foreach(ch.sendToGame)
+          ch.receiveFromGame
+          correctResponses.foreach(ch.sendToGame)
     )
     thread.start()
     thread
@@ -265,24 +270,25 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val initialGameState = GameState.getInitialGameState(deckWithMixedCards)
       val ch = GameMessagesChannel()
 
-      val guiThread = new Thread(new Runnable:
-        override def run(): Unit =
-          val receivedMsg = ch.receiveFromGame
-          receivedMsg match {
-            case EventMessages.Cards(offeredCards) =>
-              offeredCards.forall(_.seals.nonEmpty) shouldBe true
-              offeredCards should contain(card1)
-              offeredCards should not contain squirrel
-              offeredCards should not contain bear
+      val guiThread = new Thread(
+        new Runnable:
+          override def run(): Unit =
+            val receivedMsg = ch.receiveFromGame
+            receivedMsg match {
+              case EventMessages.Cards(offeredCards) =>
+                offeredCards.forall(_.seals.nonEmpty) shouldBe true
+                offeredCards should contain(card1)
+                offeredCards should not contain squirrel
+                offeredCards should not contain bear
 
-              ch.sendToGame(EventMessages.SingleCard(card1))
+                ch.sendToGame(EventMessages.SingleCard(card1))
 
-              ch.receiveFromGame
-              ch.sendToGame(EventMessages.SingleCard(bear))
+                ch.receiveFromGame
+                ch.sendToGame(EventMessages.SingleCard(bear))
 
-            case _ =>
-              fail("Expected EventMessages.Cards from game")
-          }
+              case _ =>
+                fail("Expected EventMessages.Cards from game")
+            }
       )
       guiThread.start()
 
@@ -301,24 +307,25 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val initialGameState = GameState.getInitialGameState(initialDeck)
       val ch = GameMessagesChannel()
 
-      val guiThread = new Thread(new Runnable:
-        override def run(): Unit =
-          ch.receiveFromGame match {
-            case EventMessages.Cards(cards) =>
-              cards should contain(highHealthCard)
-              ch.sendToGame(EventMessages.TrialChoice(Trial.Health))
-            case other =>
-              fail(s"Expected Cards message, but got $other")
-          }
+      val guiThread = new Thread(
+        new Runnable:
+          override def run(): Unit =
+            ch.receiveFromGame match {
+              case EventMessages.Cards(cards) =>
+                cards should contain(highHealthCard)
+                ch.sendToGame(EventMessages.TrialChoice(Trial.Health))
+              case other =>
+                fail(s"Expected Cards message, but got $other")
+            }
 
-          ch.receiveFromGame match {
-            case EventMessages.SingleCard(rewardCard) =>
-              ch.sendToGame(EventMessages.SingleCard(rewardCard))
-            case other =>
-              fail(s"Expected SingleCard reward message, but got $other")
-          }
+            ch.receiveFromGame match {
+              case EventMessages.SingleCard(rewardCard) =>
+                ch.sendToGame(EventMessages.SingleCard(rewardCard))
+              case other =>
+                fail(s"Expected SingleCard reward message, but got $other")
+            }
 
-          ch.receiveFromGame shouldBe EventMessages.End
+            ch.receiveFromGame shouldBe EventMessages.End
       )
       guiThread.start()
 
@@ -339,16 +346,17 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val initialGameState = GameState.getInitialGameState(lowAttackDeck)
       val ch = GameMessagesChannel()
 
-      val guiThread = new Thread(new Runnable:
-        override def run(): Unit =
-          ch.receiveFromGame match {
-            case EventMessages.Cards(_) =>
-              ch.sendToGame(EventMessages.TrialChoice(Trial.Attack))
-            case other =>
-              fail(s"Expected Cards message, but got $other")
-          }
+      val guiThread = new Thread(
+        new Runnable:
+          override def run(): Unit =
+            ch.receiveFromGame match {
+              case EventMessages.Cards(_) =>
+                ch.sendToGame(EventMessages.TrialChoice(Trial.Attack))
+              case other =>
+                fail(s"Expected Cards message, but got $other")
+            }
 
-          ch.receiveFromGame shouldBe EventMessages.End
+            ch.receiveFromGame shouldBe EventMessages.End
       )
       guiThread.start()
 
@@ -366,30 +374,33 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
 
     Scenario("Passing the Seals trial and testing maximum 10 cards limit") {
       Given("A deck of 12 cards with enough seals in the first 10 cards")
-      val sealCard = CreatureCard.empty withAttack 1 named ("sealBearer") withHealth 2 addSeal Sprinter(Direction.Right) addSeal MightyLeap
+      val sealCard = CreatureCard.empty withAttack 1 named ("sealBearer") withHealth 2 addSeal Sprinter(
+        Direction.Right
+      ) addSeal MightyLeap
       val cards = List.fill(2)(sealCard) ::: List.fill(10)(squirrel)
       val initialDeck = fromList(cards)
       val initialGameState = GameState.getInitialGameState(initialDeck)
       val ch = GameMessagesChannel()
 
-      val guiThread = new Thread(new Runnable:
-        override def run(): Unit =
-          ch.receiveFromGame match {
-            case EventMessages.Cards(offeredCards) =>
-              offeredCards.size should be <= 10
-              ch.sendToGame(EventMessages.TrialChoice(Trial.Seals))
-            case other =>
-              fail(s"Expected Cards message, but got $other")
-          }
+      val guiThread = new Thread(
+        new Runnable:
+          override def run(): Unit =
+            ch.receiveFromGame match {
+              case EventMessages.Cards(offeredCards) =>
+                offeredCards.size should be <= 10
+                ch.sendToGame(EventMessages.TrialChoice(Trial.Seals))
+              case other =>
+                fail(s"Expected Cards message, but got $other")
+            }
 
-          ch.receiveFromGame match {
-            case EventMessages.SingleCard(rewardCard) =>
-              ch.sendToGame(EventMessages.SingleCard(rewardCard))
-            case other =>
-              fail(s"Expected SingleCard reward message, but got $other")
-          }
+            ch.receiveFromGame match {
+              case EventMessages.SingleCard(rewardCard) =>
+                ch.sendToGame(EventMessages.SingleCard(rewardCard))
+              case other =>
+                fail(s"Expected SingleCard reward message, but got $other")
+            }
 
-          ch.receiveFromGame shouldBe EventMessages.End
+            ch.receiveFromGame shouldBe EventMessages.End
       )
       guiThread.start()
 
@@ -408,29 +419,30 @@ class ChangeDeckEventsTest extends AnyFeatureSpec with GivenWhenThen with Matche
       val initialGameState = GameState.getInitialGameState(initialDeck)
       val ch = GameMessagesChannel()
 
-      val guiThread = new Thread(new Runnable:
-        override def run(): Unit =
-          ch.receiveFromGame
-          ch.sendToGame(EventMessages.End)
+      val guiThread = new Thread(
+        new Runnable:
+          override def run(): Unit =
+            ch.receiveFromGame
+            ch.sendToGame(EventMessages.End)
 
-          ch.receiveFromGame
-          ch.sendToGame(EventMessages.TrialChoice(Trial.Attack))
+            ch.receiveFromGame
+            ch.sendToGame(EventMessages.TrialChoice(Trial.Attack))
 
-          ch.receiveFromGame match {
-            case EventMessages.SingleCard(rewardCard) =>
-              ch.sendToGame(EventMessages.SingleCard(squirrel))
+            ch.receiveFromGame match {
+              case EventMessages.SingleCard(rewardCard) =>
+                ch.sendToGame(EventMessages.SingleCard(squirrel))
 
-              ch.receiveFromGame match {
-                case EventMessages.SingleCard(`rewardCard`) =>
-                  ch.sendToGame(EventMessages.SingleCard(rewardCard))
-                case other =>
-                  fail(s"Expected reward card to be resent, got $other")
-              }
-            case other =>
-              fail(s"Expected SingleCard reward message, but got $other")
-          }
+                ch.receiveFromGame match {
+                  case EventMessages.SingleCard(`rewardCard`) =>
+                    ch.sendToGame(EventMessages.SingleCard(rewardCard))
+                  case other =>
+                    fail(s"Expected reward card to be resent, got $other")
+                }
+              case other =>
+                fail(s"Expected SingleCard reward message, but got $other")
+            }
 
-          ch.receiveFromGame shouldBe EventMessages.End
+            ch.receiveFromGame shouldBe EventMessages.End
       )
       guiThread.start()
 

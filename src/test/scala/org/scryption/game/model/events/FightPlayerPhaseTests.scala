@@ -11,18 +11,18 @@ class FightPlayerPhaseTests extends AnyFeatureSpec with GivenWhenThen with Match
 
   // Carte Giocatore (Riga in basso - Index 2)
   private val squirrel: CreatureCard = CreatureCard.empty withAttack 1 named "squirrel" withHealth 1
-  private val wolf: CreatureCard     = CreatureCard.empty withAttack 3 named "Wolf" withHealth 2
-  private val bear: CreatureCard     = CreatureCard.empty withAttack 4 named "Bear" withHealth 6
+  private val wolf: CreatureCard = CreatureCard.empty withAttack 3 named "Wolf" withHealth 2
+  private val bear: CreatureCard = CreatureCard.empty withAttack 4 named "Bear" withHealth 6
 
   // Carte Bot / Opponente (Riga centrale - Index 1)
-  private val adder: CreatureCard    = CreatureCard.empty withAttack 1 named "Adder" withHealth 2
+  private val adder: CreatureCard = CreatureCard.empty withAttack 1 named "Adder" withHealth 2
   private val bullfrog: CreatureCard = CreatureCard.empty withAttack 1 named "Bullfrog" withHealth 3
 
   private def createInitialFightState(
-                                       board: Board = Board.empty,
-                                       scalePoints: Int = 0,
-                                       bones: Int = 0
-                                     ): FightState =
+      board: Board = Board.empty,
+      scalePoints: Int = 0,
+      bones: Int = 0
+  ): FightState =
     FightState(
       scalePoints = scalePoints,
       bones = bones,
@@ -38,9 +38,9 @@ class FightPlayerPhaseTests extends AnyFeatureSpec with GivenWhenThen with Match
       Given("a player Wolf (3 ATK) in player row (index 2) and empty central row (index 1)")
       val channel: GameMessagesChannel = GameMessagesChannel()
 
-      val initialBoard = (x          | x | x | x) || // Index 0: Bot row
-        (x          | x | x | x) || // Index 1: Central row (Empty)
-        (Some(wolf) | x | x | x)    // Index 2: Player row
+      val initialBoard = (x | x | x | x) || // Index 0: Bot row
+        (x | x | x | x) || // Index 1: Central row (Empty)
+        (Some(wolf) | x | x | x) // Index 2: Player row
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
@@ -58,9 +58,9 @@ class FightPlayerPhaseTests extends AnyFeatureSpec with GivenWhenThen with Match
       Given("a player Wolf (3 ATK) in index 2 and a Bullfrog (3 HP) in the central row (index 1)")
       val channel: GameMessagesChannel = GameMessagesChannel()
 
-      val initialBoard = (x              | x | x | x) || // Index 0: Bot row
+      val initialBoard = (x | x | x | x) || // Index 0: Bot row
         (Some(bullfrog) | x | x | x) || // Index 1: Central row (Opponent card)
-        (Some(wolf)     | x | x | x)    // Index 2: Player row
+        (Some(wolf) | x | x | x) // Index 2: Player row
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
@@ -81,9 +81,9 @@ class FightPlayerPhaseTests extends AnyFeatureSpec with GivenWhenThen with Match
       Given("a player Squirrel (1 ATK) in index 2 facing an Adder (2 HP) in the central row (index 1)")
       val channel: GameMessagesChannel = GameMessagesChannel()
 
-      val initialBoard = (x              | x | x | x) || // Index 0: Bot row
-        (Some(adder)    | x | x | x) || // Index 1: Central row
-        (Some(squirrel) | x | x | x)    // Index 2: Player row
+      val initialBoard = (x | x | x | x) || // Index 0: Bot row
+        (Some(adder) | x | x | x) || // Index 1: Central row
+        (Some(squirrel) | x | x | x) // Index 2: Player row
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 0)
 
@@ -105,9 +105,9 @@ class FightPlayerPhaseTests extends AnyFeatureSpec with GivenWhenThen with Match
 
       // Col 0: Wolf (3 ATK) vs Bullfrog (3 HP) in central row -> Bullfrog dies, 0 scale damage
       // Col 1: Bear (4 ATK) vs Empty in central row           -> 4 direct scale damage
-      val initialBoard = (x              | x          | x | x) || // Index 0: Bot row
-        (Some(bullfrog) | x          | x | x) || // Index 1: Central row
-        (Some(wolf)     | Some(bear) | x | x)    // Index 2: Player row
+      val initialBoard = (x | x | x | x) || // Index 0: Bot row
+        (Some(bullfrog) | x | x | x) || // Index 1: Central row
+        (Some(wolf) | Some(bear) | x | x) // Index 2: Player row
 
       val initialState = createInitialFightState(board = initialBoard, scalePoints = 2, bones = 0)
 

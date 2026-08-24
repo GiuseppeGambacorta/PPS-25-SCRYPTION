@@ -21,10 +21,10 @@ object SaveManager:
 
   private def stringToItem(name: String): GameItem = name match
     case "Squirrel in a Bottle" => SquirrelBottle()
-    case "Hoggy Bank" => HoggyBank()
-    case "Pliers" => Pliers()
-    case "Scissors" => Scissors()
-    case _ => SquirrelBottle()
+    case "Hoggy Bank"           => HoggyBank()
+    case "Pliers"               => Pliers()
+    case "Scissors"             => Scissors()
+    case _                      => SquirrelBottle()
 
   private val eventToString: Map[GameEvent, String] = Map(
     fight -> "fight",
@@ -40,12 +40,12 @@ object SaveManager:
   private def pathToDTO(path: Path[GameEvent]): PathDTO = path match
     case Path.Node(event, next) => PathNodeDTO(eventToString.getOrElse(event, "fight"), pathToDTO(next))
     case Path.Fork(left, right) => PathForkDTO(pathToDTO(left), pathToDTO(right))
-    case Path.End() => PathEndDTO()
+    case Path.End()             => PathEndDTO()
 
   private def dtoToPath(dto: PathDTO): Path[GameEvent] = dto match
     case PathNodeDTO(event, next) => Path.Node(stringToEvent.getOrElse(event, fight), dtoToPath(next))
     case PathForkDTO(left, right) => Path.Fork(dtoToPath(left), dtoToPath(right))
-    case PathEndDTO() => Path.End()
+    case PathEndDTO()             => Path.End()
 
   private def cardToDTO(card: Card[?]): CardDTO = card match
     case c: CreatureCard => CardDTO(c.name, c.attack, c.health, isCreature = true)
@@ -54,10 +54,8 @@ object SaveManager:
   private def dtoToCard(dto: CardDTO): Card[?] =
     val baseCardOpt = CardLibrary.byName(dto.name)
     val baseCard = baseCardOpt.getOrElse(throw new Exception(s"Card not found: ${dto.name}"))
-    if dto.isCreature then
-      baseCard.asInstanceOf[CreatureCard].withAttack(dto.attack).withHealth(dto.health)
-    else
-      baseCard.asInstanceOf[SupportCard].withHealth(dto.health)
+    if dto.isCreature then baseCard.asInstanceOf[CreatureCard].withAttack(dto.attack).withHealth(dto.health)
+    else baseCard.asInstanceOf[SupportCard].withHealth(dto.health)
 
   def saveGame(state: GameState, map: Path[GameEvent], filePath: String = "savegame.json"): Unit =
     val deckDTO = state.deck.toList.map(cardToDTO)

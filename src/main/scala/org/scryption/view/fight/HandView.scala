@@ -1,6 +1,5 @@
 package org.scryption.view.fight
 
-
 import org.scryption.game.model.Card
 import org.scryption.view.common.cardToViewInfo
 import org.scryption.view.common.GUIGeometry.CardGeometry
@@ -22,10 +21,13 @@ class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
   private var blinkState: Boolean = false
 
   // blinking border animation timer every 400ms
-  private val blinkTimer = new Timer(400, _ => {
-    blinkState = !blinkState
-    cardsContainer.repaint()
-  })
+  private val blinkTimer = new Timer(
+    400,
+    _ => {
+      blinkState = !blinkState
+      cardsContainer.repaint()
+    }
+  )
   blinkTimer.start()
 
   private val toggleButton = new Button("▼"):
@@ -54,12 +56,11 @@ class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
   layout(scrollPane) = BorderPanel.Position.Center
 
   listenTo(toggleButton)
-  reactions += {
-    case ButtonClicked(`toggleButton`) =>
-      scrollPane.visible = !scrollPane.visible
-      toggleButton.text = if scrollPane.visible then "▼" else "▲"
-      revalidate()
-      repaint()
+  reactions += { case ButtonClicked(`toggleButton`) =>
+    scrollPane.visible = !scrollPane.visible
+    toggleButton.text = if scrollPane.visible then "▼" else "▲"
+    revalidate()
+    repaint()
   }
 
   private val geometry = CardGeometry(cardWidth = 180)
@@ -101,7 +102,10 @@ class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
 
     override protected def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
-      g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+      g.setRenderingHint(
+        java.awt.RenderingHints.KEY_INTERPOLATION,
+        java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR
+      )
       val isSelected = selectedPanel.contains(this)
       val yOffset = if isHovered || isSelected then 0 else 20
       g.drawImage(img, 0, yOffset, cardW, cardH, null)
@@ -115,9 +119,10 @@ class HandView(onCardSelected: Option[Card[?]] => Unit) extends BorderPanel:
         g.drawRect(2, yOffset + 2, cardW - 4, cardH - 4)
 
   /** Updates the player hand.
-   *
-   * @param cards The list of cards to update the hand with.
-   */
+    *
+    * @param cards
+    *   The list of cards to update the hand with.
+    */
   def updateHand(cards: List[Card[?]]): Unit =
     cardsContainer.contents.clear()
     selectedPanel = None

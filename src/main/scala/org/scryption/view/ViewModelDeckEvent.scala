@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ViewModelDeckEvent(channel: GameMessagesChannel):
 
   private var currentCards: List[Card[?]] = Nil
-  
+
   def ListenForCardsFromTheModel(f: List[CardViewInfo] => Unit): Unit =
     Future {
       while (true) {
@@ -33,20 +33,15 @@ class ViewModelDeckEvent(channel: GameMessagesChannel):
       }
     }
 
- 
   def sendTrialChoiceToModel(choice: Trial): Unit =
     channel.sendToGame(EventMessages.TrialChoice(choice))
 
   def sendCardToModel(index: Int = 0): Unit =
     val card =
-      if currentCards.isEmpty then
-        throw new IllegalStateException("Nessuna carta presente nel ViewModel.")
-      else if index >= 0 && index < currentCards.length then
-        currentCards(index)
-      else if index >= currentCards.length then
-        currentCards.last
-      else
-        currentCards.head
+      if currentCards.isEmpty then throw new IllegalStateException("Nessuna carta presente nel ViewModel.")
+      else if index >= 0 && index < currentCards.length then currentCards(index)
+      else if index >= currentCards.length then currentCards.last
+      else currentCards.head
 
     channel.sendToGame(EventMessages.SingleCard(card))
 
