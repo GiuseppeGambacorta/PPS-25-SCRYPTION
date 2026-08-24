@@ -20,17 +20,23 @@ import scala.util.Random
 object GameEvents:
   type GameEvent = (Event, GameMessagesChannel => Panel)
 
-  val getANewCard: GameEvent = (getANewCardEvent, (ch: GameMessagesChannel) => new CardSelectionView(ViewModelDeckEvent(ch)))
+  val getANewCard: GameEvent =
+    (getANewCardEvent, (ch: GameMessagesChannel) => new CardSelectionView(ViewModelDeckEvent(ch)))
   val fight: GameEvent = (fightEvent, (ch: GameMessagesChannel) => new FightView(ViewModelFight(ch)))
-  val fireCampAttack: GameEvent = (fireCampEvent_Attack, (ch: GameMessagesChannel) => new FireCampAttackView(ViewModelDeckEvent(ch)))
-  val fireCampHealth: GameEvent = (fireCampEvent_Health, (ch: GameMessagesChannel) => new FireCampHealthView(ViewModelDeckEvent(ch)))
-  val mycologists: GameEvent = (mushRoomsExpertEvent, (ch: GameMessagesChannel) => new MycologistsView(ViewModelDeckEvent(ch)))
-  val sacrifice: GameEvent = (sacrificeEvent, (ch: GameMessagesChannel) => new StrangeStonesView(ViewModelDeckEvent(ch)))
-  val getANewItem: GameEvent = (getANewItemEvent, (ch: GameMessagesChannel) => new ItemSelectionView(ViewModelItemEvent(ch)))
+  val fireCampAttack: GameEvent =
+    (fireCampEvent_Attack, (ch: GameMessagesChannel) => new FireCampAttackView(ViewModelDeckEvent(ch)))
+  val fireCampHealth: GameEvent =
+    (fireCampEvent_Health, (ch: GameMessagesChannel) => new FireCampHealthView(ViewModelDeckEvent(ch)))
+  val mycologists: GameEvent =
+    (mushRoomsExpertEvent, (ch: GameMessagesChannel) => new MycologistsView(ViewModelDeckEvent(ch)))
+  val sacrifice: GameEvent =
+    (sacrificeEvent, (ch: GameMessagesChannel) => new StrangeStonesView(ViewModelDeckEvent(ch)))
+  val getANewItem: GameEvent =
+    (getANewItemEvent, (ch: GameMessagesChannel) => new ItemSelectionView(ViewModelItemEvent(ch)))
   val trial: GameEvent = (trialEvent, (ch: GameMessagesChannel) => new TrialView(ViewModelDeckEvent(ch)))
 
   val listOfNotFightEvents = List(getANewItem, getANewCard, fireCampAttack, fireCampHealth, mycologists, sacrifice)
-  def randomEvent : GameEvent = Random.shuffle(listOfNotFightEvents).head
+  def randomEvent: GameEvent = Random.shuffle(listOfNotFightEvents).head
 
 class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
@@ -46,8 +52,7 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
       val mapPath = Path.fromScript(initialScript)
 
       Future {
-        try
-          gameLoop(initialState, mapPath)
+        try gameLoop(initialState, mapPath)
         finally
           running = false
           onGameOver()
@@ -75,35 +80,39 @@ class GameController(onViewChange: Panel => Unit, onGameOver: () => Unit):
 
   @tailrec
   private def gameLoop(gameState: GameState, map: Path[GameEvent], resumeFromMap: Boolean = false): Unit =
-    if gameState.isGameOver then
-      println("=== GAME OVER ===")
+    if gameState.isGameOver then println("=== GAME OVER ===")
     else
-      val (eventLogic , createView) = map match
-        case Path.Node(event, _) => event match
-          case (logic, view) => (logic, view)
+      val (eventLogic, createView) = map match
+        case Path.Node(event, _) =>
+          event match
+            case (logic, view) => (logic, view)
         case _ => return
 
-      val nextState = if resumeFromMap then
-        gameState
-      else
-        val eventCh = GameMessagesChannel()
-        onViewChange(createView(eventCh))
-        eventLogic(gameState, eventCh)
+      val nextState =
+        if resumeFromMap then gameState
+        else
+          val eventCh = GameMessagesChannel()
+          onViewChange(createView(eventCh))
+          eventLogic(gameState, eventCh)
 
       val hasNext = map match
         case Path.Node(_, Path.End()) => false
-        case Path.End() => false
-        case _ => true
+        case Path.End()               => false
+        case _                        => true
 
-      if !hasNext || nextState.isGameOver then
-        println("=== GAME COMPLETED ===")
+      if !hasNext || nextState.isGameOver then println("=== GAME COMPLETED ===")
       else
         val mapCh = GameMessagesChannel()
         val vm = ViewModelMap(mapCh, map)
 
-        onViewChange(new MapView(vm, () => {
-          SaveManager.saveGame(nextState, map)
-        }))
+        onViewChange(
+          new MapView(
+            vm,
+            () => {
+              SaveManager.saveGame(nextState, map)
+            }
+          )
+        )
 
         val nextMapPath = MapEvent(map, mapCh)
         gameLoop(nextState, nextMapPath, resumeFromMap = false)

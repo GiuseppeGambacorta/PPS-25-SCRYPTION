@@ -1,4 +1,7 @@
-ThisBuild / version := "0.1.0-SNAPSHOT"
+import sbtassembly.AssemblyPlugin.autoImport.*
+import sbtassembly.MergeStrategy
+
+ThisBuild / version := "1.0"
 
 ThisBuild / scalaVersion := "3.8.4"
 
@@ -21,7 +24,24 @@ lazy val root = (project in file("."))
       "org.scalatestplus" %% "scalacheck-1-17" % "3.2.18.0" % Test,
       "org.scalacheck" %% "scalacheck" % "1.19.0" % Test
     ),
-    scalafmtOnCompile := true
+    scalafmtOnCompile := true,
+    assembly / mainClass := Some("org.scryption.MainWindow"),
+    assembly / assemblyJarName := s"${name.value}-${version.value}-assembly.jar",
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+      case PathList("META-INF", xs @ _*)
+          if xs.exists(_.toLowerCase.endsWith(".sf")) || xs.exists(_.toLowerCase.endsWith(".dsa")) || xs
+            .exists(_.toLowerCase.endsWith(".rsa")) =>
+        MergeStrategy.discard
+      case PathList("META-INF", xs @ _*) if xs.exists(_.equalsIgnoreCase("index.list")) =>
+        MergeStrategy.discard
+      case PathList("META-INF", xs @ _*) if xs.exists(_.equalsIgnoreCase("dependencies")) =>
+        MergeStrategy.discard
+      case "module-info.class" => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
+        oldStrategy(x)
+    }
   )
 
 addCommandAlias(

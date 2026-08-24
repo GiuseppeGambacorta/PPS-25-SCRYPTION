@@ -46,7 +46,6 @@ class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   opaque = false
 
-
   override protected def paintComponent(g: Graphics2D): Unit = {
     super.paintComponent(g)
     backgroundImage.foreach(img => g.drawImage(img, 0, 0, size.width, size.height, peer))
@@ -62,22 +61,20 @@ class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
   }
 
   private def drawSlotOverlay(
-                               g: Graphics2D,
-                               overlay: Option[ImageIcon],
-                               x: Int,
-                               y: Int,
-                               w: Int,
-                               h: Int,
-                               fallbackColor: Color
-                             ): Unit =
+      g: Graphics2D,
+      overlay: Option[ImageIcon],
+      x: Int,
+      y: Int,
+      w: Int,
+      h: Int,
+      fallbackColor: Color
+  ): Unit =
     overlay match {
       case Some(icon) => g.drawImage(icon.getImage, x, y, w, h, peer)
       case None =>
         g.setColor(fallbackColor)
         g.fillRoundRect(x, y, w, h, 20, 20)
     }
-
-
 
   private sealed trait SlotKind
   private object SlotKind {
@@ -223,7 +220,6 @@ class StrangeStonesView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
     (cardSlots.find(_.index == upgradeIndex)) match {
       case Some(upgrade) =>
-
         upgrade.isAnimating = true
 
         val sacrificeInfo = lockedSacrificeInfo.getOrElse(upgrade.info)

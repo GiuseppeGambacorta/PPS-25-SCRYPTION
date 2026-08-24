@@ -8,10 +8,9 @@ import org.scryption.game.model.items.GameItem
 
 import java.util.concurrent.LinkedBlockingQueue
 
-/** Common supertype for every message exchanged on the [[GameMessagesChannel]].
- * Being `sealed`, the compiler knows the closed set of its direct subtypes,
- * which enables exhaustive pattern matching wherever a message is handled.
- */
+/** Common supertype for every message exchanged on the [[GameMessagesChannel]]. Being `sealed`, the compiler knows the
+  * closed set of its direct subtypes, which enables exhaustive pattern matching wherever a message is handled.
+  */
 sealed trait GameMessage
 
 /** The kind of trial the player can choose during a trial event. */
@@ -24,14 +23,19 @@ enum Trial:
 enum EventMessages extends GameMessage:
   /** A batch of cards offered to the player to choose from. */
   case Cards(cards: List[Card[?]])
+
   /** A single card selected by the player. */
   case SingleCard(card: Card[?])
+
   /** The trial chosen by the player. */
   case TrialChoice(trial: Trial)
+
   /** A batch of items offered to the player to choose from. */
   case Items(items: List[GameItem])
+
   /** A single item selected by the player. */
   case SingleItem(item: GameItem)
+
   /** Signals the end of the event. */
   case End
 
@@ -39,18 +43,25 @@ enum EventMessages extends GameMessage:
 enum FightMessages extends GameMessage:
   /** Notifies the view of the current fight state and turn phase. */
   case State(fightState: FightState, turn: TurnState)
+
   /** The player draws a card from the squirrel deck. */
   case DrawFromSquirrel
+
   /** The player draws a card from the main deck. */
   case DrawFromDeck
+
   /** The player plays a card at the given board position. */
   case CardToPlay(card: Card[?], position: Int)
+
   /** The player plays a card at the given board position, sacrificing the cards at the given positions. */
   case CardToPlayWithSacrifices(card: Card[?], position: Int, sacrificesPositions: List[BoardPosition])
+
   /** The player uses an item, optionally targeting a board position. */
   case UseItem(item: GameItem, target: Option[BoardPosition] = None)
+
   /** Signals that the player has ended their turn. */
   case EndPlayerTurn
+
   /** Signals the end of the fight. */
   case End
 
@@ -61,11 +72,11 @@ enum MapMessages extends GameMessage:
   case forward
 
 /** Thread-safe synchronization channel between the Model and the View.
- *
- * Programming against this trait, rather than the concrete class, lets the rest of the
- * system depend only on this abstraction: the implementation can be swapped (e.g. with a
- * stub for testing) without impacting the code that uses it.
- */
+  *
+  * Programming against this trait, rather than the concrete class, lets the rest of the system depend only on this
+  * abstraction: the implementation can be swapped (e.g. with a stub for testing) without impacting the code that uses
+  * it.
+  */
 trait GameMessagesChannel:
   /** Sends a message from the Model to the View. */
   def sendToGui(message: GameMessage): Unit
@@ -82,19 +93,17 @@ trait GameMessagesChannel:
   /** Empties both message queues. */
   def clear(): Unit
 
-/** Concrete implementation of [[GameMessagesChannel]] built on two [[LinkedBlockingQueue]]s,
- * one per direction (`toGui` and `toGame`), turning the channel into a proper
- * producer-consumer monitor.
- *
- * Read operations (`take()`) are not wrapped in the same `synchronized` block as writes:
- * `LinkedBlockingQueue` is already internally thread-safe for insertion and extraction,
- * so the explicit lock only needs to coordinate writes (and clearing) with each other,
- * not reads, which can safely happen directly on the queue.
- */
+/** Concrete implementation of [[GameMessagesChannel]] built on two [[LinkedBlockingQueue]]s, one per direction (`toGui`
+  * and `toGame`), turning the channel into a proper producer-consumer monitor.
+  *
+  * Read operations (`take()`) are not wrapped in the same `synchronized` block as writes: `LinkedBlockingQueue` is
+  * already internally thread-safe for insertion and extraction, so the explicit lock only needs to coordinate writes
+  * (and clearing) with each other, not reads, which can safely happen directly on the queue.
+  */
 class GameMessagesChannelImpl(
-                               private val toGui: LinkedBlockingQueue[GameMessage],
-                               private val toGame: LinkedBlockingQueue[GameMessage]
-                             ) extends GameMessagesChannel:
+    private val toGui: LinkedBlockingQueue[GameMessage],
+    private val toGame: LinkedBlockingQueue[GameMessage]
+) extends GameMessagesChannel:
 
   /** Dedicated lock object shared by the two send operations and by `clear`. */
   private val lock = new Object
