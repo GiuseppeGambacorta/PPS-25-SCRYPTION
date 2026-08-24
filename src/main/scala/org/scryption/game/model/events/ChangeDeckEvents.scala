@@ -22,14 +22,6 @@ def getANewCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState =
 }
 
 /**
- * Event: Draws 3 random cards from the player's deck and sends them to the GUI.
- * The player picks one card to add to their deck.
- */
-private def getANewDuplicateCardEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
-  selectCardEvent(gameState, ch, EventMessages.Cards(gameState.deck.drawRandom(3)._1))
-}
-
-/**
  * Event: Draws 3 random rare cards from the library and sends them to the GUI.
  * The player picks one card to add to their deck.
  */
@@ -75,8 +67,9 @@ def mushRoomsExpertEvent(gameState: GameState, ch: GameMessagesChannel): GameSta
 
   if duplicateCards.nonEmpty then
     ch.sendToGui(EventMessages.Cards(duplicateCards.take(cardsNumberForGui)))
-  else
-    return getANewDuplicateCardEvent(gameState, ch)
+  else {
+    return gameState
+  }
 
   ch.receiveFromGui match {
     case EventMessages.SingleCard(selectedCard) =>
@@ -214,7 +207,7 @@ def trialEvent(gameState: GameState, ch: GameMessagesChannel): GameState = {
       }
 
       if isSuccess then
-        val (rewardList, _) = CardLibrary.getADeckWithAllTheLibrary.drawRandom(1)
+        val (rewardList, _) = CardLibrary.getADeckWithRareCards.drawRandom(1)
         rewardList.headOption match {
           case Some(rewardCard) =>
             ch.sendToGui(EventMessages.SingleCard(rewardCard))
