@@ -59,9 +59,6 @@ class FightView(viewModel: ViewModelFight) extends BorderPanel:
                   else if !hasEnoughBlood then
                     selectedSacrifices = selectedSacrifices :+ (row, col)
                     boardView.updateSacrificeHighlights(selectedSacrifices)
-                    println(s"FightView: sacrifices as of now: $selectedSacrifices")
-                  else println(s"FightView: enough blood already, choose a slot to place the card.")
-                else println(s"FightView: not enough blood, currently: $amount.")
               case _ =>
                 if isSlotEmpty then
                   viewModel.cardToPlay(card, col)

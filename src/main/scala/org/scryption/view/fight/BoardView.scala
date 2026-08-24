@@ -109,7 +109,6 @@ class BoardView(onSlotClicked: (Int, Int) => Unit) extends BorderPanel:
         repaint()
       case e: MouseClicked =>
         if interactable then
-          if row == 2 then println(s"UI input: the player has clicked on a player slot (row: $row, column: $col)")
           val bounds = getCardBounds
           val px = e.point.x; val py = e.point.y
           if checkCardBounds(bounds, px, py) then onSlotClicked(row, col)
