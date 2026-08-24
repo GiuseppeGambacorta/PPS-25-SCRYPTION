@@ -49,3 +49,4 @@ object Maps:
       }
       case _ if level.tail.nonEmpty => findBranch(offset, MapLevel(level.tail))
     }
+    }

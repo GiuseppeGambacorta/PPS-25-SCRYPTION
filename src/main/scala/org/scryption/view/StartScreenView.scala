@@ -22,7 +22,6 @@ class StartScreenView(val geo: StartScreenGeometry, onNewGame: () => Unit, onLoa
   private def loadIcon(path: String, w: Int, h: Int): Option[ImageIcon] =
     ResourceLoader.loadTemplateImage(path).map(img => scaledIcon(img, w, h))
 
-  // ----- Assets -----
   private val introBackgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage(assets.startScreenPath)
   private val menuBackgroundImage: Option[BufferedImage] = ResourceLoader.loadTemplateImage(assets.menuBackgroundPath)
 
