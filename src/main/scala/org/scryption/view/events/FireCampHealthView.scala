@@ -6,7 +6,7 @@ import org.scryption.view.common.StatBonus
 
 /** Fire camp event: pick a card, boost its health by 2. */
 class FireCampHealthView(viewModel : ViewModelDeckEvent)
-  extends EventView(
+  extends FireCampView(
     viewModel = viewModel,
     cardWidth = 250,
     bonus = StatBonus.Health(2),

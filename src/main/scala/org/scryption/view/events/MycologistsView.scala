@@ -11,7 +11,7 @@ import scala.swing.{FlowPanel, Panel, Swing}
 
 /** Mycologists event: pick two matching cards, merge them into one boosted card.
  *
- *  This doesn't fit the [[EventView]] template — the slot holds a *pair* of stacked
+ *  This doesn't fit the [[FireCampView]] template — the slot holds a *pair* of stacked
  *  labels rather than one, and confirming merges them into a single icon instead of
  *  just re-rendering the same label — so it keeps its own CardSlot. It does reuse the
  *  shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used

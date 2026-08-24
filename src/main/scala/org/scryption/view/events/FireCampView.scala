@@ -10,7 +10,7 @@ import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.swing.{FlowPanel, Panel, Swing}
 
-abstract class EventView(
+abstract class FireCampView(
                           viewModel: ViewModelDeckEvent,
                           cardWidth: Int,
                           bonus: StatBonus,
@@ -140,14 +140,14 @@ abstract class EventView(
         val slotX = (parent.getWidth - setup.geo.cardWidth) / 2
         isInSlot = true
         currentX = slotX
-        currentY = EventView.this.slotY
+        currentY = FireCampView.this.slotY
         label.setLocation(currentX, currentY)
       }
       slotCardIndex = index
       refreshZOrder()
     }
 
-    private[EventView] def returnToHand(): Unit = {
+    private[FireCampView] def returnToHand(): Unit = {
       if (isAnimating) return
       isInSlot = false
       currentX = baseX
@@ -160,14 +160,14 @@ abstract class EventView(
         viewModel.sendCardToModel(index)
     }
 
-    private[EventView] def moveToSlotCoords(): Unit = {
+    private[FireCampView] def moveToSlotCoords(): Unit = {
       if (isAnimating) return
       val parent = label.getParent
       if (parent != null) {
         val slotX = (parent.getWidth - setup.geo.cardWidth) / 2
         isInSlot = true
         currentX = slotX
-        currentY = EventView.this.slotY
+        currentY = FireCampView.this.slotY
         label.setLocation(currentX, currentY)
         parent.setComponentZOrder(label, 0)
         parent.repaint()
