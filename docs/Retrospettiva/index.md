@@ -50,10 +50,28 @@ Nonostante questa imperfezione procedurale, la collaborazione all'interno del re
 
 ## Valutazione conclusiva
 
-Il ricorso ai test ha garantito solidità alla logica di gioco e ha reso agevoli i numerosi *refactoring* affrontati nel corso degli sprint, pur non essendo stati scritti sistematicamente prima dell'implementazione (si veda la sezione [Testing](Testing/)).
+Il ricorso ai test ha garantito solidità alla logica di gioco e ha reso agevoli i numerosi *refactoring* affrontati nel corso degli sprint, pur non essendo stati scritti sistematicamente prima dell'implementazione (si veda la sezione [Testing](../Testing/index.md)).
 
 Oltre alle difficoltà riscontrate nella corretta gestione del branching Git, non è stato facile stare al passo con i carichi di lavoro prefissati per ciascuno sprint. In questo contesto, l'utilizzo di **GitHub Projects** si è rivelato fondamentale per mantenere sott'occhio lo stato di avanzamento del progetto e coordinare le singole iterazioni.
 
 Tra i possibili **miglioramenti futuri** si segnalano:
 * Perfezionamento dell'**intelligenza artificiale per il bot**, per renderne il comportamento meno prevedibile
 * Introduzione di una **boss fight** con meccaniche dedicate
+
+
+## Considerazioni Finali
+
+### Cornacchia Enrico
+Sviluppare questo progetto si è rivelata un'esperienza stimolante, in quanto mi ha permesso
+di applicare concretamente concetti avanzati di programmazione funzionale (come l'F-Bounded Polymorphism o
+il trait stackable pattern) alla risoluzione di problemi reali all'interno di un dominio complesso come quello
+di un videogioco.
+Dal punto di vista organizzativo, sebbene non siamo riusciti a sfruttare integralmente tutte le pratiche
+della metodologia Scrum, affrontare queste dinamiche sul campo mi ha permesso di comprenderne a fondo il valore reale.
+Ho potuto toccare con mano quanto strumenti come il Kanban e la divisione in Sprint siano fondamentali per coordinare
+gli sforzi del team, tracciare i progressi ed evitare colli di bottiglia. Nel complesso, ritengo che il progetto
+sia stato un'occasione di crescita sia tecnica che metodologica.
+
+### Gambacorta Giuseppe
+
+### Lomas Patricia Sachez
