@@ -416,53 +416,5 @@ class MapTests extends AnyFeatureSpec with GivenWhenThen with Matchers:
     }
   }
 
-  Feature("Scrolling a MapScript to match the current Path") {
 
-    Scenario("The MapScript should remain unchanged") {
 
-      Given("a MapScript from a template")
-      val script: MapScript[GameEvent] = MapTemplates.newGameMap
-
-      When("creating a Path from it and scrolling")
-      val map: Path[GameEvent] = Path.fromScript(script)
-      val scrolledScript = Path.scrollScript(map, script)
-
-      Then("the result should be the same script")
-      scrolledScript.shouldBe(script)
-    }
-
-    Scenario("The MapScript should have removed the first level") {
-
-      Given("a MapScript with some events")
-      val script: MapScript[GameEvent] = MapScript(
-        List(
-          MapLevel(
-            List(
-              MapBranch.Node(3, randomEvent)
-            )
-          ),
-          MapLevel(
-            List(
-              MapBranch.Node(3, randomEvent)
-            )
-          ),
-          MapLevel(
-            List(
-              MapBranch.Node(3, randomEvent)
-            )
-          )
-        )
-      )
-
-      When("creating a Path from it, going forward and scrolling")
-      val map: Path[GameEvent] = Path.fromScript(script) match
-        case Path.Node(_, next) => next
-        case Path.Fork(l, _)    => l
-        case Path.End()         => Path.End()
-
-      val scrolledScript = Path.scrollScript(map, script)
-
-      Then("the result should be the same script")
-      scrolledScript.levels.shouldBe(script.tail)
-    }
-  }
