@@ -6,11 +6,11 @@ object MapBranch:
   case class Node[E](offset: Int, event: E) extends MapBranch[E]
   case class Fork[E](offset: Int, leftEvent: E, rightEvent: E) extends MapBranch[E]
   case class Join[E](offset: Int, event: E) extends MapBranch[E]
-
+  
   def offset[E](branch: MapBranch[E]): Int = branch match
-    case Node(offset, _)    => offset
+    case Node(offset, _) => offset
     case Fork(offset, _, _) => offset
-    case Join(offset, _)    => offset
+    case Join(offset, _) => offset
 
 class MapLevel[E](val branches: List[MapBranch[E]]):
   def :+(branch: MapBranch[E]): MapLevel[E] = new MapLevel(branches :+ branch)
