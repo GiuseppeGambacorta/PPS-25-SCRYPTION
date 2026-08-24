@@ -12,4 +12,5 @@ parent: Report
 - [Gambacorta Giuseppe](gambacortagiuseppe.md)
 
 - [Cornacchia Enrico](enricocornacchia.md)
-------oko
+
+- [Sanchez Lomas Patricia](patriciasanchezlomas.md)
