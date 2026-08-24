@@ -18,13 +18,11 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
 
   private val nodeSize = 100
 
-  // Dynamic grid
   private def rowHeight: Double = size.height / 7
   private def colWidth: Double = 170
   private def centerX: Double = size.width / 2.0
   private def startY: Double = size.height * 0.15
 
-  // List used ONLY for mouse hit detection
   private var interactiveNodes: List[ViewNode] = Nil
   private var hoveredNode: Option[ViewNode] = None
 
@@ -64,37 +62,26 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
 
     private def handleClick(p: java.awt.Point): Unit =
       hoveredNode.foreach { node =>
-        // Only allow clicking immediate next steps (Row 1)
         if (node.row == 1) then
           val direction = node.col - 3
           direction match
             case 0 =>
-              println("Moving Forward")
               viewModelMap.onForward()
             case n if n < 0 =>
-              println(s"Moving Left (Col ${node.col})")
               viewModelMap.onLeft()
             case n if n > 0 =>
-              println(s"Moving Right (Col ${node.col})")
               viewModelMap.onRight()
             case _ => ()
-        else
-          // Optional: Handle distant clicks or ignore
-          // println(s"Clicked distant node: Row ${node.row}, Col ${node.col}")
-          (
-        )
       }
 
     override protected def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-      // 1. Table (Stretched)
       tableImage.foreach { img =>
         g.drawImage(img, 0, 0, size.width, size.height, peer)
       }
 
-      // 2. Map Background (Centered, No Stretch)
       mapBackgroundImage.foreach { img =>
         val imgW = img.getWidth(null)
         val imgH = img.getHeight(null)
@@ -110,8 +97,6 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
         end if
       }
 
-      // 3. Draw Map by Traversing (Lines + Nodes)
-      // We get the list of nodes BACK from the paint function to ensure it's accurate
       val dashedStroke = new BasicStroke(5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(12f, 10f), 0f)
       g.setStroke(dashedStroke)
       g.setColor(new Color(50, 40, 30, 200))
@@ -126,26 +111,23 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
         case _ =>
           interactiveNodes = Nil
 
-    // Recursive function that draws AND returns the list of nodes drawn
     private def paintPath(g: Graphics2D, current: Path[GameEvent], row: Int, col: Int): List[ViewNode] =
       current match
         case Path.Node(event, next) =>
           val iconKey = viewModelMap.toString(event)
           val node = ViewNode(event, iconKey, row, col)
 
-          // Draw the Node
           drawNode(g, node)
 
-          // Draw Line to Next (if next exists)
           next match
             case Path.Node(_, _) =>
               val (x1, y1) = getCoordinates(node)
               val (x2, y2) = getCoordinates((row + 1, col))
               g.drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
-              // Return current node + nodes from recursion
               node :: paintPath(g, next, row + 1, col)
 
             case Path.Fork(leftBranch, rightBranch) =>
+
               val leftStart = col match
                 case 3 => findFirstNodeCoords(leftBranch, row + 1, col - 2)
                 case _ => findFirstNodeCoords(leftBranch, row + 1, col - 1)
@@ -155,16 +137,14 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
 
               val (x1, y1) = getCoordinates(node)
 
-              // Draw line to Left Branch start
               leftStart.foreach { case (x2, y2) =>
                 g.drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
               }
-              // Draw line to Right Branch start
+
               rightStart.foreach { case (x2, y2) =>
                 g.drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
               }
 
-              // Recurse and combine lists
               val leftNodes = col match
                 case 3 => paintPath(g, leftBranch, row + 1, col - 2)
                 case _ => paintPath(g, leftBranch, row + 1, col - 1)
@@ -177,16 +157,15 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
             case Path.End() =>
               List(node)
 
-        case Path.Fork(left, right) =>
-          col match
-            case 3 =>
-              val leftNodes = paintPath(g, left, row + 1, col - 2)
-              val rightNodes = paintPath(g, right, row + 1, col + 2)
-              leftNodes ++ rightNodes
-            case _ =>
-              val leftNodes = paintPath(g, left, row + 1, col - 1)
-              val rightNodes = paintPath(g, right, row + 1, col + 1)
-              leftNodes ++ rightNodes
+        case Path.Fork(left, right) => col match
+          case 3 =>
+            val leftNodes = paintPath(g, left, row + 1, col - 2)
+            val rightNodes = paintPath(g, right, row + 1, col + 2)
+            leftNodes ++ rightNodes
+          case _ =>
+            val leftNodes = paintPath(g, left, row + 1, col - 1)
+            val rightNodes = paintPath(g, right, row + 1, col + 1)
+            leftNodes ++ rightNodes
 
         case Path.End() =>
           Nil
@@ -194,10 +173,9 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
       p match
         case Path.Node(_, _) =>
           Some(getCoordinates((row, col)))
-        case Path.Fork(left, right) =>
-          col match
-            case 3 => findFirstNodeCoords(left, row + 1, col - 2) orElse findFirstNodeCoords(right, row + 1, col + 2)
-            case _ => findFirstNodeCoords(left, row + 1, col - 1) orElse findFirstNodeCoords(right, row + 1, col + 1)
+        case Path.Fork(left, right) => col match
+          case 3 => findFirstNodeCoords(left, row + 1, col - 2) orElse findFirstNodeCoords(right, row + 1, col + 2)
+          case _ => findFirstNodeCoords(left, row + 1, col - 1) orElse findFirstNodeCoords(right, row + 1, col + 1)
         case Path.End() =>
           None
 
@@ -215,10 +193,8 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
       val ix = x.toInt
       val iy = y.toInt
 
-      println(node.iconPath)
-
       ResourceLoader.loadImage(assets.eventIconPath(node.iconPath), nodeSize).foreach { icon =>
-        g.drawImage(icon, ix - nodeSize / 2, iy - nodeSize / 2, nodeSize, nodeSize, null)
+        g.drawImage(icon, ix - nodeSize/2, iy - nodeSize/2, nodeSize, nodeSize, null)
       }
 
   opaque = true
@@ -233,10 +209,11 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
     tooltip = "Save your progress"
 
   listenTo(saveButton)
-  reactions += { case ButtonClicked(`saveButton`) =>
-    onSave()
-    saveButton.text = "Game Saved!"
-    saveButton.enabled = false
+  reactions += {
+    case ButtonClicked(`saveButton`) =>
+      onSave()
+      saveButton.text = "Game Saved!"
+      saveButton.enabled = false
   }
 
   private val bottomPanel = new FlowPanel(FlowPanel.Alignment.Left)(saveButton):
@@ -248,3 +225,4 @@ class MapView(viewModelMap: ViewModelMap, onSave: () => Unit = () => ()) extends
 
   layout(mapCanvas) = BorderPanel.Position.Center
   layout(bottomPanel) = BorderPanel.Position.South
+
