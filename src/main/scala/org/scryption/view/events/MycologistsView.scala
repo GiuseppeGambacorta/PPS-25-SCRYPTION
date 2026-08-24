@@ -9,14 +9,7 @@ import java.awt.{Color, Cursor, Dimension, Graphics2D}
 import javax.swing.{ImageIcon, JLabel, SwingUtilities}
 import scala.swing.{FlowPanel, Panel, Swing}
 
-/** Mycologists event: pick two matching cards, merge them into one boosted card.
- *
- *  This doesn't fit the [[FireCampView]] template — the slot holds a *pair* of stacked
- *  labels rather than one, and confirming merges them into a single icon instead of
- *  just re-rendering the same label — so it keeps its own CardSlot. It does reuse the
- *  shared [[CardRendering]] setup and the shared [[ZOrder]] stacking rule, which used
- *  to be copy-pasted here too.
- */
+
 class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
  
@@ -41,8 +34,7 @@ class MycologistsView(viewModel: ViewModelDeckEvent) extends FlowPanel {
 
   private val duplicateOffsetX = 20
   private var showSlotBackground: Boolean = true
-
-  // Configuración del Bonus Visual
+  
   private val visualStatBonus = 2
 
   opaque = false

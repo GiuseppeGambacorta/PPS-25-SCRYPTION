@@ -26,24 +26,6 @@ class ViewModelMap(val channel: GameMessagesChannel, val gameMap: Path[GameEvent
     case GameEvents.trial => "decktrialnode"
     case _ => ""
 
-  def getVisibleNodes(maxDepth: Int = 6): List[ViewNode] = {
-    def traverse(current: Path[GameEvent], r: Int, c: Int, acc: List[ViewNode]): List[ViewNode] = {
-      if (r > maxDepth) acc
-      else current match {
-        case Path.Node(event, next) =>
-          val newNode = ViewNode(event, toString(event), r, c)
-          traverse(next, r + 1, c, newNode :: acc)
-        case Path.Fork(left, right) =>
-          val leftNodes = traverse(left, r + 1, c - 1, acc)
-          val rightNodes = traverse(right, r + 1, c + 1, leftNodes)
-          rightNodes
-        case Path.End() =>
-          acc
-      }
-    }
-    traverse(gameMap, 0, 3, Nil).reverse
-  }
-
   def getConnections(nodes: List[ViewNode]): List[MapConnection] = {
     nodes.flatMap { node =>
       nodes.filter(n => n.row == node.row + 1 && (n.col == node.col - 1 || n.col == node.col || n.col == node.col + 1))
