@@ -10,7 +10,7 @@ object MapTemplates:
   private val template: MapScript[GameEvent] =
     MapScript(List(
       MapLevel(List(
-        MapBranch.Node(3, sacrifice)
+        MapBranch.Node(3, fight)
       )),
       MapLevel(List(
         MapBranch.Node(3, getANewCard)
