@@ -74,4 +74,8 @@ sia stato un'occasione di crescita sia tecnica che metodologica.
 
 ### Gambacorta Giuseppe
 
-### Lomas Patricia Sachez
+### Sanchez Lomas Patricia
+
+Questo progetto mi ha aiutato a crescere in ambiti quali lo sviluppo collaborativo con Git e l’applicazione dei principi fondamentali di questo corso. In particolare, lo sviluppo della parte relativa alle mappe è stato un esercizio impegnativo, ma mi ha insegnato molto sulla potenza offerta da Scala per aspetti quali le strutture dati e gli algoritmi ricorsivi. 
+Se dovessi rifare il lavoro, presterei maggiore attenzione all’interfaccia grafica per evitare un errore significativo che fa sì che su alcuni dispositivi alcuni elementi appaiano minuscoli e altri sproporzionatamente grandi.
+Nel complesso, sono soddisfatta del risultato, soprattutto considerando che è la prima volta che lavoro a un videogioco, ma sono particolarmente grata per l’esperienza e l’aiuto dei miei compagni.
